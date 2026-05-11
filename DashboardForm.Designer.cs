@@ -94,13 +94,13 @@ namespace gym_mangment_system
             this.sidebar.TabIndex = 1;
 
             // nav buttons helper
-            SetupNavBtn(this.btnNavUsers,    "👤  المستخدمون", 7, 545);
-            SetupNavBtn(this.btnNavTrainers, "🏋️  المدربون",   6, 485);
-            SetupNavBtn(this.btnNavReports,  "📊  التقارير",   5, 425);
-            SetupNavBtn(this.btnNavDiet,     "🍏  التغذية",    4, 365);
-            SetupNavBtn(this.btnNavStore,    "🛒  المتجر",     3, 305);
-            SetupNavBtn(this.btnNavSubs,     "📋  الاشتراكات", 2, 245);
-            SetupNavBtn(this.btnNavMembers,  "👥  الأعضاء",    1, 185);
+            SetupNavBtn(this.btnNavUsers,    "👤  المستخدمون", 7);
+            SetupNavBtn(this.btnNavTrainers, "🏋️  المدربون",   6);
+            SetupNavBtn(this.btnNavReports,  "📊  التقارير",   5);
+            SetupNavBtn(this.btnNavDiet,     "🍏  التغذية",    4);
+            SetupNavBtn(this.btnNavStore,    "🛒  المتجر",     3);
+            SetupNavBtn(this.btnNavSubs,     "📋  الاشتراكات", 2);
+            SetupNavBtn(this.btnNavMembers,  "👥  الأعضاء",    1);
 
             this.btnNavHome.BackColor = System.Drawing.Color.FromArgb(40, 40, 48);
             this.btnNavHome.Cursor    = System.Windows.Forms.Cursors.Hand;
@@ -112,7 +112,7 @@ namespace gym_mangment_system
             this.btnNavHome.ForeColor  = System.Drawing.Color.White;
             this.btnNavHome.Name       = "btnNavHome";
             this.btnNavHome.Padding    = new System.Windows.Forms.Padding(0, 0, 15, 0);
-            this.btnNavHome.Size       = new System.Drawing.Size(250, 85);
+            this.btnNavHome.Size       = new System.Drawing.Size(250, 60);
             this.btnNavHome.TabIndex   = 0;
             this.btnNavHome.Text       = "🏠  الرئيسية";
             this.btnNavHome.TextAlign  = System.Drawing.ContentAlignment.MiddleRight;
@@ -126,12 +126,12 @@ namespace gym_mangment_system
             this.pnlLogo.TabIndex = 6;
 
             this.lblLogo.Dock      = System.Windows.Forms.DockStyle.Fill;
-            this.lblLogo.Font      = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.lblLogo.Font      = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
             this.lblLogo.ForeColor = System.Drawing.Color.FromArgb(220, 53, 69);
             this.lblLogo.Name      = "lblLogo";
             this.lblLogo.Size      = new System.Drawing.Size(250, 100);
             this.lblLogo.TabIndex  = 0;
-            this.lblLogo.Text      = "🏋️ GYM\r\nنظام إدارة الصالة";
+            this.lblLogo.Text      = "🏋️ GLORY GYM\r\nنظام إدارة الصالة";
             this.lblLogo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
             // ── topBar ──
@@ -294,7 +294,7 @@ namespace gym_mangment_system
             this.ResumeLayout(false);
         }
 
-        private void SetupNavBtn(System.Windows.Forms.Button btn, string text, int tabIndex, int top)
+        private void SetupNavBtn(System.Windows.Forms.Button btn, string text, int tabIndex)
         {
             btn.Cursor    = System.Windows.Forms.Cursors.Hand;
             btn.Dock      = System.Windows.Forms.DockStyle.Top;

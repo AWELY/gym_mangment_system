@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -47,12 +48,14 @@ namespace gym_mangment_system
                 }
             }
 
-            // Data: subscriptions revenue per month
-            float[] subs = { 2800, 3200, 3500, 4200, 3900, 4800, 4500, 5100, 4900, 5600, 6000, 6500 };
-            // Data: store revenue per month
-            float[] store = { 400, 900, 600, 1000, 800, 1000, 900, 1100, 1000, 1200, 1200, 1300 };
+            decimal[] dSubs  = GymDataStore.SubscriptionTotalsByMonthCurrentYear();
+            decimal[] dStore = GymDataStore.StoreTotalsByMonthCurrentYear();
+            float[] subs  = dSubs.Select(x => (float)x).ToArray();
+            float[] store = dStore.Select(x => (float)x).ToArray();
             string[] months = { "ين", "فب", "مار", "أبر", "ماي", "يون", "يول", "أغس", "سبت", "أكت", "نوف", "ديس" };
-            float maxVal = 8000;
+            float mSubs  = subs.Length > 0 ? subs.Max() : 0f;
+            float mStore = store.Length > 0 ? store.Max() : 0f;
+            float maxVal = Math.Max(500f, Math.Max(mSubs, mStore) * 1.15f);
             int barW = Math.Max(10, chartW / 24);
 
             // Y axis labels

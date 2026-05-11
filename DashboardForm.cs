@@ -14,18 +14,15 @@ namespace gym_mangment_system
         private static readonly Regex ArabicRegex = new Regex(@"[\u0600-\u06FF]", RegexOptions.Compiled);
         private Timer  _commercialTicker;
         private Label  _commercialLabel;
+        private Timer  _statusClock;
+        private Panel  _pnlDashboardQuick;
+        private Button _btnSignOut;
+        private Button _btnThemeToggle;
+        private ListBox _lstQuickMembers;
+        private ListBox _lstQuickStock;
+        private ListBox _lstQuickSales;
         private const string CommercialText = "أهلاً بكم في نادي غلوري، هنا تُصنع القوة وتولد الأساطير، انطلق اليوم نحو نسختك الأقوى.";
-
-        // ── stat card data ──
-        private static readonly (string Icon, string Title, string Value, Color Accent)[] StatCards =
-        {
-            ("👥", "إجمالي الأعضاء",         "248",        Color.FromArgb(33,  150, 243)),
-            ("✅", "الاشتراكات النشطة",       "195",        Color.FromArgb(76,  175,  80)),
-            ("⚠️", "اشتراكات تنتهي قريباً",  "12",         Color.FromArgb(255, 152,   0)),
-            ("💰", "إيرادات هذا الشهر",      "5,200 $",    Color.FromArgb(76,  175,  80)),
-            ("🛒", "مبيعات المتجر اليوم",     "340 $",      Color.FromArgb(156,  39, 176)),
-            ("🏋️","حضور اليوم",              "85",         Color.FromArgb(33,  150, 243)),
-        };
+        public bool RequestSignOut { get; private set; }
 
         public DashboardForm()
         {
@@ -34,13 +31,25 @@ namespace gym_mangment_system
             ApplyArabicTypography(this);
             AssignNavEvents();
             ApplyRoleVisibility();
-            _activeNavButton = btnNavHome;
-            HighlightNavButton(btnNavHome);
-            BuildStatCards();
+            if (_activeNavButton == null)
+                HighlightNavButton(btnNavHome);
+            BuildDashboardQuickPanel();
             BuildNotificationItems();
             InitializeCommercialBanner();
+            RefreshDashboardHomeData();
+            AddSignOutButton();
+            AddThemeToggleButton();
             lblStatusRight.Text = "اسم المستخدم: " + AppSession.Username;
-            this.FormClosing += (s, e) => { if (_commercialTicker != null) _commercialTicker.Stop(); };
+            ApplyCurrentTheme(false);
+            _statusClock = new Timer { Interval = 1000 };
+            _statusClock.Tick += (_, __) => lblStatusCenter.Text = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss");
+            _statusClock.Start();
+            this.FormClosing += (s, e) =>
+            {
+                if (_commercialTicker != null) _commercialTicker.Stop();
+                if (_statusClock != null) _statusClock.Stop();
+                GymDataStore.Save();
+            };
         }
 
         // ── branding ──────────────────────────────────────
@@ -65,32 +74,107 @@ namespace gym_mangment_system
             }
         }
 
-        // ── stat cards ────────────────────────────────────
-        private void BuildStatCards()
+        private void ApplyCurrentTheme(bool rebuildDynamicSections)
         {
+            var palette = GymTheme.Current;
+
+            if (GymTheme.IsDark)
+            {
+                if (this.BackgroundImage == null || pnlDashboardHome.BackgroundImage == null)
+                    ApplyBrandImages();
+            }
+            else
+            {
+                this.BackgroundImage = null;
+                pnlDashboardHome.BackgroundImage = null;
+            }
+
+            GymTheme.ApplyTo(this);
+
+            this.BackColor = palette.Background;
+            sidebar.BackColor = palette.Sidebar;
+            topBar.BackColor = palette.TopBar;
+            statusBar.BackColor = palette.StatusBar;
+            pnlDashboardHome.BackColor = palette.Background;
+            pnlContentHost.BackColor = palette.Background;
+            flowStatCards.BackColor = palette.Background;
+            pnlNotifDropdown.BackColor = palette.Panel;
+            flowNotifications.BackColor = palette.Panel;
+            lblNotifHeader.BackColor = palette.Primary;
+            lblDashTitle.ForeColor = Color.White;
+            lblLogo.ForeColor = GymTheme.IsDark ? palette.Accent : Color.White;
+            lblStatusLeft.ForeColor = GymTheme.IsDark ? palette.Success : Color.White;
+            lblStatusCenter.ForeColor = GymTheme.IsDark ? palette.MutedText : Color.White;
+            lblStatusRight.ForeColor = GymTheme.IsDark ? palette.MutedText : Color.White;
+
+            if (_commercialLabel != null)
+                _commercialLabel.ForeColor = palette.Warning;
+
+            if (_btnSignOut != null)
+            {
+                _btnSignOut.BackColor = palette.ButtonBack;
+                _btnSignOut.ForeColor = palette.ButtonText;
+                _btnSignOut.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
+            }
+
+            if (_btnThemeToggle != null)
+            {
+                _btnThemeToggle.Text = GymTheme.IsDark ? "☀️ فاتح" : "🌙 داكن";
+                _btnThemeToggle.BackColor = GymTheme.IsDark ? palette.Primary : palette.Accent;
+                _btnThemeToggle.ForeColor = Color.White;
+                _btnThemeToggle.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
+            }
+
+            if (_activeNavButton != null)
+                HighlightNavButton(_activeNavButton);
+
+            if (rebuildDynamicSections)
+            {
+                if (_pnlDashboardQuick != null)
+                {
+                    pnlDashboardHome.Controls.Remove(_pnlDashboardQuick);
+                    _pnlDashboardQuick.Dispose();
+                    _pnlDashboardQuick = null;
+                    BuildDashboardQuickPanel();
+                }
+                RefreshDashboardHomeData();
+                BuildNotificationItems();
+            }
+        }
+
+        // ── dashboard home: stats + quick lists (live from GymDataStore) ──
+        private void RefreshDashboardHomeData()
+        {
+            if (!pnlDashboardHome.Visible && AppSession.IsReceptionist) return;
+
+            var palette = GymTheme.Current;
             flowStatCards.Controls.Clear();
 
-            // Decide card size relative to available width
-            int cardW = 240;
-            int cardH = 130;
+            int activeSubs = GymDataStore.Data.Members.Count(m => !string.IsNullOrWhiteSpace(m.PlanName));
+            decimal monthTotal = GymDataStore.StoreRevenueThisMonth() + GymDataStore.SubscriptionCashInThisMonth();
 
-            foreach (var (icon, title, value, accent) in StatCards)
+            var statSpecs = new (string Icon, string Title, string Value, Color Accent)[]
+            {
+                ("👥", "إجمالي الأعضاء",         GymDataStore.Data.Members.Count.ToString("N0"),                    Color.FromArgb(33,  150, 243)),
+                ("✅", "اشتراك مسجّل",           activeSubs.ToString("N0"),                                         Color.FromArgb(76,  175,  80)),
+                ("⚠️", "تنتهي خلال 21 يوماً", GymDataStore.MembersExpiringWithinDays(21).ToString("N0"),        Color.FromArgb(255, 152,   0)),
+                ("💰", "إيرادات الشهر (تقدير)", monthTotal.ToString("N0") + " $",                                  Color.FromArgb(76,  175,  80)),
+                ("🛒", "مبيعات المتجر اليوم",   GymDataStore.StoreSalesToday().ToString("N0") + " $",               Color.FromArgb(156,  39, 176)),
+                ("🏋️", "المدربون",              GymDataStore.Data.Trainers.Count.ToString("N0"),                   Color.FromArgb(33,  150, 243)),
+            };
+
+            int cardW = 240, cardH = 130;
+            foreach (var (icon, title, value, accent) in statSpecs)
             {
                 Panel card = new Panel
                 {
                     Size      = new Size(cardW, cardH),
-                    BackColor = Color.FromArgb(32, 32, 40),
+                    BackColor = palette.Card,
                     Margin    = new Padding(12),
                     Cursor    = Cursors.Hand
                 };
 
-                // Left accent strip
-                Panel strip = new Panel
-                {
-                    Size      = new Size(5, cardH),
-                    BackColor = accent,
-                    Dock      = DockStyle.Left
-                };
+                Panel strip = new Panel { Size = new Size(5, cardH), BackColor = accent, Dock = DockStyle.Left };
 
                 Label lblIcon = new Label
                 {
@@ -105,7 +189,7 @@ namespace gym_mangment_system
                 Label lblVal = new Label
                 {
                     Text      = value,
-                    Font      = new Font("Segoe UI", 26F, FontStyle.Bold),
+                    Font      = new Font("Segoe UI", 22F, FontStyle.Bold),
                     ForeColor = accent,
                     Size      = new Size(cardW - 80, 55),
                     Location  = new Point(10, 30),
@@ -117,29 +201,189 @@ namespace gym_mangment_system
                 {
                     Text      = title,
                     Font      = new Font("Segoe UI", 10F),
-                    ForeColor = Color.FromArgb(160, 160, 175),
+                    ForeColor = palette.MutedText,
                     Size      = new Size(cardW - 80, 24),
                     Location  = new Point(10, 86),
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.Transparent
                 };
 
-                // Hover glow
-                card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
-                card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
+                card.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
+                card.MouseLeave += (s, e) => card.BackColor = palette.Card;
                 foreach (Control c in new Control[] { lblIcon, lblVal, lblTitle })
                 {
-                    c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
-                    c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
+                    c.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
+                    c.MouseLeave += (s, e) => card.BackColor = palette.Card;
                 }
 
                 card.Controls.Add(strip);
                 card.Controls.Add(lblIcon);
                 card.Controls.Add(lblVal);
                 card.Controls.Add(lblTitle);
-
                 flowStatCards.Controls.Add(card);
             }
+
+            RefreshQuickLists();
+        }
+
+        private void BuildDashboardQuickPanel()
+        {
+            var palette = GymTheme.Current;
+            _pnlDashboardQuick = new Panel
+            {
+                Dock      = DockStyle.Bottom,
+                Height    = 280,
+                BackColor = palette.Panel,
+                Padding   = new Padding(16, 10, 16, 10)
+            };
+
+            var lblQuick = new Label
+            {
+                Text      = "⚡ إجراءات سريعة وقوائم",
+                Dock      = DockStyle.Top,
+                Height    = 28,
+                ForeColor = palette.Text,
+                Font      = new Font("Segoe UI", 12F, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleRight
+            };
+
+            var flowBtns = new FlowLayoutPanel
+            {
+                Dock            = DockStyle.Top,
+                Height          = 44,
+                FlowDirection   = FlowDirection.RightToLeft,
+                WrapContents    = false,
+                Padding         = new Padding(0, 0, 0, 6),
+                BackColor       = palette.Panel
+            };
+
+            void AddQuickBtn(string text, Action onClick)
+            {
+                var b = new Button
+                {
+                    Text      = text,
+                    AutoSize  = true,
+                    Padding   = new Padding(14, 6, 14, 6),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = palette.ButtonBack,
+                    ForeColor = palette.ButtonText,
+                    Font      = new Font("Segoe UI", 10F, FontStyle.Bold),
+                    Cursor    = Cursors.Hand,
+                    Margin    = new Padding(6, 0, 0, 0)
+                };
+                b.FlatAppearance.BorderSize = 0;
+                b.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
+                b.Click += (_, __) => onClick();
+                flowBtns.Controls.Add(b);
+            }
+
+            if (AppSession.IsReceptionist)
+            {
+                AddQuickBtn("➕ عضو", () => ShowEmbeddedPage(new MembersForm(true), btnNavMembers, "👥  إدارة الأعضاء"));
+                AddQuickBtn("🛒 منتج", () => ShowEmbeddedPage(new StoreForm(true), btnNavStore, "🛒  المتجر (POS)"));
+                AddQuickBtn("🍏 تغذية", () => ShowEmbeddedPage(new DietPlanForm(), btnNavDiet, "🍏  التغذية"));
+            }
+            else
+            {
+                AddQuickBtn("➕ عضو", () => ShowEmbeddedPage(new MembersForm(true), btnNavMembers, "👥  إدارة الأعضاء"));
+                AddQuickBtn("🛒 منتج", () => ShowEmbeddedPage(new StoreForm(true), btnNavStore, "🛒  المتجر (POS)"));
+                AddQuickBtn("📋 اشتراك", () => ShowEmbeddedPage(new SubscriptionsForm(true), btnNavSubs, "📋  الاشتراكات"));
+                AddQuickBtn("🏋️ مدرب", () => ShowEmbeddedPage(new TrainersForm(true), btnNavTrainers, "🏋️  إدارة المدربين"));
+            }
+
+            var hdr = new TableLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                Height = 34,
+                ColumnCount = 3,
+                RowCount = 1,
+                BackColor = palette.Panel,
+                RightToLeft = RightToLeft.Yes,
+                Padding = new Padding(4, 0, 4, 4)
+            };
+            hdr.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f));
+            hdr.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33f));
+            hdr.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33f));
+
+            Label MakeHdrLabel(string text, Action onClick)
+            {
+                var l = new Label
+                {
+                    Text = text,
+                    Dock = DockStyle.Fill,
+                    BackColor = palette.Primary,
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                    TextAlign = ContentAlignment.MiddleRight,
+                    Padding = new Padding(8, 0, 8, 0),
+                    Cursor = Cursors.Hand,
+                    Margin = new Padding(0, 0, 6, 0)
+                };
+                l.Click += (_, __) => onClick();
+                return l;
+            }
+
+            var tbl = new TableLayoutPanel
+            {
+                Dock              = DockStyle.Fill,
+                ColumnCount       = 3,
+                RowCount          = 1,
+                BackColor         = palette.Panel,
+                RightToLeft       = RightToLeft.Yes
+            };
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f));
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33f));
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33f));
+
+            Panel MakeListColumn(out ListBox lb)
+            {
+                var p = new Panel { Dock = DockStyle.Fill, Padding = new Padding(4) };
+                lb = new ListBox
+                {
+                    Dock = DockStyle.Fill,
+                    BackColor = palette.InputBack,
+                    ForeColor = palette.InputText,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Font = new Font("Segoe UI", 10F),
+                    IntegralHeight = false,
+                    ItemHeight = 22
+                };
+
+                p.Controls.Add(lb);
+                return p;
+            }
+
+            hdr.Controls.Add(MakeHdrLabel("آخر الأعضاء", () => ShowEmbeddedPage(new MembersForm(true), btnNavMembers, "👥  إدارة الأعضاء")), 0, 0);
+            hdr.Controls.Add(MakeHdrLabel("مخزون منخفض (≤5)", () => ShowEmbeddedPage(new StoreForm(true), btnNavStore, "🛒  المتجر (POS)")), 1, 0);
+            hdr.Controls.Add(MakeHdrLabel("آخر مبيعات المتجر", () => ShowEmbeddedPage(new StoreForm(true), btnNavStore, "🛒  المتجر (POS)")), 2, 0);
+
+            tbl.Controls.Add(MakeListColumn(out _lstQuickMembers), 0, 0);
+            tbl.Controls.Add(MakeListColumn(out _lstQuickStock), 1, 0);
+            tbl.Controls.Add(MakeListColumn(out _lstQuickSales), 2, 0);
+
+            _pnlDashboardQuick.Controls.Add(tbl);
+            _pnlDashboardQuick.Controls.Add(hdr);
+            _pnlDashboardQuick.Controls.Add(flowBtns);
+            _pnlDashboardQuick.Controls.Add(lblQuick);
+
+            pnlDashboardHome.Controls.Add(_pnlDashboardQuick);
+        }
+
+        private void RefreshQuickLists()
+        {
+            if (_lstQuickMembers == null) return;
+
+            _lstQuickMembers.Items.Clear();
+            foreach (var m in GymDataStore.Data.Members.OrderByDescending(x => x.Id).Take(8))
+                _lstQuickMembers.Items.Add(m.FullName + "  —  " + m.Phone);
+
+            _lstQuickStock.Items.Clear();
+            foreach (var p in GymDataStore.Data.StoreProducts.Where(x => x.StockQty <= 5).OrderBy(x => x.StockQty).Take(10))
+                _lstQuickStock.Items.Add(p.Name + "  (" + p.StockQty + ")");
+
+            _lstQuickSales.Items.Clear();
+            foreach (var s in GymDataStore.Data.StoreSales.OrderByDescending(x => x.SoldAt).Take(8))
+                _lstQuickSales.Items.Add((s.SoldAt ?? "").Substring(0, Math.Min(16, (s.SoldAt ?? "").Length)) + "  —  " + s.Total.ToString("0.##") + " $");
         }
 
         // ── navigation ────────────────────────────────────
@@ -212,10 +456,11 @@ namespace gym_mangment_system
             childForm.TopLevel         = false;
             childForm.FormBorderStyle  = FormBorderStyle.None;
             childForm.Dock             = DockStyle.Fill;
-            childForm.BackColor        = Color.FromArgb(18, 18, 22);
+            childForm.BackColor        = GymTheme.Current.Background;
 
             pnlContentHost.Controls.Add(childForm);
             ApplyArabicTypography(childForm);
+            GymTheme.ApplyTo(childForm);
             childForm.Show();
 
             lblDashTitle.Text = title;
@@ -233,14 +478,17 @@ namespace gym_mangment_system
 
             lblDashTitle.Text = "لوحة التحكم (Dashboard)";
             HighlightNavButton(btnNavHome);
+            RefreshDashboardHomeData();
+            BuildNotificationItems();
         }
 
         private void HighlightNavButton(Button btn)
         {
-            Color normalBg = Color.FromArgb(22, 22, 26);
-            Color activeBg = Color.FromArgb(40, 40, 48);
-            Color normalFg = Color.FromArgb(160, 160, 170);
-            Color activeFg = Color.White;
+            var palette = GymTheme.Current;
+            Color normalBg = palette.Sidebar;
+            Color activeBg = GymTheme.IsDark ? palette.CardHover : palette.Accent;
+            Color normalFg = palette.NavNormal;
+            Color activeFg = palette.NavActive;
 
             foreach (Control c in sidebar.Controls)
                 if (c is Button b && b != btn)
@@ -258,31 +506,84 @@ namespace gym_mangment_system
             if (pnlNotifDropdown.Visible) pnlNotifDropdown.BringToFront();
         }
 
+        private void AddSignOutButton()
+        {
+            _btnSignOut = new Button
+            {
+                Text = "تسجيل الخروج",
+                Size = new Size(118, 34),
+                Location = new Point(70, 10),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(55, 55, 65),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            _btnSignOut.FlatAppearance.BorderSize = 0;
+            _btnSignOut.FlatAppearance.MouseOverBackColor = Color.FromArgb(75, 75, 88);
+            _btnSignOut.Click += (s, e) =>
+            {
+                if (MessageBox.Show("هل تريد تسجيل الخروج؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+                RequestSignOut = true;
+                Close();
+            };
+            topBar.Controls.Add(_btnSignOut);
+            _btnSignOut.BringToFront();
+        }
+
+        private void AddThemeToggleButton()
+        {
+            _btnThemeToggle = new Button
+            {
+                Size = new Size(95, 34),
+                Location = new Point(195, 10),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            _btnThemeToggle.FlatAppearance.BorderSize = 0;
+            _btnThemeToggle.Click += (s, e) =>
+            {
+                GymTheme.Toggle();
+                ApplyCurrentTheme(true);
+            };
+            topBar.Controls.Add(_btnThemeToggle);
+            _btnThemeToggle.BringToFront();
+        }
+
         private void BuildNotificationItems()
         {
             flowNotifications.Controls.Clear();
-            AddNotifCard("⚠️", "المخزون منخفض",  "بروتين مصل اللبن - أقل من 5 وحدات",  Color.FromArgb(255, 152, 0));
-            AddNotifCard("🔴", "انتهاء اشتراك",   "أحمد محمد - ينتهي خلال 3 أيام",       Color.FromArgb(220,  53, 69));
-            AddNotifCard("🔴", "انتهاء اشتراك",   "سارة علي - ينتهي غداً",               Color.FromArgb(220,  53, 69));
-            AddNotifCard("🔴", "انتهاء اشتراك",   "خالد إبراهيم - ينتهي خلال 5 أيام",   Color.FromArgb(220,  53, 69));
-            AddNotifCard("💰", "دفعة جديدة",      "تم استلام 150$ من يوسف كمال",          Color.FromArgb( 76, 175, 80));
-            AddNotifCard("👤", "عضو جديد",        "انضمت فاطمة سعيد اليوم",              Color.FromArgb( 33, 150, 243));
+            foreach (var p in GymDataStore.Data.StoreProducts.Where(x => x.StockQty <= 5).Take(3))
+                AddNotifCard("⚠️", "مخزون منخفض", p.Name + " — المتبقي " + p.StockQty, Color.FromArgb(255, 152, 0));
+
+            int soon = GymDataStore.MembersExpiringWithinDays(14);
+            if (soon > 0)
+                AddNotifCard("🔴", "اشتراكات قريبة الانتهاء", soon + " عضو خلال أسبوعين", Color.FromArgb(220, 53, 69));
+
+            foreach (var s in GymDataStore.Data.StoreSales.OrderByDescending(x => x.SoldAt).Take(3))
+                AddNotifCard("💰", "بيع متجر", (s.Summary ?? "").Trim(), Color.FromArgb(76, 175, 80));
+
+            if (flowNotifications.Controls.Count == 0)
+                AddNotifCard("✅", "لا تنبيهات", "كل شيء يبدو جيداً", Color.FromArgb(76, 175, 80));
         }
 
         private void AddNotifCard(string icon, string title, string body, Color accent)
         {
-            Panel card = new Panel { Size = new Size(356, 60), BackColor = Color.FromArgb(38, 38, 45), Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
+            var palette = GymTheme.Current;
+            Panel card = new Panel { Size = new Size(356, 60), BackColor = palette.Card, Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
             Panel strip = new Panel { Size = new Size(4, 60), BackColor = accent, Dock = DockStyle.Right };
             Label lblIcon  = new Label { Text = icon,  Font = new Font("Segoe UI", 16F), Size = new Size(40, 55), Location = new Point(305, 2), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
-            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.White,                    Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F),                 ForeColor = Color.FromArgb(150, 150, 160), Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = palette.Text,      Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F),                 ForeColor = palette.MutedText, Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
-            card.MouseEnter  += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
-            card.MouseLeave  += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
+            card.MouseEnter  += (s, e) => card.BackColor = palette.CardHover;
+            card.MouseLeave  += (s, e) => card.BackColor = palette.Card;
             foreach (Control c in new Control[] { lblIcon, lblTitle, lblBody })
             {
-                c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
-                c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
+                c.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
+                c.MouseLeave += (s, e) => card.BackColor = palette.Card;
             }
 
             card.Controls.Add(strip); card.Controls.Add(lblIcon); card.Controls.Add(lblTitle); card.Controls.Add(lblBody);

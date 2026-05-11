@@ -100,7 +100,7 @@ namespace gym_mangment_system
             this.gridUsers.ReadOnly                    = true;
             this.gridUsers.RightToLeft                 = System.Windows.Forms.RightToLeft.Yes;
             this.gridUsers.RowHeadersVisible           = false;
-            this.gridUsers.RowTemplate.Height          = 36;
+            this.gridUsers.RowTemplate.Height          = 44;
             this.gridUsers.SelectionMode               = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridUsers.TabIndex                    = 1;
 

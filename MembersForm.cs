@@ -10,17 +10,25 @@ namespace gym_mangment_system
     {
         private DataTable _dt;
         private bool _isEditing = false;
-        private int  _editingRowIndex = -1;
+        private int  _editingMemberId = -1;
+        private readonly bool _startAddMode;
 
-        public MembersForm()
+        public MembersForm() : this(false) { }
+
+        public MembersForm(bool startAddMode)
         {
+            _startAddMode = startAddMode;
             InitializeComponent();
             ApplyBackgroundBranding();
             ApplyGridOpacityStyle();
             LoadSubscriptionPlans();
-            LoadMockData();
+            InitMembersTable();
+            RebindMembersFromStore();
             WireEvents();
             UpdateMemberCount();
+
+            if (_startAddMode)
+                BtnAddMember_Click(this, EventArgs.Empty);
         }
 
         private void ApplyBackgroundBranding()
@@ -57,10 +65,7 @@ namespace gym_mangment_system
                 cmbFPlan.Items.Add("بدون اشتراك");
         }
 
-        // ═══════════════════════════════════════════
-        //  MOCK DATA
-        // ═══════════════════════════════════════════
-        private void LoadMockData()
+        private void InitMembersTable()
         {
             _dt = new DataTable();
             _dt.Columns.Add("ID",              typeof(int));
@@ -72,22 +77,21 @@ namespace gym_mangment_system
             _dt.Columns.Add("المدة",           typeof(string));
             _dt.Columns.Add("تاريخ الانضمام", typeof(string));
 
-            _dt.Rows.Add(1,  "أحمد محمد",    "0501234567", "ذكر",  "Basic Plan",  "30 $",  "1 شهر",  "2026-01-15");
-            _dt.Rows.Add(2,  "سارة علي",     "0559876543", "أنثى", "Pro Plan",    "50 $",  "3 شهر",  "2025-06-20");
-            _dt.Rows.Add(3,  "خالد إبراهيم", "0561112233", "ذكر",  "Annual Plan", "300 $", "1 سنة",  "2025-11-01");
-            _dt.Rows.Add(4,  "نورة حسن",     "0547778899", "أنثى", "Basic Plan",  "30 $",  "1 شهر",  "2026-02-10");
-            _dt.Rows.Add(5,  "عمر فاروق",    "0533334455", "ذكر",  "Pro Plan",    "50 $",  "3 شهر",  "2025-09-05");
-            _dt.Rows.Add(6,  "ليلى أحمد",    "0522225566", "أنثى", "Basic Plan",  "30 $",  "1 شهر",  "2026-03-01");
-            _dt.Rows.Add(7,  "يوسف كمال",    "0511116677", "ذكر",  "Annual Plan", "300 $", "1 سنة",  "2025-08-15");
-            _dt.Rows.Add(8,  "فاطمة سعيد",   "0588889900", "أنثى", "Basic Plan",  "30 $",  "1 شهر",  "2026-04-01");
-            _dt.Rows.Add(9,  "محمود عادل",   "0577771122", "ذكر",  "Pro Plan",    "50 $",  "3 شهر",  "2025-12-20");
-            _dt.Rows.Add(10, "هند محمود",    "0566662233", "أنثى", "Annual Plan", "300 $", "1 سنة",  "2026-01-05");
-
             gridMembers.DataSource = _dt;
             gridMembers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
             if (gridMembers.Columns.Contains("ID"))
                 gridMembers.Columns["ID"].Visible = false;
+        }
+
+        private void RebindMembersFromStore()
+        {
+            _dt.Rows.Clear();
+            foreach (var m in GymDataStore.Data.Members.OrderBy(x => x.Id))
+            {
+                _dt.Rows.Add(m.Id, m.FullName, m.Phone, m.Gender, m.PlanName, m.PriceText, m.DurationText, m.JoinDate);
+            }
+            _dt.AcceptChanges();
+            UpdateMemberCount();
         }
 
         // ═══════════════════════════════════════════
@@ -148,8 +152,8 @@ namespace gym_mangment_system
         // ═══════════════════════════════════════════
         private void BtnAddMember_Click(object sender, EventArgs e)
         {
-            _isEditing      = false;
-            _editingRowIndex = -1;
+            _isEditing       = false;
+            _editingMemberId = -1;
             lblFormTitle.Text = "➕  إضافة عضو جديد";
             ClearForm();
             ShowForm();
@@ -168,7 +172,7 @@ namespace gym_mangment_system
 
             _isEditing = true;
             DataGridViewRow row = gridMembers.SelectedRows[0];
-            _editingRowIndex = row.Index;
+            _editingMemberId = Convert.ToInt32(row.Cells["ID"].Value);
 
             txtFName.Text  = row.Cells["الاسم"].Value?.ToString()  ?? "";
             txtFPhone.Text = row.Cells["الهاتف"].Value?.ToString() ?? "";
@@ -222,10 +226,10 @@ namespace gym_mangment_system
             if (MessageBox.Show("هل أنت متأكد من حذف العضو: " + name + "؟", "⚠️ تأكيد الحذف",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                int rowIndex = gridMembers.SelectedRows[0].Index;
-                DataRowView drv = gridMembers.Rows[rowIndex].DataBoundItem as DataRowView;
-                if (drv != null) { drv.Row.Delete(); _dt.AcceptChanges(); }
-                UpdateMemberCount();
+                int id = Convert.ToInt32(gridMembers.SelectedRows[0].Cells["ID"].Value);
+                GymDataStore.Data.Members.RemoveAll(x => x.Id == id);
+                GymDataStore.Save();
+                RebindMembersFromStore();
                 MessageBox.Show("تم حذف العضو بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -246,30 +250,40 @@ namespace gym_mangment_system
             string duration   = txtFPlanMonths.Text;
             string gender     = cmbFGender.SelectedItem?.ToString() ?? "ذكر";
 
-            if (_isEditing && _editingRowIndex >= 0 && _editingRowIndex < gridMembers.Rows.Count)
+            if (_isEditing && _editingMemberId > 0)
             {
-                DataRowView drv = gridMembers.Rows[_editingRowIndex].DataBoundItem as DataRowView;
-                if (drv != null)
+                var mem = GymDataStore.Data.Members.FirstOrDefault(x => x.Id == _editingMemberId);
+                if (mem != null)
                 {
-                    drv["الاسم"]     = txtFName.Text.Trim();
-                    drv["الهاتف"]   = txtFPhone.Text.Trim();
-                    drv["الجنس"]    = gender;
-                    drv["الاشتراك"] = planName;
-                    drv["السعر"]    = price;
-                    drv["المدة"]    = duration;
+                    mem.FullName   = txtFName.Text.Trim();
+                    mem.Phone      = txtFPhone.Text.Trim();
+                    mem.Gender     = gender;
+                    mem.PlanName   = planName;
+                    mem.PriceText  = price;
+                    mem.DurationText = duration;
                 }
+                GymDataStore.Save();
                 MessageBox.Show("تم تحديث بيانات العضو بنجاح", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                int newId = _dt.Rows.Count > 0 ? _dt.AsEnumerable().Max(r => r.Field<int>("ID")) + 1 : 1;
-                _dt.Rows.Add(newId, txtFName.Text.Trim(), txtFPhone.Text.Trim(),
-                    gender, planName, price, duration, DateTime.Now.ToString("yyyy-MM-dd"));
+                GymDataStore.Data.Members.Add(new MemberRecord
+                {
+                    Id            = GymDataStore.NextMemberId(),
+                    FullName      = txtFName.Text.Trim(),
+                    Phone         = txtFPhone.Text.Trim(),
+                    Gender        = gender,
+                    PlanName      = planName,
+                    PriceText     = price,
+                    DurationText  = duration,
+                    JoinDate      = DateTime.Now.ToString("yyyy-MM-dd")
+                });
+                GymDataStore.Save();
                 MessageBox.Show("تمت إضافة العضو بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             HideForm();
-            UpdateMemberCount();
+            RebindMembersFromStore();
         }
 
         private void BtnFormCancel_Click(object sender, EventArgs e) => HideForm();

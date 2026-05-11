@@ -12,6 +12,11 @@ namespace gym_mangment_system
         private int _editingId = -1;
 
         public SubscriptionsForm()
+            : this(false)
+        {
+        }
+
+        public SubscriptionsForm(bool startAddMode)
         {
             InitializeComponent();
             ApplyBackgroundBranding();
@@ -20,6 +25,12 @@ namespace gym_mangment_system
             LoadPlanData();
             WireEvents();
             ResetForm();
+
+            if (startAddMode)
+            {
+                // Editor is inline on this screen; just focus the input.
+                txtType.Focus();
+            }
         }
 
         private void ApplyBackgroundBranding()

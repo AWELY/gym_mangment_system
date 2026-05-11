@@ -9,18 +9,27 @@ namespace gym_mangment_system
     public partial class TrainersForm : Form
     {
         private DataTable _dt;
-        private bool _isEditing      = false;
-        private int  _editingRowIndex = -1;
+        private bool _isEditing       = false;
+        private int  _editingTrainerId = -1;
+        private readonly bool _startAddMode;
 
         public TrainersForm()
+            : this(false) { }
+
+        public TrainersForm(bool startAddMode)
         {
+            _startAddMode = startAddMode;
             InitializeComponent();
-            LoadMockData();
+            InitTrainersTable();
+            RebindTrainersFromStore();
             WireEvents();
             UpdateCount();
+
+            if (_startAddMode)
+                BtnAddTrainer_Click(this, EventArgs.Empty);
         }
 
-        private void LoadMockData()
+        private void InitTrainersTable()
         {
             _dt = new DataTable();
             _dt.Columns.Add("ID",            typeof(int));
@@ -30,20 +39,23 @@ namespace gym_mangment_system
             _dt.Columns.Add("الراتب ($)",    typeof(decimal));
             _dt.Columns.Add("تاريخ التعيين", typeof(string));
 
-            _dt.Rows.Add(1, "محمد السالم",    "0501111222", "رفع أثقال",    2500m, "2023-01-10");
-            _dt.Rows.Add(2, "أنس العتيبي",    "0522223333", "كروس فيت",     2200m, "2023-03-15");
-            _dt.Rows.Add(3, "ريم الزهراني",   "0533334444", "يوغا ولياقة",  2000m, "2023-06-01");
-            _dt.Rows.Add(4, "فيصل الحربي",    "0544445555", "ملاكمة",       2800m, "2022-11-20");
-            _dt.Rows.Add(5, "نورا الشمري",    "0555556666", "تمارين نسائية",1900m, "2024-01-05");
-
             gridTrainers.DataSource = _dt;
             gridTrainers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             if (gridTrainers.Columns.Contains("ID")) gridTrainers.Columns["ID"].Visible = false;
         }
 
+        private void RebindTrainersFromStore()
+        {
+            _dt.Rows.Clear();
+            foreach (var t in GymDataStore.Data.Trainers.OrderBy(x => x.Id))
+                _dt.Rows.Add(t.Id, t.Name, t.Phone, t.Specialty, t.Salary, t.JoinDate);
+            _dt.AcceptChanges();
+            UpdateCount();
+        }
+
         private void WireEvents()
         {
-            btnAddTrainer.Click  += (s, e) => { _isEditing = false; _editingRowIndex = -1; lblFormTitle.Text = "➕  إضافة مدرب جديد"; ClearForm(); ShowForm(); };
+            btnAddTrainer.Click  += BtnAddTrainer_Click;
             btnEdit.Click        += BtnEdit_Click;
             btnDelete.Click      += BtnDelete_Click;
             btnFormSave.Click    += BtnFormSave_Click;
@@ -56,12 +68,21 @@ namespace gym_mangment_system
             };
         }
 
+        private void BtnAddTrainer_Click(object sender, EventArgs e)
+        {
+            _isEditing = false;
+            _editingTrainerId = -1;
+            lblFormTitle.Text = "➕  إضافة مدرب جديد";
+            ClearForm();
+            ShowForm();
+        }
+
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             if (gridTrainers.SelectedRows.Count == 0) { MessageBox.Show("الرجاء تحديد مدرب للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
             _isEditing = true;
             var row = gridTrainers.SelectedRows[0];
-            _editingRowIndex = row.Index;
+            _editingTrainerId = Convert.ToInt32(row.Cells["ID"].Value);
             txtFName.Text      = row.Cells["الاسم"].Value?.ToString() ?? "";
             txtFPhone.Text     = row.Cells["الهاتف"].Value?.ToString() ?? "";
             txtFSpecialty.Text = row.Cells["التخصص"].Value?.ToString() ?? "";
@@ -80,10 +101,10 @@ namespace gym_mangment_system
             string name = gridTrainers.SelectedRows[0].Cells["الاسم"].Value?.ToString() ?? "";
             if (MessageBox.Show("هل أنت متأكد من حذف المدرب: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                int idx = gridTrainers.SelectedRows[0].Index;
-                var drv = gridTrainers.Rows[idx].DataBoundItem as DataRowView;
-                if (drv != null) { drv.Row.Delete(); _dt.AcceptChanges(); }
-                UpdateCount();
+                int id = Convert.ToInt32(gridTrainers.SelectedRows[0].Cells["ID"].Value);
+                GymDataStore.Data.Trainers.RemoveAll(x => x.Id == id);
+                GymDataStore.Save();
+                RebindTrainersFromStore();
                 MessageBox.Show("تم حذف المدرب بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -92,27 +113,36 @@ namespace gym_mangment_system
         {
             if (string.IsNullOrWhiteSpace(txtFName.Text)) { MessageBox.Show("الرجاء إدخال اسم المدرب", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
-            if (_isEditing && _editingRowIndex >= 0 && _editingRowIndex < gridTrainers.Rows.Count)
+            if (_isEditing && _editingTrainerId > 0)
             {
-                var drv = gridTrainers.Rows[_editingRowIndex].DataBoundItem as DataRowView;
-                if (drv != null)
+                var tr = GymDataStore.Data.Trainers.FirstOrDefault(x => x.Id == _editingTrainerId);
+                if (tr != null)
                 {
-                    drv["الاسم"]         = txtFName.Text.Trim();
-                    drv["الهاتف"]        = txtFPhone.Text.Trim();
-                    drv["التخصص"]        = txtFSpecialty.Text.Trim();
-                    drv["الراتب ($)"]    = numFSalary.Value;
-                    drv["تاريخ التعيين"] = dtpFJoinDate.Value.ToString("yyyy-MM-dd");
+                    tr.Name      = txtFName.Text.Trim();
+                    tr.Phone     = txtFPhone.Text.Trim();
+                    tr.Specialty = txtFSpecialty.Text.Trim();
+                    tr.Salary    = numFSalary.Value;
+                    tr.JoinDate  = dtpFJoinDate.Value.ToString("yyyy-MM-dd");
                 }
+                GymDataStore.Save();
                 MessageBox.Show("تم تحديث بيانات المدرب", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                int newId = _dt.Rows.Count > 0 ? _dt.AsEnumerable().Max(r => r.Field<int>("ID")) + 1 : 1;
-                _dt.Rows.Add(newId, txtFName.Text.Trim(), txtFPhone.Text.Trim(), txtFSpecialty.Text.Trim(),
-                    numFSalary.Value, dtpFJoinDate.Value.ToString("yyyy-MM-dd"));
+                GymDataStore.Data.Trainers.Add(new TrainerRecord
+                {
+                    Id         = GymDataStore.NextTrainerId(),
+                    Name       = txtFName.Text.Trim(),
+                    Phone      = txtFPhone.Text.Trim(),
+                    Specialty  = txtFSpecialty.Text.Trim(),
+                    Salary     = numFSalary.Value,
+                    JoinDate   = dtpFJoinDate.Value.ToString("yyyy-MM-dd")
+                });
+                GymDataStore.Save();
                 MessageBox.Show("تمت إضافة المدرب بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            HideForm(); UpdateCount();
+            HideForm();
+            RebindTrainersFromStore();
         }
 
         private void ClearForm()

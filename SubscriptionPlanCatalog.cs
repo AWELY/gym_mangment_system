@@ -6,6 +6,8 @@ namespace gym_mangment_system
 {
     public class SubscriptionPlan
     {
+        public SubscriptionPlan() { }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
@@ -17,21 +19,12 @@ namespace gym_mangment_system
 
     public static class SubscriptionPlanCatalog
     {
-        private static List<SubscriptionPlan> _plans = new List<SubscriptionPlan>
-        {   
-            new SubscriptionPlan { Id = 1, Name = "Basic Plan", Price = 30.00m, DurationValue = 1, DurationUnit = "شهر" },
-            new SubscriptionPlan { Id = 2, Name = "Pro Plan", Price = 50.00m, DurationValue = 3, DurationUnit = "شهر" },
-            new SubscriptionPlan { Id = 3, Name = "Annual Plan", Price = 300.00m, DurationValue = 1, DurationUnit = "سنة" }
-        };
-
-        public static IEnumerable<SubscriptionPlan> GetPlans()
-        {
-            return _plans;
-        }
+        public static IEnumerable<SubscriptionPlan> GetPlans() => GymDataStore.Data.SubscriptionPlans;
 
         public static void Upsert(SubscriptionPlan plan)
         {
-            var existing = _plans.FirstOrDefault(p => p.Id == plan.Id);
+            var list = GymDataStore.Data.SubscriptionPlans;
+            var existing = list.FirstOrDefault(p => p.Id == plan.Id);
             if (existing != null)
             {
                 existing.Name = plan.Name;
@@ -41,17 +34,18 @@ namespace gym_mangment_system
             }
             else
             {
-                _plans.Add(plan);
+                list.Add(plan);
             }
+            GymDataStore.Save();
         }
 
         public static void Delete(int id)
         {
-            var existing = _plans.FirstOrDefault(p => p.Id == id);
+            var list = GymDataStore.Data.SubscriptionPlans;
+            var existing = list.FirstOrDefault(p => p.Id == id);
             if (existing != null)
-            {
-                _plans.Remove(existing);
-            }
+                list.Remove(existing);
+            GymDataStore.Save();
         }
     }
 }

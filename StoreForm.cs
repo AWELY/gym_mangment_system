@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -18,6 +22,7 @@ namespace gym_mangment_system
         // Product model
         private class Product
         {
+            public int Id           { get; set; }
             public string Name      { get; set; }
             public decimal Price    { get; set; }
             public string Category  { get; set; }
@@ -29,35 +34,102 @@ namespace gym_mangment_system
         }
 
         private readonly List<CartItem> _cart = new List<CartItem>();
-        private readonly List<Product>  _products = new List<Product>
-        {
-            new Product { Name="واي بروتين",      Price=50.00m, Category="بروتين",      Emoji="💪", StockQty=20, Expiry=DateTime.Now.AddMonths(8) },
-            new Product { Name="كرياتين مونو",    Price=25.00m, Category="كرياتين",     Emoji="⚡", StockQty=15, Expiry=DateTime.Now.AddMonths(12) },
-            new Product { Name="BCAA أحماض",      Price=30.00m, Category="بروتين",      Emoji="🧬", StockQty=10, Expiry=DateTime.Now.AddMonths(6) },
-            new Product { Name="فيتامين D3",      Price=12.00m, Category="فيتامينات",   Emoji="☀️", StockQty=30, Expiry=DateTime.Now.AddMonths(18) },
-            new Product { Name="أوميغا 3",        Price=18.00m, Category="فيتامينات",   Emoji="🐟", StockQty=25, Expiry=DateTime.Now.AddMonths(10) },
-            new Product { Name="مشروب طاقة",      Price=5.00m,  Category="مشروبات طاقة",Emoji="🥤", StockQty=50, Expiry=DateTime.Now.AddMonths(4) },
-            new Product { Name="حزام رفع أثقال", Price=35.00m, Category="معدات",       Emoji="🏋️", StockQty=8,  Expiry=DateTime.Now.AddYears(3) },
-            new Product { Name="قفازات تمرين",   Price=15.00m, Category="معدات",       Emoji="🧤", StockQty=12, Expiry=DateTime.Now.AddYears(3) },
-            new Product { Name="شيكر بروتين",    Price=8.00m,  Category="معدات",       Emoji="🥤", StockQty=18, Expiry=DateTime.Now.AddYears(2) },
-            new Product { Name="بروتين بار",     Price=3.50m,  Category="بروتين",      Emoji="🍫", StockQty=40, Expiry=DateTime.Now.AddMonths(3) },
-            new Product { Name="جلوتامين",       Price=22.00m, Category="بروتين",      Emoji="💊", StockQty=14, Expiry=DateTime.Now.AddMonths(9) },
-            new Product { Name="ZMA مكمل",       Price=16.00m, Category="فيتامينات",   Emoji="💤", StockQty=11, Expiry=DateTime.Now.AddMonths(15) },
-        };
+        private readonly List<Product>  _products = new List<Product>();
+        private readonly bool _startAddMode;
 
         public StoreForm()
+            : this(false) { }
+
+        public StoreForm(bool startAddMode)
         {
+            _startAddMode = startAddMode;
             InitializeComponent();
             ApplyBackgroundBranding();
+            LoadProductsFromStore();
             PopulateProducts();
             WireEvents();
             FormClosed += StoreForm_FormClosed;
+
+            if (_startAddMode)
+                BtnAddNewItem_Click(this, EventArgs.Empty);
+        }
+
+        private void LoadProductsFromStore()
+        {
+            foreach (var p in _products)
+                p.Photo?.Dispose();
+            _products.Clear();
+            foreach (var r in GymDataStore.Data.StoreProducts.OrderBy(x => x.Id))
+                _products.Add(ProductFromRecord(r));
+        }
+
+        private static Product ProductFromRecord(StoreProductRecord r)
+        {
+            Image img = null;
+            if (!string.IsNullOrEmpty(r.PhotoBase64))
+            {
+                try
+                {
+                    byte[] bytes = Convert.FromBase64String(r.PhotoBase64);
+                    using (var ms = new MemoryStream(bytes))
+                        img = Image.FromStream(ms);
+                }
+                catch { /* ignore bad image */ }
+            }
+
+            DateTime exp = DateTime.TryParse(r.Expiry, out var e) ? e : DateTime.Now.AddMonths(6);
+            return new Product
+            {
+                Id       = r.Id,
+                Name     = r.Name ?? "",
+                Price    = r.Price,
+                Category = r.Category ?? "",
+                Emoji    = string.IsNullOrEmpty(r.Emoji) ? "📦" : r.Emoji,
+                StockQty = r.StockQty,
+                Expiry   = exp,
+                Photo    = img
+            };
+        }
+
+        private static StoreProductRecord ToRecord(Product p)
+        {
+            string b64 = null;
+            if (p.Photo != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    p.Photo.Save(ms, ImageFormat.Png);
+                    b64 = Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
+            return new StoreProductRecord
+            {
+                Id          = p.Id,
+                Name        = p.Name,
+                Price       = p.Price,
+                Category    = p.Category,
+                Emoji       = p.Emoji,
+                StockQty    = p.StockQty,
+                Expiry      = p.Expiry.ToString("yyyy-MM-dd"),
+                PhotoBase64 = b64
+            };
+        }
+
+        private void PersistAllProducts()
+        {
+            GymDataStore.Data.StoreProducts.Clear();
+            foreach (var p in _products.OrderBy(x => x.Id))
+                GymDataStore.Data.StoreProducts.Add(ToRecord(p));
+            GymDataStore.Save();
         }
 
         private void StoreForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            PersistAllProducts();
             foreach (var p in _products)
                 p.Photo?.Dispose();
+            _products.Clear();
         }
 
         private void ApplyBackgroundBranding()
@@ -234,11 +306,36 @@ namespace gym_mangment_system
         private void BtnCheckout_Click(object sender, EventArgs e)
         {
             if (_cart.Count == 0) { MessageBox.Show("السلة فارغة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+            foreach (var line in _cart)
+            {
+                var rec = GymDataStore.Data.StoreProducts.FirstOrDefault(x => x.Name == line.Name);
+                if (rec != null)
+                    rec.StockQty = Math.Max(0, rec.StockQty - line.Qty);
+                var pr = _products.FirstOrDefault(x => x.Name == line.Name);
+                if (pr != null)
+                    pr.StockQty = Math.Max(0, pr.StockQty - line.Qty);
+            }
+
             decimal total = 0;
             foreach (var item in _cart) total += item.Price * item.Qty;
+            var sb = new StringBuilder();
+            foreach (var item in _cart)
+                sb.Append(item.Name).Append("×").Append(item.Qty).Append("؛ ");
+
+            GymDataStore.Data.StoreSales.Add(new StoreSaleRecord
+            {
+                SoldAt  = DateTime.Now.ToString("o"),
+                Total   = total,
+                Summary = sb.ToString().Trim()
+            });
+            GymDataStore.Save();
+
             MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " $\nعدد المنتجات: " + _cart.Count,
                 "✅ فاتورة", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            _cart.Clear(); RefreshCart();
+            _cart.Clear();
+            RefreshCart();
+            PopulateProducts();
         }
 
         private void BtnClearCart_Click(object sender, EventArgs e) { _cart.Clear(); RefreshCart(); }
@@ -277,8 +374,10 @@ namespace gym_mangment_system
             if (picNewImage.Image != null)
                 photoCopy = (Image)picNewImage.Image.Clone();
 
+            int newId = GymDataStore.NextProductId();
             var p = new Product
             {
+                Id       = newId,
                 Name     = txtNewName.Text.Trim(),
                 Price    = numNewPrice.Value,
                 Category = cat,
@@ -289,6 +388,9 @@ namespace gym_mangment_system
             };
 
             _products.Add(p);
+            GymDataStore.Data.StoreProducts.Add(ToRecord(p));
+            GymDataStore.Save();
+
             flowProducts.Controls.Add(CreateProductCard(p));
             pnlAddItem.Visible = false;
             picNewImage.Image?.Dispose();

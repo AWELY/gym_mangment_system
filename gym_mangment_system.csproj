@@ -55,6 +55,7 @@
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Form1.cs">
@@ -98,6 +99,9 @@
     </Compile>
     <Compile Include="ImageAssets.cs" />
     <Compile Include="AppSession.cs" />
+    <Compile Include="GymDataModels.cs" />
+    <Compile Include="GymDataStore.cs" />
+    <Compile Include="GymTheme.cs" />
     <Compile Include="UserDirectory.cs" />
     <Compile Include="WhatsAppWeb.cs" />
     <Compile Include="SubscriptionPlanCatalog.cs" />

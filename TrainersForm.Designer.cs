@@ -146,7 +146,7 @@ namespace gym_mangment_system
                 Padding = new System.Windows.Forms.Padding(5, 3, 5, 3)
             };
             this.gridTrainers.AlternatingRowsDefaultCellStyle = new System.Windows.Forms.DataGridViewCellStyle { BackColor = System.Drawing.Color.FromArgb(30, 30, 36) };
-            this.gridTrainers.ColumnHeadersHeight         = 42;
+            this.gridTrainers.ColumnHeadersHeight         = 48;
             this.gridTrainers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.gridTrainers.Dock                        = System.Windows.Forms.DockStyle.Fill;
             this.gridTrainers.EnableHeadersVisualStyles   = false;
@@ -155,7 +155,7 @@ namespace gym_mangment_system
             this.gridTrainers.ReadOnly                    = true;
             this.gridTrainers.RightToLeft                 = System.Windows.Forms.RightToLeft.Yes;
             this.gridTrainers.RowHeadersVisible           = false;
-            this.gridTrainers.RowTemplate.Height          = 36;
+            this.gridTrainers.RowTemplate.Height          = 44;
             this.gridTrainers.SelectionMode               = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridTrainers.TabIndex                    = 2;
 

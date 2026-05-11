@@ -6,10 +6,22 @@ namespace gym_mangment_system
 {
     public partial class Form1 : Form
     {
+        private bool _autoLoginOnFirstShow = true;
+
         public Form1()
         {
             InitializeComponent();
             ApplyBranding();
+            txtUser.Text = "admin";
+            txtPass.Text = "admin";
+            this.Shown += Form1_Shown;
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            if (!_autoLoginOnFirstShow) return;
+            _autoLoginOnFirstShow = false;
+            BtnLogin_Click(this, EventArgs.Empty);
         }
 
         private void ApplyBranding()
@@ -58,6 +70,16 @@ namespace gym_mangment_system
             DashboardForm dashboard = new DashboardForm();
             this.Hide();
             dashboard.ShowDialog();
+            if (dashboard.RequestSignOut)
+            {
+                AppSession.Username = "";
+                txtUser.Text = "admin";
+                txtPass.Text = "admin";
+                txtUser.Focus();
+                txtUser.SelectAll();
+                this.Show();
+                return;
+            }
             this.Close();
         }
     }

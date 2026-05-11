@@ -8,54 +8,41 @@ namespace gym_mangment_system
 {
     public partial class DietPlanForm : Form
     {
-        // ── Feeding plan model ──
-        private class FeedingPlan
+        private sealed class FeedingPlan
         {
             public string Name    { get; set; }
             public string PdfPath { get; set; }
             public override string ToString() => Name;
         }
 
-        // ── Mock member store (shared with MembersForm mock data) ──
-        private static readonly List<(string Name, string Phone, string Plan)> MockMembers =
-            new List<(string, string, string)>
-            {
-                ("أحمد محمد",    "0501234567", "Basic Plan"),
-                ("سارة علي",     "0559876543", "Pro Plan"),
-                ("خالد إبراهيم", "0561112233", "Annual Plan"),
-                ("نورة حسن",     "0547778899", "Basic Plan"),
-                ("عمر فاروق",    "0533334455", "Pro Plan"),
-                ("ليلى أحمد",    "0522225566", "Basic Plan"),
-                ("يوسف كمال",    "0511116677", "Annual Plan"),
-                ("فاطمة سعيد",   "0588889900", "Basic Plan"),
-                ("محمود عادل",   "0577771122", "Pro Plan"),
-                ("هند محمود",    "0566662233", "Annual Plan"),
-            };
+        private readonly List<FeedingPlan> _feedingPlans = new List<FeedingPlan>();
 
-        // ── Feeding plans catalog ──
-        private readonly List<FeedingPlan> _feedingPlans = new List<FeedingPlan>
-        {
-            new FeedingPlan { Name = "خطة التنشيف",       PdfPath = @"C:\Plans\cutting_plan.pdf" },
-            new FeedingPlan { Name = "خطة التضخم",        PdfPath = @"C:\Plans\bulking_plan.pdf" },
-            new FeedingPlan { Name = "خطة الحفاظ",        PdfPath = @"C:\Plans\maintenance_plan.pdf" },
-            new FeedingPlan { Name = "خطة نباتية",        PdfPath = @"C:\Plans\vegan_plan.pdf" },
-            new FeedingPlan { Name = "خطة كيتو",          PdfPath = @"C:\Plans\keto_plan.pdf" },
-        };
-
-        // ── Currently found member ──
         private string _currentMemberName  = "";
         private string _currentMemberPhone = "";
 
         public DietPlanForm()
         {
             InitializeComponent();
+            ReloadFeedingPlansFromStore();
+            ReloadHistoryFromStore();
             RefreshPlanCombo();
             WireEvents();
         }
 
-        // ═══════════════════════════════════════════
-        //  INIT
-        // ═══════════════════════════════════════════
+        private void ReloadFeedingPlansFromStore()
+        {
+            _feedingPlans.Clear();
+            foreach (var r in GymDataStore.Data.FeedingPlans)
+                _feedingPlans.Add(new FeedingPlan { Name = r.Name, PdfPath = r.PdfPath });
+        }
+
+        private void ReloadHistoryFromStore()
+        {
+            listHistory.Items.Clear();
+            foreach (var line in Enumerable.Reverse(GymDataStore.Data.DietSendHistory))
+                listHistory.Items.Add(line);
+        }
+
         private void RefreshPlanCombo()
         {
             cmbSelectPlan.Items.Clear();
@@ -76,9 +63,6 @@ namespace gym_mangment_system
             btnSendPlan.Click                 += BtnSendPlan_Click;
         }
 
-        // ═══════════════════════════════════════════
-        //  SEARCH BY PHONE
-        // ═══════════════════════════════════════════
         private void BtnSearchPhone_Click(object sender, EventArgs e)
         {
             string phone = txtSearchPhone.Text.Trim();
@@ -88,9 +72,10 @@ namespace gym_mangment_system
                 return;
             }
 
-            var found = MockMembers.FirstOrDefault(m => m.Phone.Contains(phone));
+            var found = GymDataStore.Data.Members.FirstOrDefault(m =>
+                !string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phone));
 
-            if (found == default)
+            if (found == null)
             {
                 lblFoundName.Text  = "❌  لم يُعثر على عضو بهذا الرقم";
                 lblFoundName.ForeColor = Color.FromArgb(220, 53, 69);
@@ -101,19 +86,16 @@ namespace gym_mangment_system
             }
             else
             {
-                _currentMemberName  = found.Name;
+                _currentMemberName  = found.FullName;
                 _currentMemberPhone = found.Phone;
 
-                lblFoundName.Text  = "👤  " + found.Name;
+                lblFoundName.Text  = "👤  " + found.FullName;
                 lblFoundName.ForeColor = Color.White;
                 lblFoundPhone.Text = "📞  " + found.Phone;
-                lblFoundPlan.Text  = "📋  " + found.Plan;
+                lblFoundPlan.Text  = "📋  " + found.PlanName;
             }
         }
 
-        // ═══════════════════════════════════════════
-        //  CREATE FEEDING PLAN
-        // ═══════════════════════════════════════════
         private void BtnBrowsePlanPdf_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog dlg = new OpenFileDialog())
@@ -141,18 +123,19 @@ namespace gym_mangment_system
                 return;
             }
 
-            // Check for duplicate name
-            if (_feedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            if (_feedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ||
+                GymDataStore.Data.FeedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show("توجد خطة بهذا الاسم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            GymDataStore.Data.FeedingPlans.Add(new FeedingPlanRecord { Name = name, PdfPath = pdf });
+            GymDataStore.Save();
+
             var newPlan = new FeedingPlan { Name = name, PdfPath = pdf };
             _feedingPlans.Add(newPlan);
             RefreshPlanCombo();
-
-            // Auto-select the new plan
             cmbSelectPlan.SelectedItem = newPlan;
 
             txtPlanName.Text = "";
@@ -161,9 +144,6 @@ namespace gym_mangment_system
             MessageBox.Show("تم حفظ الخطة: " + name, "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // ═══════════════════════════════════════════
-        //  SELECT PLAN → AUTO-FILL PDF PATH
-        // ═══════════════════════════════════════════
         private void CmbSelectPlan_Changed(object sender, EventArgs e)
         {
             if (cmbSelectPlan.SelectedItem is FeedingPlan plan)
@@ -172,9 +152,6 @@ namespace gym_mangment_system
                 txtSelectedPlanPdf.Text = "";
         }
 
-        // ═══════════════════════════════════════════
-        //  SEND PLAN
-        // ═══════════════════════════════════════════
         private void BtnSendPlan_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_currentMemberName))
@@ -192,6 +169,8 @@ namespace gym_mangment_system
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
             string logEntry  = $"[{timestamp}]  {_currentMemberName} ({_currentMemberPhone})  ←  {plan.Name}";
 
+            GymDataStore.Data.DietSendHistory.Insert(0, logEntry);
+            GymDataStore.Save();
             listHistory.Items.Insert(0, logEntry);
 
             string msg =
