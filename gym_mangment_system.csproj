@@ -101,7 +101,6 @@
     <Compile Include="AppSession.cs" />
     <Compile Include="GymDataModels.cs" />
     <Compile Include="GymDataStore.cs" />
-    <Compile Include="GymTheme.cs" />
     <Compile Include="UserDirectory.cs" />
     <Compile Include="WhatsAppWeb.cs" />
     <Compile Include="SubscriptionPlanCatalog.cs" />

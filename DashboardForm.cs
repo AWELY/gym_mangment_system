@@ -17,7 +17,6 @@ namespace gym_mangment_system
         private Timer  _statusClock;
         private Panel  _pnlDashboardQuick;
         private Button _btnSignOut;
-        private Button _btnThemeToggle;
         private ListBox _lstQuickMembers;
         private ListBox _lstQuickStock;
         private ListBox _lstQuickSales;
@@ -31,16 +30,14 @@ namespace gym_mangment_system
             ApplyArabicTypography(this);
             AssignNavEvents();
             ApplyRoleVisibility();
-            if (_activeNavButton == null)
-                HighlightNavButton(btnNavHome);
+            _activeNavButton = btnNavHome;
+            HighlightNavButton(btnNavHome);
             BuildDashboardQuickPanel();
             BuildNotificationItems();
             InitializeCommercialBanner();
             RefreshDashboardHomeData();
             AddSignOutButton();
-            AddThemeToggleButton();
             lblStatusRight.Text = "اسم المستخدم: " + AppSession.Username;
-            ApplyCurrentTheme(false);
             _statusClock = new Timer { Interval = 1000 };
             _statusClock.Tick += (_, __) => lblStatusCenter.Text = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss");
             _statusClock.Start();
@@ -74,80 +71,11 @@ namespace gym_mangment_system
             }
         }
 
-        private void ApplyCurrentTheme(bool rebuildDynamicSections)
-        {
-            var palette = GymTheme.Current;
-
-            if (GymTheme.IsDark)
-            {
-                if (this.BackgroundImage == null || pnlDashboardHome.BackgroundImage == null)
-                    ApplyBrandImages();
-            }
-            else
-            {
-                this.BackgroundImage = null;
-                pnlDashboardHome.BackgroundImage = null;
-            }
-
-            GymTheme.ApplyTo(this);
-
-            this.BackColor = palette.Background;
-            sidebar.BackColor = palette.Sidebar;
-            topBar.BackColor = palette.TopBar;
-            statusBar.BackColor = palette.StatusBar;
-            pnlDashboardHome.BackColor = palette.Background;
-            pnlContentHost.BackColor = palette.Background;
-            flowStatCards.BackColor = palette.Background;
-            pnlNotifDropdown.BackColor = palette.Panel;
-            flowNotifications.BackColor = palette.Panel;
-            lblNotifHeader.BackColor = palette.Primary;
-            lblDashTitle.ForeColor = Color.White;
-            lblLogo.ForeColor = GymTheme.IsDark ? palette.Accent : Color.White;
-            lblStatusLeft.ForeColor = GymTheme.IsDark ? palette.Success : Color.White;
-            lblStatusCenter.ForeColor = GymTheme.IsDark ? palette.MutedText : Color.White;
-            lblStatusRight.ForeColor = GymTheme.IsDark ? palette.MutedText : Color.White;
-
-            if (_commercialLabel != null)
-                _commercialLabel.ForeColor = palette.Warning;
-
-            if (_btnSignOut != null)
-            {
-                _btnSignOut.BackColor = palette.ButtonBack;
-                _btnSignOut.ForeColor = palette.ButtonText;
-                _btnSignOut.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
-            }
-
-            if (_btnThemeToggle != null)
-            {
-                _btnThemeToggle.Text = GymTheme.IsDark ? "☀️ فاتح" : "🌙 داكن";
-                _btnThemeToggle.BackColor = GymTheme.IsDark ? palette.Primary : palette.Accent;
-                _btnThemeToggle.ForeColor = Color.White;
-                _btnThemeToggle.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
-            }
-
-            if (_activeNavButton != null)
-                HighlightNavButton(_activeNavButton);
-
-            if (rebuildDynamicSections)
-            {
-                if (_pnlDashboardQuick != null)
-                {
-                    pnlDashboardHome.Controls.Remove(_pnlDashboardQuick);
-                    _pnlDashboardQuick.Dispose();
-                    _pnlDashboardQuick = null;
-                    BuildDashboardQuickPanel();
-                }
-                RefreshDashboardHomeData();
-                BuildNotificationItems();
-            }
-        }
-
         // ── dashboard home: stats + quick lists (live from GymDataStore) ──
         private void RefreshDashboardHomeData()
         {
             if (!pnlDashboardHome.Visible && AppSession.IsReceptionist) return;
 
-            var palette = GymTheme.Current;
             flowStatCards.Controls.Clear();
 
             int activeSubs = GymDataStore.Data.Members.Count(m => !string.IsNullOrWhiteSpace(m.PlanName));
@@ -169,7 +97,7 @@ namespace gym_mangment_system
                 Panel card = new Panel
                 {
                     Size      = new Size(cardW, cardH),
-                    BackColor = palette.Card,
+                    BackColor = Color.FromArgb(32, 32, 40),
                     Margin    = new Padding(12),
                     Cursor    = Cursors.Hand
                 };
@@ -201,19 +129,19 @@ namespace gym_mangment_system
                 {
                     Text      = title,
                     Font      = new Font("Segoe UI", 10F),
-                    ForeColor = palette.MutedText,
+                    ForeColor = Color.FromArgb(160, 160, 175),
                     Size      = new Size(cardW - 80, 24),
                     Location  = new Point(10, 86),
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.Transparent
                 };
 
-                card.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
-                card.MouseLeave += (s, e) => card.BackColor = palette.Card;
+                card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
+                card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
                 foreach (Control c in new Control[] { lblIcon, lblVal, lblTitle })
                 {
-                    c.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
-                    c.MouseLeave += (s, e) => card.BackColor = palette.Card;
+                    c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
+                    c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
                 }
 
                 card.Controls.Add(strip);
@@ -228,12 +156,11 @@ namespace gym_mangment_system
 
         private void BuildDashboardQuickPanel()
         {
-            var palette = GymTheme.Current;
             _pnlDashboardQuick = new Panel
             {
                 Dock      = DockStyle.Bottom,
                 Height    = 280,
-                BackColor = palette.Panel,
+                BackColor = Color.FromArgb(22, 22, 28),
                 Padding   = new Padding(16, 10, 16, 10)
             };
 
@@ -242,7 +169,7 @@ namespace gym_mangment_system
                 Text      = "⚡ إجراءات سريعة وقوائم",
                 Dock      = DockStyle.Top,
                 Height    = 28,
-                ForeColor = palette.Text,
+                ForeColor = Color.White,
                 Font      = new Font("Segoe UI", 12F, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleRight
             };
@@ -254,7 +181,7 @@ namespace gym_mangment_system
                 FlowDirection   = FlowDirection.RightToLeft,
                 WrapContents    = false,
                 Padding         = new Padding(0, 0, 0, 6),
-                BackColor       = palette.Panel
+                BackColor       = Color.FromArgb(22, 22, 28)
             };
 
             void AddQuickBtn(string text, Action onClick)
@@ -265,14 +192,13 @@ namespace gym_mangment_system
                     AutoSize  = true,
                     Padding   = new Padding(14, 6, 14, 6),
                     FlatStyle = FlatStyle.Flat,
-                    BackColor = palette.ButtonBack,
-                    ForeColor = palette.ButtonText,
+                    BackColor = Color.FromArgb(55, 55, 65),
+                    ForeColor = Color.White,
                     Font      = new Font("Segoe UI", 10F, FontStyle.Bold),
                     Cursor    = Cursors.Hand,
                     Margin    = new Padding(6, 0, 0, 0)
                 };
                 b.FlatAppearance.BorderSize = 0;
-                b.FlatAppearance.MouseOverBackColor = palette.ButtonHover;
                 b.Click += (_, __) => onClick();
                 flowBtns.Controls.Add(b);
             }
@@ -297,7 +223,7 @@ namespace gym_mangment_system
                 Height = 34,
                 ColumnCount = 3,
                 RowCount = 1,
-                BackColor = palette.Panel,
+                BackColor = Color.FromArgb(22, 22, 28),
                 RightToLeft = RightToLeft.Yes,
                 Padding = new Padding(4, 0, 4, 4)
             };
@@ -311,7 +237,7 @@ namespace gym_mangment_system
                 {
                     Text = text,
                     Dock = DockStyle.Fill,
-                    BackColor = palette.Primary,
+                    BackColor = Color.FromArgb(70, 70, 82),
                     ForeColor = Color.White,
                     Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                     TextAlign = ContentAlignment.MiddleRight,
@@ -328,7 +254,7 @@ namespace gym_mangment_system
                 Dock              = DockStyle.Fill,
                 ColumnCount       = 3,
                 RowCount          = 1,
-                BackColor         = palette.Panel,
+                BackColor         = Color.FromArgb(22, 22, 28),
                 RightToLeft       = RightToLeft.Yes
             };
             tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f));
@@ -341,8 +267,8 @@ namespace gym_mangment_system
                 lb = new ListBox
                 {
                     Dock = DockStyle.Fill,
-                    BackColor = palette.InputBack,
-                    ForeColor = palette.InputText,
+                    BackColor = Color.FromArgb(30, 30, 36),
+                    ForeColor = Color.White,
                     BorderStyle = BorderStyle.FixedSingle,
                     Font = new Font("Segoe UI", 10F),
                     IntegralHeight = false,
@@ -394,7 +320,7 @@ namespace gym_mangment_system
             btnNavSubs.Click     += (s, e) => ShowEmbeddedPage(new SubscriptionsForm(), btnNavSubs,     "📋  الاشتراكات");
             btnNavStore.Click    += (s, e) => ShowEmbeddedPage(new StoreForm(),         btnNavStore,    "🛒  المتجر (POS)");
             btnNavDiet.Click     += (s, e) => ShowEmbeddedPage(new DietPlanForm(),      btnNavDiet,     "🍏  التغذية");
-            btnNavReports.Click  += (s, e) => ShowEmbeddedPage(new ReportsForm(),       btnNavReports,  "📊  التقارير المالية");
+            btnNavReports.Click  += (s, e) => ShowEmbeddedPage(new ReportsForm(),       btnNavReports,  "📊  المالية");
             btnNavTrainers.Click += (s, e) => ShowEmbeddedPage(new TrainersForm(),      btnNavTrainers, "🏋️  إدارة المدربين");
             btnNavUsers.Click    += (s, e) => ShowEmbeddedPage(new UsersForm(),         btnNavUsers,    "👤  إدارة المستخدمين");
             btnNotifications.Click += (s, e) => ToggleNotifications();
@@ -456,11 +382,10 @@ namespace gym_mangment_system
             childForm.TopLevel         = false;
             childForm.FormBorderStyle  = FormBorderStyle.None;
             childForm.Dock             = DockStyle.Fill;
-            childForm.BackColor        = GymTheme.Current.Background;
+            childForm.BackColor        = Color.FromArgb(18, 18, 22);
 
             pnlContentHost.Controls.Add(childForm);
             ApplyArabicTypography(childForm);
-            GymTheme.ApplyTo(childForm);
             childForm.Show();
 
             lblDashTitle.Text = title;
@@ -484,11 +409,10 @@ namespace gym_mangment_system
 
         private void HighlightNavButton(Button btn)
         {
-            var palette = GymTheme.Current;
-            Color normalBg = palette.Sidebar;
-            Color activeBg = GymTheme.IsDark ? palette.CardHover : palette.Accent;
-            Color normalFg = palette.NavNormal;
-            Color activeFg = palette.NavActive;
+            Color normalBg = Color.FromArgb(22, 22, 26);
+            Color activeBg = Color.FromArgb(40, 40, 48);
+            Color normalFg = Color.FromArgb(160, 160, 170);
+            Color activeFg = Color.White;
 
             foreach (Control c in sidebar.Controls)
                 if (c is Button b && b != btn)
@@ -532,26 +456,6 @@ namespace gym_mangment_system
             _btnSignOut.BringToFront();
         }
 
-        private void AddThemeToggleButton()
-        {
-            _btnThemeToggle = new Button
-            {
-                Size = new Size(95, 34),
-                Location = new Point(195, 10),
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            _btnThemeToggle.FlatAppearance.BorderSize = 0;
-            _btnThemeToggle.Click += (s, e) =>
-            {
-                GymTheme.Toggle();
-                ApplyCurrentTheme(true);
-            };
-            topBar.Controls.Add(_btnThemeToggle);
-            _btnThemeToggle.BringToFront();
-        }
-
         private void BuildNotificationItems()
         {
             flowNotifications.Controls.Clear();
@@ -571,19 +475,18 @@ namespace gym_mangment_system
 
         private void AddNotifCard(string icon, string title, string body, Color accent)
         {
-            var palette = GymTheme.Current;
-            Panel card = new Panel { Size = new Size(356, 60), BackColor = palette.Card, Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
+            Panel card = new Panel { Size = new Size(356, 60), BackColor = Color.FromArgb(38, 38, 45), Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
             Panel strip = new Panel { Size = new Size(4, 60), BackColor = accent, Dock = DockStyle.Right };
             Label lblIcon  = new Label { Text = icon,  Font = new Font("Segoe UI", 16F), Size = new Size(40, 55), Location = new Point(305, 2), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
-            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = palette.Text,      Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F),                 ForeColor = palette.MutedText, Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.White,                    Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F),                 ForeColor = Color.FromArgb(150, 150, 160), Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
-            card.MouseEnter  += (s, e) => card.BackColor = palette.CardHover;
-            card.MouseLeave  += (s, e) => card.BackColor = palette.Card;
+            card.MouseEnter  += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
+            card.MouseLeave  += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
             foreach (Control c in new Control[] { lblIcon, lblTitle, lblBody })
             {
-                c.MouseEnter += (s, e) => card.BackColor = palette.CardHover;
-                c.MouseLeave += (s, e) => card.BackColor = palette.Card;
+                c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
+                c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
             }
 
             card.Controls.Add(strip); card.Controls.Add(lblIcon); card.Controls.Add(lblTitle); card.Controls.Add(lblBody);

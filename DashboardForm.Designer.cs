@@ -96,7 +96,7 @@ namespace gym_mangment_system
             // nav buttons helper
             SetupNavBtn(this.btnNavUsers,    "👤  المستخدمون", 7);
             SetupNavBtn(this.btnNavTrainers, "🏋️  المدربون",   6);
-            SetupNavBtn(this.btnNavReports,  "📊  التقارير",   5);
+            SetupNavBtn(this.btnNavReports,  "📊  المالية",    5);
             SetupNavBtn(this.btnNavDiet,     "🍏  التغذية",    4);
             SetupNavBtn(this.btnNavStore,    "🛒  المتجر",     3);
             SetupNavBtn(this.btnNavSubs,     "📋  الاشتراكات", 2);

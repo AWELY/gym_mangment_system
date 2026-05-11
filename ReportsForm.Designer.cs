@@ -57,7 +57,7 @@ namespace gym_mangment_system
             this.lblTitle.Padding = new System.Windows.Forms.Padding(15, 10, 15, 5);
             this.lblTitle.Size = new System.Drawing.Size(910, 55);
             this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "📊  التقارير المالية";
+            this.lblTitle.Text = "📊  المالية";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // tlpRevCards
@@ -225,7 +225,7 @@ namespace gym_mangment_system
             this.Padding = new System.Windows.Forms.Padding(20);
             this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "التقارير المالية";
+            this.Text = "المالية";
             this.tlpRevCards.ResumeLayout(false);
             this.pnlRev.ResumeLayout(false);
             this.pnlSubs.ResumeLayout(false);
