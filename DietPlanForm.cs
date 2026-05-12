@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -60,7 +62,7 @@ namespace gym_mangment_system
             btnBrowsePlanPdf.Click            += BtnBrowsePlanPdf_Click;
             btnSavePlan.Click                 += BtnSavePlan_Click;
             cmbSelectPlan.SelectedIndexChanged += CmbSelectPlan_Changed;
-            btnSendPlan.Click                 += BtnSendPlan_Click;
+            btnSendPlan.Click                 += async (s, e) => await BtnSendPlan_ClickAsync(s, e);
         }
 
         private void BtnSearchPhone_Click(object sender, EventArgs e)
@@ -152,7 +154,7 @@ namespace gym_mangment_system
                 txtSelectedPlanPdf.Text = "";
         }
 
-        private void BtnSendPlan_Click(object sender, EventArgs e)
+        private async Task BtnSendPlan_ClickAsync(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_currentMemberName))
             {
@@ -173,13 +175,88 @@ namespace gym_mangment_system
             GymDataStore.Save();
             listHistory.Items.Insert(0, logEntry);
 
-            string msg =
-                $"مرحباً {_currentMemberName}،\n\nنرفق لك خطة التغذية: {plan.Name}\nملف PDF: {plan.PdfPath}\n\nمع تحيات فريق Glory Gym";
-            WhatsAppWeb.OpenChat(_currentMemberPhone, msg);
+            string defaultCc = QonvoWhatsAppClient.ReadSetting("QonvoDefaultCountryCode", "218");
+            string recipient = QonvoPhone.ToE164(_currentMemberPhone, defaultCc);
+            string senderPhone = QonvoWhatsAppClient.ReadSetting("QonvoSenderWhatsAppPhone", "").Trim();
+            if (!string.IsNullOrEmpty(senderPhone) && !senderPhone.StartsWith("+", StringComparison.Ordinal))
+                senderPhone = "+" + new string(senderPhone.Where(char.IsDigit).ToArray());
 
-            MessageBox.Show(
-                "تم فتح واتساب في المتصفح لإرسال الرسالة. أكمل الإرسال من هناك إن لزم.",
-                "واتساب", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            string msgForMember =
+                $"مرحباً {_currentMemberName}،\n\nخطة التغذية: {plan.Name}\n\nمع تحيات فريق Glory Gym";
+
+            string baseUrl = QonvoWhatsAppClient.ReadSetting("QonvoBaseUrl", "https://backup.qonvo.ly/api");
+            string token   = QonvoWhatsAppClient.ReadSetting("QonvoApiToken", "");
+
+            bool sentAsDocument = !string.IsNullOrWhiteSpace(plan.PdfPath) && File.Exists(plan.PdfPath.Trim());
+            QonvoSendResult result;
+
+            string prevBtnText = btnSendPlan.Text;
+            try
+            {
+                btnSendPlan.Enabled = false;
+                btnSendPlan.Text    = "جاري الإرسال…";
+                Cursor              = Cursors.WaitCursor;
+
+                using (var client = new QonvoWhatsAppClient())
+                {
+                    if (sentAsDocument)
+                    {
+                        result = await client.SendDocumentFromFileAsync(
+                                baseUrl,
+                                token,
+                                senderPhone,
+                                recipient,
+                                plan.PdfPath.Trim(),
+                                msgForMember)
+                            .ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(plan.PdfPath))
+                        {
+                            MessageBox.Show(
+                                "ملف PDF غير موجود في المسار المحفوظ. سيتم إرسال رسالة نصية فقط.",
+                                "تنبيه",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                        }
+
+                        result = await client.SendTextAsync(baseUrl, token, senderPhone, recipient, msgForMember)
+                            .ConfigureAwait(true);
+                    }
+                }
+            }
+            finally
+            {
+                btnSendPlan.Enabled = true;
+                btnSendPlan.Text    = prevBtnText;
+                Cursor              = Cursors.Default;
+            }
+
+            if (result.Ok)
+            {
+                MessageBox.Show(
+                    sentAsDocument
+                        ? "تم جدولة إرسال خطة التغذية (ملف PDF) عبر واتساب (Qonvo)."
+                        : "تم جدولة إرسال الرسالة عبر واتساب (Qonvo).",
+                    "واتساب",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var openBrowser = MessageBox.Show(
+                result.Detail + "\n\nهل تريد فتح واتساب في المتصفح كبديل؟",
+                "فشل الإرسال عبر الـ API",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (openBrowser == DialogResult.Yes)
+            {
+                string msgWithPdf =
+                    $"مرحباً {_currentMemberName}،\n\nنرفق لك خطة التغذية: {plan.Name}\nملف PDF: {plan.PdfPath}\n\nمع تحيات فريق Glory Gym";
+                WhatsAppWeb.OpenChat(_currentMemberPhone, msgWithPdf);
+            }
         }
     }
 }
