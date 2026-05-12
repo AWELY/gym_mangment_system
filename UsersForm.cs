@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class UsersForm : Form
+    public partial class UsersForm : Form, IThemeAware
     {
         private DataTable _dt;
         private bool _isEditing      = false;
@@ -17,7 +17,25 @@ namespace gym_mangment_system
             InitializeComponent();
             LoadMockData();
             WireEvents();
+            ApplyTheme(ThemeManager.Current);
             UpdateCount();
+        }
+
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            lblTitle.ForeColor = s.TextPrimary;
+            ThemeManager.StyleDataGridView(gridUsers, s);
+            lblCount.ForeColor = s.TextMuted;
+
+            pnlForm.BackColor = s.Card;
+            lblFormTitle.ForeColor = s.TextPrimary;
+            lblFFullName.ForeColor = lblFUsername.ForeColor = lblFPassword.ForeColor = lblFRole.ForeColor = s.TextMuted;
+            txtFFullName.BackColor = txtFUsername.BackColor = txtFPassword.BackColor = cmbFRole.BackColor = s.InputBackground;
+            txtFFullName.ForeColor = txtFUsername.ForeColor = txtFPassword.ForeColor = cmbFRole.ForeColor = s.InputForeground;
+            btnFormCancel.BackColor = s.SecondaryButton;
+            btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
+            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
         }
 
         private void LoadMockData()

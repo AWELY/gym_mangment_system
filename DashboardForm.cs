@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -26,38 +25,133 @@ namespace gym_mangment_system
         public DashboardForm()
         {
             InitializeComponent();
+            ThemeManager.ThemeChanged += OnGlobalThemeChanged;
+            btnThemeToggle.Click += (_, __) => ThemeManager.Toggle();
+
+            ApplyDashboardDesignerTheme();
+            UpdateThemeToggleGlyph();
             ApplyBrandImages();
             ApplyArabicTypography(this);
             AssignNavEvents();
-            ApplyRoleVisibility();
             _activeNavButton = btnNavHome;
             HighlightNavButton(btnNavHome);
             BuildDashboardQuickPanel();
-            BuildNotificationItems();
-            InitializeCommercialBanner();
             RefreshDashboardHomeData();
             AddSignOutButton();
+            StyleSignOutButton();
+            InitializeCommercialBanner();
             lblStatusRight.Text = "اسم المستخدم: " + AppSession.Username;
             _statusClock = new Timer { Interval = 1000 };
             _statusClock.Tick += (_, __) => lblStatusCenter.Text = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss");
             _statusClock.Start();
             this.FormClosing += (s, e) =>
             {
+                ThemeManager.ThemeChanged -= OnGlobalThemeChanged;
                 if (_commercialTicker != null) _commercialTicker.Stop();
                 if (_statusClock != null) _statusClock.Stop();
                 GymDataStore.Save();
             };
+            ApplyRoleVisibility();
+        }
+
+        private void OnGlobalThemeChanged(object sender, EventArgs e)
+        {
+            ApplyDashboardDesignerTheme();
+            UpdateThemeToggleGlyph();
+            ApplyBrandImages();
+            RebuildDashboardQuickPanel();
+            RefreshDashboardHomeData();
+            BuildNotificationItems();
+            StyleSignOutButton();
+            if (_activeNavButton != null)
+                HighlightNavButton(_activeNavButton);
+            ApplyThemeToEmbeddedChild();
+            EnsureTopBarInteractiveZOrder();
+        }
+
+        private void RebuildDashboardQuickPanel()
+        {
+            DisposeDashboardQuickPanel();
+            BuildDashboardQuickPanel();
+            RefreshQuickLists();
+        }
+
+        private void DisposeDashboardQuickPanel()
+        {
+            if (_pnlDashboardQuick == null) return;
+            pnlDashboardHome.Controls.Remove(_pnlDashboardQuick);
+            _pnlDashboardQuick.Dispose();
+            _pnlDashboardQuick = null;
+            _lstQuickMembers = null;
+            _lstQuickStock = null;
+            _lstQuickSales = null;
+        }
+
+        private void ApplyDashboardDesignerTheme()
+        {
+            UiColorScheme t = ThemeManager.Current;
+            BackColor = t.FormBackground;
+            sidebar.BackColor = t.Sidebar;
+            topBar.BackColor = t.TopBar;
+            lblDashTitle.ForeColor = t.TextPrimary;
+            btnNotifications.BackColor = t.TopBar;
+            btnNotifications.ForeColor = t.TextPrimary;
+            btnNotifications.FlatAppearance.MouseOverBackColor = t.TopBarButtonHover;
+            btnNotifications.UseVisualStyleBackColor = false;
+            btnThemeToggle.BackColor = t.TopBar;
+            btnThemeToggle.ForeColor = t.TextPrimary;
+            btnThemeToggle.FlatAppearance.MouseOverBackColor = t.TopBarButtonHover;
+            statusBar.BackColor = t.StatusBar;
+            lblStatusCenter.ForeColor = t.TextMuted;
+            lblStatusRight.ForeColor = t.TextMuted;
+            pnlContentHost.BackColor = t.ContentHost;
+            pnlNotifDropdown.BackColor = t.Panel;
+            flowNotifications.BackColor = t.Panel;
+            lblNotifHeader.BackColor = t.PanelElevated;
+            lblNotifHeader.ForeColor = t.TextPrimary;
+
+            foreach (Control c in sidebar.Controls)
+            {
+                if (c is Button b)
+                    b.FlatAppearance.MouseOverBackColor = t.SidebarNavActive;
+            }
+            EnsureTopBarInteractiveZOrder();
+        }
+
+        private void UpdateThemeToggleGlyph()
+        {
+            btnThemeToggle.Text = ThemeManager.IsLight ? "🌙" : "☀";
+        }
+
+        private void StyleSignOutButton()
+        {
+            if (_btnSignOut == null) return;
+            UiColorScheme t = ThemeManager.Current;
+            _btnSignOut.BackColor = t.SecondaryButton;
+            _btnSignOut.ForeColor = ThemeManager.IsLight ? t.TextPrimary : t.TextOnAccent;
+            _btnSignOut.FlatAppearance.MouseOverBackColor = t.SecondaryButtonHover;
+        }
+
+        private void ApplyThemeToEmbeddedChild()
+        {
+            foreach (Control c in pnlContentHost.Controls)
+            {
+                if (c is IThemeAware th)
+                    th.ApplyTheme(ThemeManager.Current);
+            }
         }
 
         // ── branding ──────────────────────────────────────
         private void ApplyBrandImages()
         {
-            Image bg = ImageAssets.TryLoadToughBackground("dashboard", 0.55f);
+            float dashOp = ThemeManager.BrandingOpacity(isDashboard: true);
+            float homeOp = ThemeManager.IsLight ? 0.28f : 0.60f;
+            Image bg = ImageAssets.TryLoadToughBackground("dashboard", dashOp);
             if (bg != null)
             {
                 this.BackgroundImage = bg;
                 this.BackgroundImageLayout = ImageLayout.Stretch;
-                pnlDashboardHome.BackgroundImage = ImageAssets.TryLoadToughBackground("dashboard-home", 0.60f);
+                pnlDashboardHome.BackgroundImage = ImageAssets.TryLoadToughBackground("dashboard-home", homeOp);
                 pnlDashboardHome.BackgroundImageLayout = ImageLayout.Stretch;
             }
 
@@ -77,6 +171,7 @@ namespace gym_mangment_system
             if (!pnlDashboardHome.Visible && AppSession.IsReceptionist) return;
 
             flowStatCards.Controls.Clear();
+            UiColorScheme t = ThemeManager.Current;
 
             int activeSubs = GymDataStore.Data.Members.Count(m => !string.IsNullOrWhiteSpace(m.PlanName));
             decimal monthTotal = GymDataStore.StoreRevenueThisMonth() + GymDataStore.SubscriptionCashInThisMonth();
@@ -97,7 +192,7 @@ namespace gym_mangment_system
                 Panel card = new Panel
                 {
                     Size      = new Size(cardW, cardH),
-                    BackColor = Color.FromArgb(32, 32, 40),
+                    BackColor = t.Card,
                     Margin    = new Padding(12),
                     Cursor    = Cursors.Hand
                 };
@@ -129,19 +224,21 @@ namespace gym_mangment_system
                 {
                     Text      = title,
                     Font      = new Font("Segoe UI", 10F),
-                    ForeColor = Color.FromArgb(160, 160, 175),
+                    ForeColor = t.TextMuted,
                     Size      = new Size(cardW - 80, 24),
                     Location  = new Point(10, 86),
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.Transparent
                 };
 
-                card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
-                card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
+                Color hover = t.CardHover;
+                Color normal = t.Card;
+                card.MouseEnter += (s, e) => card.BackColor = hover;
+                card.MouseLeave += (s, e) => card.BackColor = normal;
                 foreach (Control c in new Control[] { lblIcon, lblVal, lblTitle })
                 {
-                    c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(42, 42, 52);
-                    c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(32, 32, 40);
+                    c.MouseEnter += (s, e) => card.BackColor = hover;
+                    c.MouseLeave += (s, e) => card.BackColor = normal;
                 }
 
                 card.Controls.Add(strip);
@@ -156,11 +253,12 @@ namespace gym_mangment_system
 
         private void BuildDashboardQuickPanel()
         {
+            UiColorScheme t = ThemeManager.Current;
             _pnlDashboardQuick = new Panel
             {
                 Dock      = DockStyle.Bottom,
                 Height    = 280,
-                BackColor = Color.FromArgb(22, 22, 28),
+                BackColor = t.QuickPanel,
                 Padding   = new Padding(16, 10, 16, 10)
             };
 
@@ -169,9 +267,10 @@ namespace gym_mangment_system
                 Text      = "⚡ إجراءات سريعة وقوائم",
                 Dock      = DockStyle.Top,
                 Height    = 28,
-                ForeColor = Color.White,
+                ForeColor = t.TextPrimary,
                 Font      = new Font("Segoe UI", 12F, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleRight
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
             };
 
             var flowBtns = new FlowLayoutPanel
@@ -181,7 +280,7 @@ namespace gym_mangment_system
                 FlowDirection   = FlowDirection.RightToLeft,
                 WrapContents    = false,
                 Padding         = new Padding(0, 0, 0, 6),
-                BackColor       = Color.FromArgb(22, 22, 28)
+                BackColor       = t.QuickPanel
             };
 
             void AddQuickBtn(string text, Action onClick)
@@ -192,13 +291,14 @@ namespace gym_mangment_system
                     AutoSize  = true,
                     Padding   = new Padding(14, 6, 14, 6),
                     FlatStyle = FlatStyle.Flat,
-                    BackColor = Color.FromArgb(55, 55, 65),
-                    ForeColor = Color.White,
+                    BackColor = t.SecondaryButton,
+                    ForeColor = t.TextOnAccent,
                     Font      = new Font("Segoe UI", 10F, FontStyle.Bold),
                     Cursor    = Cursors.Hand,
                     Margin    = new Padding(6, 0, 0, 0)
                 };
                 b.FlatAppearance.BorderSize = 0;
+                b.FlatAppearance.MouseOverBackColor = t.SecondaryButtonHover;
                 b.Click += (_, __) => onClick();
                 flowBtns.Controls.Add(b);
             }
@@ -223,7 +323,7 @@ namespace gym_mangment_system
                 Height = 34,
                 ColumnCount = 3,
                 RowCount = 1,
-                BackColor = Color.FromArgb(22, 22, 28),
+                BackColor = t.QuickPanel,
                 RightToLeft = RightToLeft.Yes,
                 Padding = new Padding(4, 0, 4, 4)
             };
@@ -237,8 +337,8 @@ namespace gym_mangment_system
                 {
                     Text = text,
                     Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(70, 70, 82),
-                    ForeColor = Color.White,
+                    BackColor = t.TableHeaderBand,
+                    ForeColor = ThemeManager.IsLight ? t.TextPrimary : t.TextOnAccent,
                     Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                     TextAlign = ContentAlignment.MiddleRight,
                     Padding = new Padding(8, 0, 8, 0),
@@ -254,7 +354,7 @@ namespace gym_mangment_system
                 Dock              = DockStyle.Fill,
                 ColumnCount       = 3,
                 RowCount          = 1,
-                BackColor         = Color.FromArgb(22, 22, 28),
+                BackColor         = t.QuickPanel,
                 RightToLeft       = RightToLeft.Yes
             };
             tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f));
@@ -263,12 +363,12 @@ namespace gym_mangment_system
 
             Panel MakeListColumn(out ListBox lb)
             {
-                var p = new Panel { Dock = DockStyle.Fill, Padding = new Padding(4) };
+                var p = new Panel { Dock = DockStyle.Fill, Padding = new Padding(4), BackColor = Color.Transparent };
                 lb = new ListBox
                 {
                     Dock = DockStyle.Fill,
-                    BackColor = Color.FromArgb(30, 30, 36),
-                    ForeColor = Color.White,
+                    BackColor = t.ListBackground,
+                    ForeColor = t.ListForeground,
                     BorderStyle = BorderStyle.FixedSingle,
                     Font = new Font("Segoe UI", 10F),
                     IntegralHeight = false,
@@ -331,15 +431,14 @@ namespace gym_mangment_system
         {
             if (AppSession.IsReceptionist)
             {
-                // Recipient: only Members, Store, Diet (feeding)
                 btnNavHome.Visible     = false;
                 btnNavSubs.Visible     = false;
                 btnNavReports.Visible  = false;
                 btnNavTrainers.Visible = false;
                 btnNavUsers.Visible    = false;
                 btnNotifications.Visible = false;
+                btnThemeToggle.Location = new Point(12, 6);
                 lblStatusLeft.Text = "● واتساب عبر المتصفح (wa.me)";
-                // Start on Members page directly
                 ShowEmbeddedPage(new MembersForm(), btnNavMembers, "👥  إدارة الأعضاء");
             }
         }
@@ -357,7 +456,8 @@ namespace gym_mangment_system
                 Left      = topBar.Width
             };
             topBar.Controls.Add(_commercialLabel);
-            _commercialLabel.BringToFront();
+            _commercialLabel.SendToBack();
+            EnsureTopBarInteractiveZOrder();
 
             _commercialTicker = new Timer { Interval = 35 };
             _commercialTicker.Tick += (s, e) =>
@@ -367,6 +467,18 @@ namespace gym_mangment_system
                     _commercialLabel.Left = topBar.Width;
             };
             _commercialTicker.Start();
+        }
+
+        /// <summary>Keeps the scrolling banner behind notification, theme, title, and sign-out.</summary>
+        private void EnsureTopBarInteractiveZOrder()
+        {
+            if (_commercialLabel != null)
+                _commercialLabel.SendToBack();
+            lblDashTitle.BringToFront();
+            btnThemeToggle.BringToFront();
+            btnNotifications.BringToFront();
+            if (_btnSignOut != null)
+                _btnSignOut.BringToFront();
         }
 
         private void ShowEmbeddedPage(Form childForm, Button navButton, string title)
@@ -379,14 +491,18 @@ namespace gym_mangment_system
                 if (c is Form f) f.Close();
             pnlContentHost.Controls.Clear();
 
+            UiColorScheme t = ThemeManager.Current;
             childForm.TopLevel         = false;
             childForm.FormBorderStyle  = FormBorderStyle.None;
             childForm.Dock             = DockStyle.Fill;
-            childForm.BackColor        = Color.FromArgb(18, 18, 22);
+            childForm.BackColor        = t.ContentHost;
 
             pnlContentHost.Controls.Add(childForm);
             ApplyArabicTypography(childForm);
             childForm.Show();
+
+            if (childForm is IThemeAware th)
+                th.ApplyTheme(t);
 
             lblDashTitle.Text = title;
             HighlightNavButton(navButton);
@@ -409,10 +525,11 @@ namespace gym_mangment_system
 
         private void HighlightNavButton(Button btn)
         {
-            Color normalBg = Color.FromArgb(22, 22, 26);
-            Color activeBg = Color.FromArgb(40, 40, 48);
-            Color normalFg = Color.FromArgb(160, 160, 170);
-            Color activeFg = Color.White;
+            UiColorScheme t = ThemeManager.Current;
+            Color normalBg = t.SidebarNav;
+            Color activeBg = t.SidebarNavActive;
+            Color normalFg = t.TextMuted;
+            Color activeFg = t.TextPrimary;
 
             foreach (Control c in sidebar.Controls)
                 if (c is Button b && b != btn)
@@ -436,15 +553,12 @@ namespace gym_mangment_system
             {
                 Text = "تسجيل الخروج",
                 Size = new Size(118, 34),
-                Location = new Point(70, 10),
+                Location = new Point(118, 10),
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(55, 55, 65),
-                ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
             _btnSignOut.FlatAppearance.BorderSize = 0;
-            _btnSignOut.FlatAppearance.MouseOverBackColor = Color.FromArgb(75, 75, 88);
             _btnSignOut.Click += (s, e) =>
             {
                 if (MessageBox.Show("هل تريد تسجيل الخروج؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -475,18 +589,21 @@ namespace gym_mangment_system
 
         private void AddNotifCard(string icon, string title, string body, Color accent)
         {
-            Panel card = new Panel { Size = new Size(356, 60), BackColor = Color.FromArgb(38, 38, 45), Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
+            UiColorScheme t = ThemeManager.Current;
+            Panel card = new Panel { Size = new Size(356, 60), BackColor = t.NotifCard, Margin = new Padding(3, 2, 3, 2), Cursor = Cursors.Hand };
             Panel strip = new Panel { Size = new Size(4, 60), BackColor = accent, Dock = DockStyle.Right };
             Label lblIcon  = new Label { Text = icon,  Font = new Font("Segoe UI", 16F), Size = new Size(40, 55), Location = new Point(305, 2), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
-            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.White,                    Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F),                 ForeColor = Color.FromArgb(150, 150, 160), Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblTitle = new Label { Text = title, Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = t.TextPrimary, Size = new Size(260, 20), Location = new Point(10, 8),  TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label lblBody  = new Label { Text = body,  Font = new Font("Segoe UI",  9F), ForeColor = t.TextMuted, Size = new Size(290, 18), Location = new Point(10, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
-            card.MouseEnter  += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
-            card.MouseLeave  += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
+            Color hover = t.NotifCardHover;
+            Color normal = t.NotifCard;
+            card.MouseEnter  += (s, e) => card.BackColor = hover;
+            card.MouseLeave  += (s, e) => card.BackColor = normal;
             foreach (Control c in new Control[] { lblIcon, lblTitle, lblBody })
             {
-                c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(48, 48, 55);
-                c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(38, 38, 45);
+                c.MouseEnter += (s, e) => card.BackColor = hover;
+                c.MouseLeave += (s, e) => card.BackColor = normal;
             }
 
             card.Controls.Add(strip); card.Controls.Add(lblIcon); card.Controls.Add(lblTitle); card.Controls.Add(lblBody);

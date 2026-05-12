@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class ReportsForm : Form
+    public partial class ReportsForm : Form, IThemeAware
     {
         private decimal _monthlySubscriptions;
         private decimal _monthlyStore;
@@ -21,18 +21,29 @@ namespace gym_mangment_system
             BuildFinancialReport();
         }
 
+        public void ApplyTheme(UiColorScheme _)
+        {
+            ApplyBackgroundBranding();
+            BuildFinancialReport();
+        }
+
         private void ApplyBackgroundBranding()
         {
-            Image faded = ImageAssets.TryLoadToughBackground("reports", 0.22f);
+            float op = ThemeManager.BrandingOpacity();
+            Image faded = ImageAssets.TryLoadToughBackground("reports", op);
             if (faded == null) return;
             this.BackgroundImage = faded;
             this.BackgroundImageLayout = ImageLayout.Stretch;
-            pnlChart.BackgroundImage = faded;
-            pnlChart.BackgroundImageLayout = ImageLayout.Stretch;
+            if (pnlChart != null)
+            {
+                pnlChart.BackgroundImage = faded;
+                pnlChart.BackgroundImageLayout = ImageLayout.Stretch;
+            }
         }
 
         private void BuildFinancialReport()
         {
+            UiColorScheme s = ThemeManager.Current;
             Controls.Clear();
 
             _monthlySubscriptions = GymDataStore.SubscriptionCashInThisMonth();
@@ -41,15 +52,18 @@ namespace gym_mangment_system
             _monthlyGross = _monthlySubscriptions + _monthlyStore;
             _monthlyNet = _monthlyGross - _monthlySalaries;
 
+            BackColor = s.ContentHost;
+
             var title = new Label
             {
                 Dock = DockStyle.Top,
                 Height = 70,
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold),
-                ForeColor = Color.White,
+                ForeColor = s.TextPrimary,
                 Padding = new Padding(15, 10, 15, 5),
                 Text = "📊  المالية",
-                TextAlign = ContentAlignment.MiddleRight
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
             };
 
             var cards = new TableLayoutPanel
@@ -66,16 +80,16 @@ namespace gym_mangment_system
             cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 
-            cards.Controls.Add(CreateFinancialCard("💵 ربح الاشتراكات", FormatMoney(_monthlySubscriptions), Color.FromArgb(33, 150, 243)), 3, 0);
-            cards.Controls.Add(CreateFinancialCard("🛒 ربح المتجر", FormatMoney(_monthlyStore), Color.FromArgb(76, 175, 80)), 2, 0);
-            cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(244, 67, 54)), 1, 0);
-            cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(76, 175, 80) : Color.FromArgb(244, 67, 54)), 0, 0);
+            cards.Controls.Add(CreateFinancialCard("💵 ربح الاشتراكات", FormatMoney(_monthlySubscriptions), Color.FromArgb(33, 150, 243), s), 3, 0);
+            cards.Controls.Add(CreateFinancialCard("🛒 ربح المتجر", FormatMoney(_monthlyStore), Color.FromArgb(76, 175, 80), s), 2, 0);
+            cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(244, 67, 54), s), 1, 0);
+            cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(76, 175, 80) : Color.FromArgb(244, 67, 54), s), 0, 0);
 
             var summary = new Panel
             {
                 Dock = DockStyle.Top,
                 Height = 150,
-                BackColor = Color.FromArgb(32, 32, 38),
+                BackColor = s.PanelElevated,
                 Padding = new Padding(20, 12, 20, 12),
                 Margin = new Padding(0, 12, 0, 12)
             };
@@ -85,17 +99,19 @@ namespace gym_mangment_system
                 Dock = DockStyle.Top,
                 Height = 42,
                 Font = new Font("Segoe UI", 14F, FontStyle.Bold),
-                ForeColor = Color.White,
+                ForeColor = s.TextPrimary,
                 TextAlign = ContentAlignment.MiddleRight,
-                Text = "المعادلة: الاشتراكات + المتجر - الرواتب = المتبقي"
+                Text = "المعادلة: الاشتراكات + المتجر - الرواتب = المتبقي",
+                BackColor = Color.Transparent
             };
 
             var details = new Label
             {
                 Dock = DockStyle.Fill,
                 Font = new Font("Segoe UI", 12F),
-                ForeColor = Color.FromArgb(210, 210, 220),
+                ForeColor = s.TextMuted,
                 TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent,
                 Text = string.Join(Environment.NewLine, new[]
                 {
                     "دخل الشهر قبل الرواتب: " + FormatMoney(_monthlyGross),
@@ -113,10 +129,16 @@ namespace gym_mangment_system
             pnlChart = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(35, 35, 35),
+                BackColor = s.Panel,
                 Margin = new Padding(0, 12, 0, 0)
             };
             pnlChart.Paint += PnlChart_Paint;
+
+            if (BackgroundImage != null)
+            {
+                pnlChart.BackgroundImage = BackgroundImage;
+                pnlChart.BackgroundImageLayout = ImageLayout.Stretch;
+            }
 
             Controls.Add(pnlChart);
             Controls.Add(summary);
@@ -124,12 +146,12 @@ namespace gym_mangment_system
             Controls.Add(title);
         }
 
-        private Panel CreateFinancialCard(string title, string value, Color accent)
+        private Panel CreateFinancialCard(string title, string value, Color accent, UiColorScheme s)
         {
             var panel = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(35, 35, 35),
+                BackColor = s.PanelElevated,
                 Margin = new Padding(8)
             };
 
@@ -138,9 +160,10 @@ namespace gym_mangment_system
                 Dock = DockStyle.Top,
                 Height = 42,
                 Font = new Font("Segoe UI", 11F),
-                ForeColor = Color.LightGray,
+                ForeColor = s.TextMuted,
                 Text = title,
-                TextAlign = ContentAlignment.MiddleCenter
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
             };
 
             var valueLabel = new Label
@@ -149,7 +172,8 @@ namespace gym_mangment_system
                 Font = new Font("Segoe UI", 22F, FontStyle.Bold),
                 ForeColor = accent,
                 Text = value,
-                TextAlign = ContentAlignment.MiddleCenter
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent
             };
 
             var strip = new Panel
@@ -167,6 +191,7 @@ namespace gym_mangment_system
 
         private void PnlChart_Paint(object sender, PaintEventArgs e)
         {
+            UiColorScheme s = ThemeManager.Current;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -179,13 +204,12 @@ namespace gym_mangment_system
             if (chartW <= 0 || chartH <= 0) return;
 
             using (Font headerFont = new Font("Segoe UI", 12F, FontStyle.Bold))
-            using (Brush headerBrush = new SolidBrush(Color.White))
+            using (Brush headerBrush = new SolidBrush(s.TextPrimary))
             {
                 g.DrawString("تدفق السنة: الدخل الشهري، الرواتب، والمتبقي", headerFont, headerBrush, w - 390, 8);
             }
 
-            // Grid
-            using (Pen gridPen = new Pen(Color.FromArgb(55, 55, 65)))
+            using (Pen gridPen = new Pen(s.BorderSubtle))
             {
                 for (int i = 0; i <= 6; i++)
                 {
@@ -194,9 +218,9 @@ namespace gym_mangment_system
                 }
             }
 
-            decimal[] dSubs  = GymDataStore.SubscriptionTotalsByMonthCurrentYear();
+            decimal[] dSubs = GymDataStore.SubscriptionTotalsByMonthCurrentYear();
             decimal[] dStore = GymDataStore.StoreTotalsByMonthCurrentYear();
-            float[] gross = dSubs.Zip(dStore, (s, st) => (float)(s + st)).ToArray();
+            float[] gross = dSubs.Zip(dStore, (a, b) => (float)(a + b)).ToArray();
             float salary = (float)GymDataStore.Data.Trainers.Sum(t => t.Salary);
             float[] net = gross.Select(x => x - salary).ToArray();
             string[] months = { "ين", "فب", "مار", "أبر", "ماي", "يون", "يول", "أغس", "سبت", "أكت", "نوف", "ديس" };
@@ -204,9 +228,8 @@ namespace gym_mangment_system
             float maxVal = Math.Max(500f, Math.Max(maxGross, salary) * 1.20f);
             int barW = Math.Max(8, chartW / 34);
 
-            // Y axis labels
             using (Font axisFont = new Font("Segoe UI", 8F))
-            using (Brush axisBrush = new SolidBrush(Color.FromArgb(120, 120, 130)))
+            using (Brush axisBrush = new SolidBrush(s.TextMuted))
             {
                 for (int i = 0; i <= 6; i++)
                 {
@@ -216,55 +239,44 @@ namespace gym_mangment_system
                 }
             }
 
-            // Draw bars
             for (int i = 0; i < 12; i++)
             {
                 int x = padL + (chartW * i / 12) + barW;
 
                 int hGross = (int)(chartH * gross[i] / maxVal);
                 using (Brush bGross = new SolidBrush(Color.FromArgb(76, 175, 80)))
-                {
                     g.FillRectangle(bGross, x, padT + chartH - hGross, barW, hGross);
-                }
 
                 int hSalary = (int)(chartH * salary / maxVal);
                 using (Brush bSalary = new SolidBrush(Color.FromArgb(244, 67, 54)))
-                {
                     g.FillRectangle(bSalary, x + barW + 2, padT + chartH - hSalary, barW, hSalary);
-                }
 
                 int hNet = (int)(chartH * Math.Abs(net[i]) / maxVal);
                 Color netColor = net[i] >= 0 ? Color.FromArgb(33, 150, 243) : Color.FromArgb(255, 152, 0);
                 using (Brush bNet = new SolidBrush(netColor))
-                {
                     g.FillRectangle(bNet, x + (barW * 2) + 4, padT + chartH - hNet, barW, hNet);
-                }
 
-                // Month label
                 using (Font mFont = new Font("Segoe UI", 7F))
-                using (Brush mBrush = new SolidBrush(Color.FromArgb(130, 130, 140)))
-                {
-
+                using (Brush mBrush = new SolidBrush(s.TextMuted))
                     g.DrawString(months[i], mFont, mBrush, x, padT + chartH + 8);
-                }
             }
 
-            // Legend
             int lx = w - 390;
             int ly = 8;
             using (Font lFont = new Font("Segoe UI", 9F, FontStyle.Bold))
+            using (Brush legBrush = new SolidBrush(s.TextPrimary))
             using (Brush incomeBrush = new SolidBrush(Color.FromArgb(76, 175, 80)))
             using (Brush salaryBrush = new SolidBrush(Color.FromArgb(244, 67, 54)))
             using (Brush netBrush = new SolidBrush(Color.FromArgb(33, 150, 243)))
             {
                 g.FillRectangle(incomeBrush, lx, ly + 28, 14, 14);
-                g.DrawString("الدخل", lFont, Brushes.White, lx + 20, ly + 25);
+                g.DrawString("الدخل", lFont, legBrush, lx + 20, ly + 25);
 
                 g.FillRectangle(salaryBrush, lx + 95, ly + 28, 14, 14);
-                g.DrawString("الرواتب", lFont, Brushes.White, lx + 115, ly + 25);
+                g.DrawString("الرواتب", lFont, legBrush, lx + 115, ly + 25);
 
                 g.FillRectangle(netBrush, lx + 205, ly + 28, 14, 14);
-                g.DrawString("المتبقي", lFont, Brushes.White, lx + 225, ly + 25);
+                g.DrawString("المتبقي", lFont, legBrush, lx + 225, ly + 25);
             }
         }
 

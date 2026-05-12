@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class MembersForm : Form
+    public partial class MembersForm : Form, IThemeAware
     {
         private DataTable _dt;
         private bool _isEditing = false;
@@ -20,20 +20,58 @@ namespace gym_mangment_system
             _startAddMode = startAddMode;
             InitializeComponent();
             ApplyBackgroundBranding();
-            ApplyGridOpacityStyle();
             LoadSubscriptionPlans();
             InitMembersTable();
             RebindMembersFromStore();
             WireEvents();
+            ApplyTheme(ThemeManager.Current);
             UpdateMemberCount();
 
             if (_startAddMode)
                 BtnAddMember_Click(this, EventArgs.Empty);
         }
 
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            lblTitle.ForeColor = s.TextPrimary;
+            lblSearch.ForeColor = s.TextMuted;
+            txtSearch.BackColor = s.InputBackground;
+            txtSearch.ForeColor = s.InputForeground;
+            ThemeManager.StyleDataGridView(gridMembers, s);
+            lblMemberCount.ForeColor = s.TextMuted;
+
+            pnlForm.BackColor = s.Card;
+            lblFormTitle.ForeColor = s.TextPrimary;
+            Color labelMuted = s.TextMuted;
+            lblFName.ForeColor = labelMuted;
+            lblFPhone.ForeColor = labelMuted;
+            lblFGender.ForeColor = labelMuted;
+            lblFPlan.ForeColor = labelMuted;
+            lblFPlanPrice.ForeColor = labelMuted;
+            lblFPlanMonths.ForeColor = labelMuted;
+
+            txtFName.BackColor = s.InputBackground;
+            txtFName.ForeColor = s.InputForeground;
+            txtFPhone.BackColor = s.InputBackground;
+            txtFPhone.ForeColor = s.InputForeground;
+            cmbFGender.BackColor = s.InputBackground;
+            cmbFGender.ForeColor = s.InputForeground;
+            cmbFPlan.BackColor = s.InputBackground;
+            cmbFPlan.ForeColor = s.InputForeground;
+
+            txtFPlanPrice.BackColor = s.PanelElevated;
+            txtFPlanMonths.BackColor = s.PanelElevated;
+
+            btnFormCancel.BackColor = s.SecondaryButton;
+            btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
+            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+        }
+
         private void ApplyBackgroundBranding()
         {
-            Image faded = ImageAssets.TryLoadToughBackground("members", 0.22f);
+            float op = ThemeManager.BrandingOpacity();
+            Image faded = ImageAssets.TryLoadToughBackground("members", op);
             if (faded == null) return;
             this.BackgroundImage = faded;
             this.BackgroundImageLayout = ImageLayout.Center;
@@ -43,16 +81,6 @@ namespace gym_mangment_system
             pnlSearch.BackgroundImageLayout = ImageLayout.Stretch;
             pnlActions.BackgroundImage = faded;
             pnlActions.BackgroundImageLayout = ImageLayout.Stretch;
-        }
-
-        private void ApplyGridOpacityStyle()
-        {
-            gridMembers.BackgroundColor = Color.FromArgb(12, 12, 14);
-            gridMembers.DefaultCellStyle.BackColor = Color.FromArgb(18, 18, 24);
-            gridMembers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(40, 40, 52);
-            gridMembers.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(24, 24, 30);
-            gridMembers.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(30, 30, 38);
-            gridMembers.EnableHeadersVisualStyles = false;
         }
 
         private void LoadSubscriptionPlans()

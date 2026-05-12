@@ -99,6 +99,8 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImageAssets.cs" />
+    <Compile Include="IThemeAware.cs" />
+    <Compile Include="ThemeManager.cs" />
     <Compile Include="AppSession.cs" />
     <Compile Include="GymDataModels.cs" />
     <Compile Include="GymDataStore.cs" />

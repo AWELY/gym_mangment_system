@@ -4,17 +4,55 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IThemeAware
     {
         private bool _autoLoginOnFirstShow = true;
 
         public Form1()
         {
             InitializeComponent();
+            ThemeManager.ThemeChanged += OnThemeManagerThemeChanged;
+            this.FormClosed += (_, __) => ThemeManager.ThemeChanged -= OnThemeManagerThemeChanged;
             ApplyBranding();
+            ApplyTheme(ThemeManager.Current);
             txtUser.Text = "admin";
             txtPass.Text = "admin";
             this.Shown += Form1_Shown;
+        }
+
+        private void OnThemeManagerThemeChanged(object sender, EventArgs e)
+        {
+            ApplyTheme(ThemeManager.Current);
+            ApplyBranding();
+        }
+
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.FormBackground;
+            topBar.BackColor = ThemeManager.IsLight ? s.StatusBar : Color.FromArgb(15, 15, 15);
+            lblTitleBar.ForeColor = s.TextPrimary;
+            btnClose.ForeColor = s.TextPrimary;
+
+            mainPanel.BackColor = ThemeManager.IsLight ? s.Panel : Color.FromArgb(30, 30, 30);
+            brandPanel.BackColor = ThemeManager.IsLight ? s.PanelElevated : Color.FromArgb(20, 20, 20);
+
+            lblTitle.ForeColor = s.TextPrimary;
+            lblUser.ForeColor = s.TextMuted;
+            lblPass.ForeColor = s.TextMuted;
+            chkRemember.ForeColor = s.TextMuted;
+
+            pnlUser.BackColor = s.InputBackground;
+            txtUser.BackColor = s.InputBackground;
+            txtUser.ForeColor = s.InputForeground;
+            pnlPass.BackColor = s.InputBackground;
+            txtPass.BackColor = s.InputBackground;
+            txtPass.ForeColor = s.InputForeground;
+
+            lblWelcome.ForeColor = s.TextPrimary;
+
+            btnExit.BackColor = s.SecondaryButton;
+            btnExit.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
+            btnExit.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -29,7 +67,8 @@ namespace gym_mangment_system
             Image bg = ImageAssets.TryLoad(ImageAssets.BgGym);
             if (bg != null)
             {
-                this.BackgroundImage = ImageAssets.CreateWithOpacity(bg, 0.28f);
+                float op = ThemeManager.IsLight ? 0.14f : 0.28f;
+                this.BackgroundImage = ImageAssets.CreateWithOpacity(bg, op);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
 

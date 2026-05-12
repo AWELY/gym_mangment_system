@@ -18,6 +18,7 @@ namespace gym_mangment_system
 
         private System.Windows.Forms.Panel topBar;
         private System.Windows.Forms.Label lblDashTitle;
+        private System.Windows.Forms.Button btnThemeToggle;
         private System.Windows.Forms.Button btnNotifications;
         private System.Windows.Forms.Panel pnlNotifDropdown;
         private System.Windows.Forms.Label lblNotifHeader;
@@ -56,6 +57,7 @@ namespace gym_mangment_system
             this.pnlLogo                = new System.Windows.Forms.Panel();
             this.lblLogo                = new System.Windows.Forms.Label();
             this.topBar                 = new System.Windows.Forms.Panel();
+            this.btnThemeToggle         = new System.Windows.Forms.Button();
             this.btnNotifications       = new System.Windows.Forms.Button();
             this.lblDashTitle           = new System.Windows.Forms.Label();
             this.pnlNotifDropdown       = new System.Windows.Forms.Panel();
@@ -136,8 +138,9 @@ namespace gym_mangment_system
 
             // ── topBar ──
             this.topBar.BackColor = System.Drawing.Color.FromArgb(26, 26, 30);
-            this.topBar.Controls.Add(this.btnNotifications);
             this.topBar.Controls.Add(this.lblDashTitle);
+            this.topBar.Controls.Add(this.btnThemeToggle);
+            this.topBar.Controls.Add(this.btnNotifications);
             this.topBar.Dock     = System.Windows.Forms.DockStyle.Top;
             this.topBar.Name     = "topBar";
             this.topBar.Size     = new System.Drawing.Size(950, 55);
@@ -155,6 +158,19 @@ namespace gym_mangment_system
             this.btnNotifications.TabIndex = 1;
             this.btnNotifications.Text     = "🔔";
             this.btnNotifications.UseVisualStyleBackColor = true;
+
+            this.btnThemeToggle.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnThemeToggle.FlatAppearance.BorderSize = 0;
+            this.btnThemeToggle.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(45, 45, 50);
+            this.btnThemeToggle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnThemeToggle.Font = new System.Drawing.Font("Segoe UI Emoji", 14F);
+            this.btnThemeToggle.ForeColor = System.Drawing.Color.White;
+            this.btnThemeToggle.Location = new System.Drawing.Point(66, 6);
+            this.btnThemeToggle.Name = "btnThemeToggle";
+            this.btnThemeToggle.Size = new System.Drawing.Size(44, 42);
+            this.btnThemeToggle.TabIndex = 3;
+            this.btnThemeToggle.Text = "☀";
+            this.btnThemeToggle.UseVisualStyleBackColor = false;
 
             this.lblDashTitle.Anchor    = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.lblDashTitle.AutoSize  = true;

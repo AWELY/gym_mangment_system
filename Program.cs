@@ -17,6 +17,7 @@ namespace gym_mangment_system
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             GymDataStore.Initialize();
+            ThemeManager.LoadFromSettings();
             Application.Run(new Form1());
         }
     }

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class StoreForm : Form
+    public partial class StoreForm : Form, IThemeAware
     {
         // Cart model
         private class CartItem
@@ -46,8 +46,8 @@ namespace gym_mangment_system
             InitializeComponent();
             ApplyBackgroundBranding();
             LoadProductsFromStore();
-            PopulateProducts();
             WireEvents();
+            ApplyTheme(ThemeManager.Current);
             FormClosed += StoreForm_FormClosed;
 
             if (_startAddMode)
@@ -132,9 +132,55 @@ namespace gym_mangment_system
             _products.Clear();
         }
 
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            pnlProducts.BackColor = s.Panel;
+            flowProducts.BackColor = s.Panel;
+            lblProductsTitle.ForeColor = s.TextPrimary;
+
+            pnlCart.BackColor = s.PanelElevated;
+            pnlCartItems.BackColor = s.PanelElevated;
+            flowCartItems.BackColor = s.PanelElevated;
+            pnlCartFooter.BackColor = s.PanelElevated;
+            lblCartTitle.ForeColor = s.TextPrimary;
+            lblCartCount.ForeColor = s.TextMuted;
+            lblTotalLabel.ForeColor = s.TextMuted;
+
+            btnClearCart.BackColor = s.SecondaryButton;
+            btnClearCart.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
+            btnClearCart.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+
+            pnlAddItem.BackColor = s.Card;
+            lblAddItemTitle.ForeColor = s.TextPrimary;
+            foreach (Label lb in new[] { lblNewName, lblNewPrice, lblNewStock, lblNewExpiry, lblNewCategory, lblNewImage })
+            {
+                lb.ForeColor = s.TextMuted;
+            }
+            txtNewName.BackColor = s.InputBackground;
+            txtNewName.ForeColor = s.InputForeground;
+            numNewPrice.BackColor = s.InputBackground;
+            numNewPrice.ForeColor = s.InputForeground;
+            numNewStock.BackColor = s.InputBackground;
+            numNewStock.ForeColor = s.InputForeground;
+            cmbNewCategory.BackColor = s.InputBackground;
+            cmbNewCategory.ForeColor = s.InputForeground;
+            dtpNewExpiry.CalendarMonthBackground = s.InputBackground;
+            dtpNewExpiry.CalendarForeColor = s.InputForeground;
+            picNewImage.BackColor = s.InputBackground;
+            btnBrowseImage.BackColor = s.SecondaryButton;
+            btnBrowseImage.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
+            btnCancelAdd.BackColor = s.SecondaryButton;
+            btnCancelAdd.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
+
+            PopulateProducts();
+            RefreshCart();
+        }
+
         private void ApplyBackgroundBranding()
         {
-            Image faded = ImageAssets.TryLoadToughBackground("store", 0.22f);
+            float op = ThemeManager.BrandingOpacity();
+            Image faded = ImageAssets.TryLoadToughBackground("store", op);
             if (faded == null) return;
             this.BackgroundImage = faded;
             this.BackgroundImageLayout = ImageLayout.Stretch;
@@ -156,13 +202,14 @@ namespace gym_mangment_system
 
         private Panel CreateProductCard(Product product)
         {
+            UiColorScheme s = ThemeManager.Current;
             bool lowStock  = product.StockQty <= 5;
             bool nearExpiry = (product.Expiry - DateTime.Now).TotalDays <= 30;
 
             Panel card = new Panel
             {
                 Size      = new Size(170, 175),
-                BackColor = Color.FromArgb(35, 35, 35),
+                BackColor = s.PanelElevated,
                 Margin    = new Padding(6),
                 Cursor    = Cursors.Hand,
                 Tag       = product
@@ -184,29 +231,29 @@ namespace gym_mangment_system
             {
                 visual = new Label { Text = product.Emoji, Font = new Font("Segoe UI", 26F), Size = new Size(170, 48), Location = new Point(0, 6), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
             }
-            Label name  = new Label { Text = product.Name,  Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = Color.White, Size = new Size(170, 20), Location = new Point(0, 56), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
+            Label name  = new Label { Text = product.Name,  Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = s.TextPrimary, Size = new Size(170, 20), Location = new Point(0, 56), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
             Label price = new Label { Text = product.Price.ToString("0.00") + " $", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = Color.FromArgb(76, 175, 80), Size = new Size(170, 24), Location = new Point(0, 78), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
-            // Stock badge
             Color stockColor = lowStock ? Color.FromArgb(220, 53, 69) : Color.FromArgb(76, 175, 80);
             Label stock = new Label { Text = "كمية: " + product.StockQty, Font = new Font("Segoe UI", 8F), ForeColor = stockColor, Size = new Size(170, 18), Location = new Point(0, 104), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
-            // Expiry badge
-            Color expiryColor = nearExpiry ? Color.FromArgb(255, 152, 0) : Color.FromArgb(120, 120, 130);
+            Color expiryColor = nearExpiry ? Color.FromArgb(255, 152, 0) : s.TextMuted;
             Label expiry = new Label { Text = "ينتهي: " + product.Expiry.ToString("yyyy-MM-dd"), Font = new Font("Segoe UI", 7.5F), ForeColor = expiryColor, Size = new Size(170, 16), Location = new Point(0, 124), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
-            Label cat = new Label { Text = product.Category, Font = new Font("Segoe UI", 7.5F), ForeColor = Color.Gray, Size = new Size(170, 14), Location = new Point(0, 142), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
+            Label cat = new Label { Text = product.Category, Font = new Font("Segoe UI", 7.5F), ForeColor = s.TextMuted, Size = new Size(170, 14), Location = new Point(0, 142), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
-            card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(50, 50, 50);
-            card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(35, 35, 35);
+            Color hover = s.CardHover;
+            Color normal = s.PanelElevated;
+            card.MouseEnter += (ev, e) => card.BackColor = hover;
+            card.MouseLeave += (ev, e) => card.BackColor = normal;
 
-            EventHandler click = (s, e) => AddToCart(product);
+            EventHandler click = (ev, e) => AddToCart(product);
             card.Click += click;
             foreach (Control c in new Control[] { visual, name, price, stock, expiry, cat })
             {
                 c.Click += click;
-                c.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(50, 50, 50);
-                c.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(35, 35, 35);
+                c.MouseEnter += (ev, e) => card.BackColor = hover;
+                c.MouseLeave += (ev, e) => card.BackColor = normal;
                 c.Cursor = Cursors.Hand;
             }
 
@@ -237,6 +284,7 @@ namespace gym_mangment_system
 
         private void RefreshCart()
         {
+            UiColorScheme s = ThemeManager.Current;
             flowCartItems.Controls.Clear();
             decimal total = 0; int totalItems = 0;
 
@@ -245,22 +293,24 @@ namespace gym_mangment_system
                 decimal line = item.Price * item.Qty;
                 total += line; totalItems += item.Qty;
 
-                Panel row = new Panel { Size = new Size(320, 55), BackColor = Color.FromArgb(40, 40, 40), Margin = new Padding(2, 3, 2, 3) };
+                Panel row = new Panel { Size = new Size(320, 55), BackColor = s.Panel, Margin = new Padding(2, 3, 2, 3) };
 
-                Label lblN = new Label { Text = item.Name, Font = new Font("Segoe UI", 11F, FontStyle.Bold), ForeColor = Color.White, Location = new Point(165, 5), Size = new Size(150, 22), TextAlign = ContentAlignment.MiddleRight };
+                Label lblN = new Label { Text = item.Name, Font = new Font("Segoe UI", 11F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(165, 5), Size = new Size(150, 22), TextAlign = ContentAlignment.MiddleRight };
                 Label lblD = new Label { Text = item.Qty + " × " + item.Price.ToString("0.00") + " $ = " + line.ToString("0.00") + " $", Font = new Font("Segoe UI", 9F), ForeColor = Color.FromArgb(76, 175, 80), Location = new Point(100, 30), Size = new Size(215, 18), TextAlign = ContentAlignment.MiddleRight };
 
-                Button btnRm = new Button { Text = "✕", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.FromArgb(220, 53, 69), BackColor = Color.FromArgb(40, 40, 40), FlatStyle = FlatStyle.Flat, Size = new Size(30, 30), Location = new Point(8, 12), Cursor = Cursors.Hand, Tag = item };
+                Button btnRm = new Button { Text = "✕", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.FromArgb(220, 53, 69), BackColor = s.Panel, FlatStyle = FlatStyle.Flat, Size = new Size(30, 30), Location = new Point(8, 12), Cursor = Cursors.Hand, Tag = item };
                 btnRm.FlatAppearance.BorderSize = 0;
-                btnRm.Click += (s, e) => { _cart.Remove((CartItem)((Button)s).Tag); RefreshCart(); };
+                btnRm.Click += (sender, e) => { _cart.Remove((CartItem)((Button)sender).Tag); RefreshCart(); };
 
-                Button btnP = new Button { Text = "+", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.White, BackColor = Color.FromArgb(55, 55, 55), FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(42, 13), Cursor = Cursors.Hand, Tag = item };
+                Button btnP = new Button { Text = "+", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = s.TextOnAccent, BackColor = s.SecondaryButton, FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(42, 13), Cursor = Cursors.Hand, Tag = item };
                 btnP.FlatAppearance.BorderSize = 0;
-                btnP.Click += (s, e) => { ((CartItem)((Button)s).Tag).Qty++; RefreshCart(); };
+                btnP.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+                btnP.Click += (sender, e) => { ((CartItem)((Button)sender).Tag).Qty++; RefreshCart(); };
 
-                Button btnM = new Button { Text = "-", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.White, BackColor = Color.FromArgb(55, 55, 55), FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(72, 13), Cursor = Cursors.Hand, Tag = item };
+                Button btnM = new Button { Text = "-", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = s.TextOnAccent, BackColor = s.SecondaryButton, FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(72, 13), Cursor = Cursors.Hand, Tag = item };
                 btnM.FlatAppearance.BorderSize = 0;
-                btnM.Click += (s, e) => { var ci = (CartItem)((Button)s).Tag; if (--ci.Qty <= 0) _cart.Remove(ci); RefreshCart(); };
+                btnM.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+                btnM.Click += (sender, e) => { var ci = (CartItem)((Button)sender).Tag; if (--ci.Qty <= 0) _cart.Remove(ci); RefreshCart(); };
 
                 row.Controls.Add(lblN); row.Controls.Add(lblD);
                 row.Controls.Add(btnRm); row.Controls.Add(btnP); row.Controls.Add(btnM);

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class SubscriptionsForm : Form
+    public partial class SubscriptionsForm : Form, IThemeAware
     {
         private DataTable _dt;
         private int _editingId = -1;
@@ -20,11 +20,11 @@ namespace gym_mangment_system
         {
             InitializeComponent();
             ApplyBackgroundBranding();
-            ApplyGridOpacityStyle();
             ConfigureEditorForPlanCatalog();
             LoadPlanData();
             WireEvents();
             ResetForm();
+            ApplyTheme(ThemeManager.Current);
 
             if (startAddMode)
             {
@@ -33,9 +33,42 @@ namespace gym_mangment_system
             }
         }
 
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            lblTitle.ForeColor = s.TextPrimary;
+            pnlEditor.BackColor = s.Panel;
+            lblHint.ForeColor = s.TextMuted;
+            lblMember.ForeColor = s.TextPrimary;
+            lblType.ForeColor = s.TextPrimary;
+            lblDuration.ForeColor = s.TextPrimary;
+            lblPrice.ForeColor = s.TextPrimary;
+            lblStartDate.ForeColor = s.TextPrimary;
+
+            txtType.BackColor = s.InputBackground;
+            txtType.ForeColor = s.InputForeground;
+            cmbMember.BackColor = s.InputBackground;
+            cmbMember.ForeColor = s.InputForeground;
+            cmbDurationUnit.BackColor = s.InputBackground;
+            cmbDurationUnit.ForeColor = s.InputForeground;
+            numDuration.BackColor = s.InputBackground;
+            numDuration.ForeColor = s.InputForeground;
+            numPrice.BackColor = s.InputBackground;
+            numPrice.ForeColor = s.InputForeground;
+            dtpStartDate.CalendarMonthBackground = s.InputBackground;
+            dtpStartDate.CalendarForeColor = s.InputForeground;
+
+            btnClearForm.BackColor = s.SecondaryButton;
+            btnClearForm.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
+            btnClearForm.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+
+            ThemeManager.StyleDataGridView(gridSubs, s);
+        }
+
         private void ApplyBackgroundBranding()
         {
-            Image faded = ImageAssets.TryLoadToughBackground("subscriptions", 0.22f);
+            float op = ThemeManager.BrandingOpacity();
+            Image faded = ImageAssets.TryLoadToughBackground("subscriptions", op);
             if (faded == null) return;
             this.BackgroundImage = faded;
             this.BackgroundImageLayout = ImageLayout.Center;
@@ -43,15 +76,6 @@ namespace gym_mangment_system
             gridSubs.BackgroundImageLayout = ImageLayout.Center;
             pnlEditor.BackgroundImage = faded;
             pnlEditor.BackgroundImageLayout = ImageLayout.Stretch;
-        }
-
-        private void ApplyGridOpacityStyle()
-        {
-            gridSubs.BackgroundColor = Color.FromArgb(12, 12, 14);
-            gridSubs.DefaultCellStyle.BackColor = Color.FromArgb(18, 18, 24);
-            gridSubs.DefaultCellStyle.SelectionBackColor = Color.FromArgb(40, 40, 52);
-            gridSubs.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(30, 30, 38);
-            gridSubs.EnableHeadersVisualStyles = false;
         }
 
         private void ConfigureEditorForPlanCatalog()

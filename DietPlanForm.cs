@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class DietPlanForm : Form
+    public partial class DietPlanForm : Form, IThemeAware
     {
         private sealed class FeedingPlan
         {
@@ -28,7 +28,60 @@ namespace gym_mangment_system
             ReloadFeedingPlansFromStore();
             ReloadHistoryFromStore();
             RefreshPlanCombo();
+            SetupPhoneAutoComplete();
             WireEvents();
+            ApplyTheme(ThemeManager.Current);
+        }
+
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            ForeColor = s.TextPrimary;
+            lblTitle.ForeColor = s.TextPrimary;
+
+            pnlLeft.BackColor = s.Panel;
+            lblSearchPhone.ForeColor = s.TextMuted;
+            txtSearchPhone.BackColor = s.InputBackground;
+            txtSearchPhone.ForeColor = s.InputForeground;
+
+            pnlMemberInfo.BackColor = s.PanelElevated;
+            lblFoundName.ForeColor = s.TextPrimary;
+            lblFoundPhone.ForeColor = s.TextMuted;
+
+            lblSectionHistory.ForeColor = s.TextMuted;
+            listHistory.BackColor = s.ListBackground;
+            listHistory.ForeColor = s.ListForeground;
+
+            pnlRight.BackColor = s.Panel;
+            lblRightTitle.ForeColor = s.TextPrimary;
+
+            pnlCreatePlan.BackColor = s.PanelElevated;
+            lblPlanName.ForeColor = s.TextMuted;
+            lblPlanPdf.ForeColor = s.TextMuted;
+            txtPlanName.BackColor = s.InputBackground;
+            txtPlanName.ForeColor = s.InputForeground;
+            txtPlanPdf.BackColor = s.InputBackground;
+            txtPlanPdf.ForeColor = s.InputForeground;
+
+            lblSelectPlan.ForeColor = s.TextMuted;
+            cmbSelectPlan.BackColor = s.InputBackground;
+            cmbSelectPlan.ForeColor = s.InputForeground;
+            txtSelectedPlanPdf.BackColor = s.PanelElevated;
+            txtSelectedPlanPdf.ForeColor = Color.FromArgb(33, 150, 243);
+        }
+
+        private void SetupPhoneAutoComplete()
+        {
+            var phones = new AutoCompleteStringCollection();
+            foreach (var m in GymDataStore.Data.Members)
+            {
+                if (!string.IsNullOrWhiteSpace(m.Phone))
+                    phones.Add(m.Phone.Trim());
+            }
+
+            txtSearchPhone.AutoCompleteCustomSource = phones;
+            txtSearchPhone.AutoCompleteSource       = AutoCompleteSource.CustomSource;
+            txtSearchPhone.AutoCompleteMode         = AutoCompleteMode.SuggestAppend;
         }
 
         private void ReloadFeedingPlansFromStore()

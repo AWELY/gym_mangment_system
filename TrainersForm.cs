@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
-    public partial class TrainersForm : Form
+    public partial class TrainersForm : Form, IThemeAware
     {
         private DataTable _dt;
         private bool _isEditing       = false;
@@ -23,10 +23,35 @@ namespace gym_mangment_system
             InitTrainersTable();
             RebindTrainersFromStore();
             WireEvents();
+            ApplyTheme(ThemeManager.Current);
             UpdateCount();
 
             if (_startAddMode)
                 BtnAddTrainer_Click(this, EventArgs.Empty);
+        }
+
+        public void ApplyTheme(UiColorScheme s)
+        {
+            BackColor = s.ContentHost;
+            lblTitle.ForeColor = s.TextPrimary;
+            lblSearch.ForeColor = s.TextMuted;
+            txtSearch.BackColor = s.InputBackground;
+            txtSearch.ForeColor = s.InputForeground;
+            ThemeManager.StyleDataGridView(gridTrainers, s);
+
+            lblCount.ForeColor = s.TextMuted;
+
+            pnlForm.BackColor = s.Card;
+            lblFormTitle.ForeColor = s.TextPrimary;
+            foreach (Label lb in new[] { lblFName, lblFPhone, lblFSpecialty, lblFSalary, lblFJoinDate })
+                lb.ForeColor = s.TextMuted;
+            txtFName.BackColor = txtFPhone.BackColor = txtFSpecialty.BackColor = numFSalary.BackColor = s.InputBackground;
+            txtFName.ForeColor = txtFPhone.ForeColor = txtFSpecialty.ForeColor = numFSalary.ForeColor = s.InputForeground;
+            dtpFJoinDate.CalendarMonthBackground = s.InputBackground;
+            dtpFJoinDate.CalendarForeColor = s.InputForeground;
+            btnFormCancel.BackColor = s.SecondaryButton;
+            btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
+            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
         }
 
         private void InitTrainersTable()
