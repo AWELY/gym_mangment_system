@@ -269,6 +269,16 @@ namespace gym_mangment_system
         // ═══════════════════════════════════════════
         //  CART LOGIC
         // ═══════════════════════════════════════════
+        private static void ShowStockExceededWarning(string productName, int requestedQty, int availableQty)
+        {
+            MessageBox.Show(
+                "الكمية المطلوبة أكبر من المتوفر في المخزون.\n\n" +
+                "المنتج: " + productName + "\n" +
+                "المطلوب: " + requestedQty + "\n" +
+                "المتوفر: " + availableQty,
+                "تنبيه المخزون", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
         private void AddToCart(Product product)
         {
             if (product.StockQty <= 0)
@@ -277,8 +287,18 @@ namespace gym_mangment_system
                 return;
             }
             var existing = _cart.Find(c => c.Name == product.Name);
-            if (existing != null) existing.Qty++;
-            else _cart.Add(new CartItem { Name = product.Name, Price = product.Price, Qty = 1 });
+            if (existing != null)
+            {
+                int nextQty = existing.Qty + 1;
+                if (nextQty > product.StockQty)
+                {
+                    ShowStockExceededWarning(product.Name, nextQty, product.StockQty);
+                    return;
+                }
+                existing.Qty++;
+            }
+            else
+                _cart.Add(new CartItem { Name = product.Name, Price = product.Price, Qty = 1 });
             RefreshCart();
         }
 
@@ -305,7 +325,19 @@ namespace gym_mangment_system
                 Button btnP = new Button { Text = "+", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = s.TextOnAccent, BackColor = s.SecondaryButton, FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(42, 13), Cursor = Cursors.Hand, Tag = item };
                 btnP.FlatAppearance.BorderSize = 0;
                 btnP.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
-                btnP.Click += (sender, e) => { ((CartItem)((Button)sender).Tag).Qty++; RefreshCart(); };
+                btnP.Click += (sender, e) =>
+                {
+                    var ci = (CartItem)((Button)sender).Tag;
+                    var pr = _products.FirstOrDefault(p => p.Name == ci.Name);
+                    int avail = pr?.StockQty ?? 0;
+                    if (ci.Qty >= avail)
+                    {
+                        ShowStockExceededWarning(ci.Name, ci.Qty + 1, avail);
+                        return;
+                    }
+                    ci.Qty++;
+                    RefreshCart();
+                };
 
                 Button btnM = new Button { Text = "-", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = s.TextOnAccent, BackColor = s.SecondaryButton, FlatStyle = FlatStyle.Flat, Size = new Size(28, 28), Location = new Point(72, 13), Cursor = Cursors.Hand, Tag = item };
                 btnM.FlatAppearance.BorderSize = 0;
@@ -356,6 +388,22 @@ namespace gym_mangment_system
         private void BtnCheckout_Click(object sender, EventArgs e)
         {
             if (_cart.Count == 0) { MessageBox.Show("السلة فارغة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+
+            var stockErrors = new List<string>();
+            foreach (var line in _cart)
+            {
+                var pr = _products.FirstOrDefault(p => p.Name == line.Name);
+                int avail = pr?.StockQty ?? 0;
+                if (line.Qty > avail)
+                    stockErrors.Add(line.Name + ": المطلوب " + line.Qty + "، المتوفر " + avail);
+            }
+            if (stockErrors.Count > 0)
+            {
+                MessageBox.Show(
+                    "لا يمكن إتمام البيع بسبب نقص المخزون:\n\n" + string.Join("\n", stockErrors),
+                    "تنبيه المخزون", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             foreach (var line in _cart)
             {

@@ -50,7 +50,7 @@ namespace gym_mangment_system
         public string PdfPath { get; set; }
     }
 
-    /// <summary>Root document persisted as JSON under LocalApplicationData.</summary>
+    /// <summary>Root in-memory snapshot (session only; not persisted to disk).</summary>
     public sealed class GymDataSnapshot
     {
         public int Version { get; set; } = 1;

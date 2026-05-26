@@ -1,92 +1,34 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
-using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
     /// <summary>
-    /// Single source of truth: in-memory collections persisted to JSON.
+    /// Single source of truth: in-memory lists only (session / runtime; no file persistence).
     /// </summary>
     public static class GymDataStore
     {
         private static GymDataSnapshot _data;
-        private static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = 8_388_608 };
-
-        public static string DataFilePath =>
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GloryGym", "gym_data.json");
 
         public static GymDataSnapshot Data
         {
             get
             {
                 if (_data == null)
-                    Load();
+                    _data = SeedDefaults();
                 return _data;
             }
         }
 
         public static void Initialize()
         {
-            Load();
+            if (_data == null)
+                _data = SeedDefaults();
         }
 
-        public static void Load()
-        {
-            try
-            {
-                if (File.Exists(DataFilePath))
-                {
-                    string text = File.ReadAllText(DataFilePath);
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        var snap = Json.Deserialize<GymDataSnapshot>(text);
-                        EnsureCollections(snap);
-                        _data = snap;
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("تعذر تحميل بيانات النادي، سيتم استخدام بيانات افتراضية.\n" + ex.Message,
-                    "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-
-            _data = SeedDefaults();
-            Save();
-        }
-
-        public static void Save()
-        {
-            if (_data == null) return;
-            try
-            {
-                string dir = Path.GetDirectoryName(DataFilePath);
-                if (!string.IsNullOrEmpty(dir))
-                    Directory.CreateDirectory(dir);
-                File.WriteAllText(DataFilePath, Json.Serialize(_data));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("تعذر حفظ البيانات:\n" + ex.Message, "خطأ حفظ", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private static void EnsureCollections(GymDataSnapshot s)
-        {
-            if (s == null) { _data = SeedDefaults(); return; }
-            if (s.Members == null) s.Members = new List<MemberRecord>();
-            if (s.Trainers == null) s.Trainers = new List<TrainerRecord>();
-            if (s.Users == null) s.Users = new List<UserDirectoryEntry>();
-            if (s.SubscriptionPlans == null) s.SubscriptionPlans = new List<SubscriptionPlan>();
-            if (s.StoreProducts == null) s.StoreProducts = new List<StoreProductRecord>();
-            if (s.StoreSales == null) s.StoreSales = new List<StoreSaleRecord>();
-            if (s.FeedingPlans == null) s.FeedingPlans = new List<FeedingPlanRecord>();
-            if (s.DietSendHistory == null) s.DietSendHistory = new List<string>();
-        }
+        /// <summary>No-op: data is not written to disk. Kept for call sites that used to persist.</summary>
+        public static void Save() { }
 
         private static GymDataSnapshot SeedDefaults()
         {

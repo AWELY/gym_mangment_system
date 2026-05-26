@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glory Gym - Comprehensive System Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px 60px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f7f6;
+            color: #2c3e50;
+        }
+        tr:nth-child(even) { background-color: #fafafa; }
+        .mermaid {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .error { color: #e74c3c; font-weight: bold; }
+        .warning { color: #f39c12; font-weight: bold; }
+        .info { color: #3498db; font-weight: bold; }
+        .highlight-bad { background-color: #fadbd8 !important; }
+        .highlight-good { background-color: #d5f5e3 !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Glory Gym Management System<br><small style="font-size: 0.5em; color: #7f8c8d;">Comprehensive System Documentation</small></h1>
+
+        <h2>1. Software Requirements Specification (SRS)</h2>
+        <h3>1.1 Purpose</h3>
+        <p>This document provides a comprehensive and detailed specification, architecture design, and static analysis report for the Glory Gym Management System. The system is built as a Windows desktop application (WinForms, C#) designed to manage all operations of a modern gym, including memberships, subscriptions, trainers, point-of-sale (POS) store, and diet plans.</p>
+
+        <h3>1.2 User Classes and Roles</h3>
+        <ul>
+            <li><strong>System Administrator (Admin)</strong>: Has unrestricted access to all modules. Can view high-level financial reports, manage trainers, configure system settings, and add/remove users.</li>
+            <li><strong>Receptionist</strong>: Has operational access. Restricted to managing Members, conducting POS transactions (Store), and viewing/sending Diet plans. Cannot view financial reports or trainer salaries.</li>
+        </ul>
+
+        <h3>1.3 Detailed Functional Requirements (FR)</h3>
+        <ul>
+            <li><strong>FR-AUTH</strong>: The system shall provide a secure login screen. Authentication relies on local data validation.</li>
+            <li><strong>FR-MEM</strong>: The system shall allow users to Add, Edit, Delete, and Search members. Member data includes personal details and active subscription plans.</li>
+            <li><strong>FR-SUB</strong>: The system shall maintain a catalog of Subscription Plans to be assigned to members.</li>
+            <li><strong>FR-POS</strong>: The system shall include a POS module where users can add items to a cart, calculate totals, and checkout, automatically deducting from inventory.</li>
+            <li><strong>FR-FIN</strong>: The system shall calculate monthly net profit by subtracting trainer salaries from the gross revenue.</li>
+        </ul>
+
+        <h3>1.4 External Integrations (WhatsApp API)</h3>
+        <p>A critical business requirement is direct communication with members. The system supports two modes of WhatsApp integration:</p>
+        <ul>
+            <li><strong>Qonvo API (Automated):</strong> Used primarily in the Diet module. The system reads <code>QonvoApiToken</code> and <code>QonvoBaseUrl</code> from <code>App.config</code> to automatically dispatch PDF Diet Plans directly to the member's WhatsApp number. Statuses are logged in the <code>DietSendHistory</code>.</li>
+            <li><strong>Browser Fallback (Manual):</strong> For general chats, the system opens the default web browser to <code>https://wa.me/{phone}</code> with a pre-filled, URL-encoded Arabic greeting so the Receptionist can quickly message members without saving their numbers to a phone.</li>
+        </ul>
+
+        <h2>2. Software Design Document (SDD)</h2>
+        <h3>2.1 Architectural Pattern</h3>
+        <p>The application uses a <strong>Monolithic WinForms Architecture</strong>. It separates concerns logically into three implicit layers:</p>
+        <ol>
+            <li><strong>Presentation Layer (UI)</strong>: Contains all .cs Form classes handling user interactions and input validation.</li>
+            <li><strong>Business Logic Layer (BLL)</strong>: Contains managers like AppSession, and ThemeManager.</li>
+            <li><strong>Data Access Layer (DAL)</strong>: GymDataStore is responsible for serializing/deserializing the JSON objects to the local drive.</li>
+        </ol>
+
+        <h3>2.2 External API Modules</h3>
+        <p>To support the WhatsApp requirements defined in the SRS, the architecture includes dedicated service classes:</p>
+        <ul>
+            <li><code>QonvoWhatsApp.cs</code>: Handles HTTP POST requests to the Qonvo API endpoints, attaching PDF binaries and formatting the JSON payloads required for automated messaging.</li>
+            <li><code>WhatsAppWeb.cs</code>: A utility class that sanitizes phone numbers and generates the correct URI strings to launch the system's default browser for manual chat initiation.</li>
+        </ul>
+
+        <h2>3. Use Case Diagram</h2>
+        <p>The Use Case Diagram illustrates the interactions between the system's actors (Admin, Receptionist, Member) and the primary system functions.</p>
+        <div class="mermaid">
+        flowchart LR
+            classDef actor fill:none,stroke:none,color:#2c3e50,font-weight:bold,text-align:center
+            classDef usecase fill:#d6eaf8,stroke:#2980b9,stroke-width:2px,color:#2c3e50
+
+            Admin["O<br/>/|\<br/>/ \<br/>Admin"]:::actor
+            Recep["O<br/>/|\<br/>/ \<br/>Receptionist"]:::actor
+            Member["O<br/>/|\<br/>/ \<br/>Gym Member"]:::actor
+
+            UC1([Login & Authentication]):::usecase
+            UC2([Manage Subscriptions & Plans]):::usecase
+            UC3([Process POS Sales]):::usecase
+            UC4([Manage Trainers & Salaries]):::usecase
+            UC5([Generate Financial Reports]):::usecase
+            UC6([Send Diet PDFs via WhatsApp]):::usecase
+            UC7([Receive Expiry Alerts]):::usecase
+
+            Admin --> UC1
+            Admin --> UC2
+            Admin --> UC3
+            Admin --> UC4
+            Admin --> UC5
+            Admin --> UC6
+
+            Recep --> UC1
+            Recep --> UC2
+            Recep --> UC3
+            Recep --> UC6
+
+            UC6 -.->|API Delivery| Member
+            UC7 -.->|API Delivery| Member
+        </div>
+
+        <h2>4. Data Flow Diagrams (DFD)</h2>
+        <h3>4.1 DFD Level 0 (Context Diagram)</h3>
+        <p>Shows the system as a single black box interacting with external entities. As requested, the central <strong>Gym Data Store</strong> is visualized at this level to emphasize the persistence layer.</p>
+        <div class="mermaid">
+        flowchart TD
+            E1[Admin]
+            E2[Receptionist]
+            E3[Member]
+            P0((Glory Gym System))
+            D0[(Gym Data Store)]
+            
+            E1 -->|User Config, Trainer Data| P0
+            E2 -->|New Members, Sales Data| P0
+            
+            P0 -->|Financial Reports| E1
+            P0 -->|Alerts, POS Invoices| E2
+            P0 -->|Expiry Alerts & Diet PDFs| E3
+            
+            E3 -->|Payments & Health Info| P0
+
+            P0 <-->|Read / Write System State| D0
+        </div>
+
+        <h3>4.2 DFD Level 1 (Process Breakdown)</h3>
+        <p>A classic DFD using <strong>Circles</strong> for specific data processes, and <strong>Open Cylinders</strong> for data stores, comprehensively mapping the entire project.</p>
+        <div class="mermaid">
+        flowchart TD
+            classDef entity fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff,font-weight:bold
+            classDef process fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+            classDef store fill:#f1c40f,stroke:#f39c12,stroke-width:2px,color:#333,font-weight:bold
+
+            Admin[Admin]:::entity
+            Recep[Receptionist]:::entity
+            Member[Member]:::entity
+            WhatsApp[WhatsApp API]:::entity
+
+            P1((1. Authentication)):::process
+            P2((2. Manage Members)):::process
+            P3((3. Point of Sale)):::process
+            P4((4. Manage Staff)):::process
+            P5((5. Generate Reports)):::process
+            P6((6. Diet & Comm)):::process
+
+            D1[(D1: System Users)]:::store
+            D2[(D2: Memberships)]:::store
+            D3[(D3: Inventory & Sales)]:::store
+            D4[(D4: Trainers)]:::store
+            D5[(D5: Diet Plans)]:::store
+
+            Admin --> P1
+            Recep --> P1
+            P1 <--> D1
+            
+            Recep --> P2
+            P2 <--> D2
+            
+            Recep --> P3
+            P3 <--> D3
+            
+            Admin --> P4
+            P4 <--> D4
+            
+            Admin --> P5
+            D2 --> P5
+            D3 --> P5
+            D4 --> P5
+
+            Recep -->|Trigger Diet Send| P6
+            P6 <-->|Fetch PDF| D5
+            P6 -->|Payload| WhatsApp
+            WhatsApp -->|Message| Member
+        </div>
+
+        <h2>5. Entity Relationship Diagram (ERD)</h2>
+        <p>A classic <strong>Chen Notation ERD</strong> using Rectangles for Entities, Diamonds for Relationships, and Ovals for Attributes (Primary Keys highlighted in red). This maps the entirety of the project's data architecture.</p>
+        <div class="mermaid">
+        flowchart TD
+            classDef entity fill:#ecf0f1,stroke:#2c3e50,stroke-width:2px,color:#2c3e50,font-weight:bold
+            classDef relation fill:#dffeec,stroke:#27ae60,stroke-width:2px,color:#27ae60,font-weight:bold
+            classDef attribute fill:#ffffff,stroke:#7f8c8d,stroke-width:1px,color:#34495e
+            classDef pk fill:#ffffff,stroke:#c0392b,stroke-width:2px,color:#c0392b,font-weight:bold
+
+            U[USERS]:::entity
+            M[MEMBERS]:::entity
+            P[SUBSCRIPTION_PLANS]:::entity
+            T[TRAINERS]:::entity
+            Pr[STORE_PRODUCTS]:::entity
+            S[STORE_SALES]:::entity
+            D[DIET_PLANS]:::entity
+
+            Sub{Assigns}:::relation
+            Sup{Manages}:::relation
+            Con{Processes}:::relation
+            Inc{Includes}:::relation
+            DietR{Receives}:::relation
+
+            M ---|N| Sub
+            Sub ---|1| P
+
+            T ---|1| Sup
+            Sup ---|N| M
+
+            U ---|1| Con
+            Con ---|N| S
+
+            S ---|N| Inc
+            Inc ---|M| Pr
+
+            M ---|1| DietR
+            DietR ---|1| D
+
+            U1([<u>User_ID</u>]):::pk
+            U2([Username]):::attribute
+            U3([Role]):::attribute
+            U --- U1 & U2 & U3
+
+            M1([<u>Member_ID</u>]):::pk
+            M2([FullName]):::attribute
+            M3([Phone]):::attribute
+            M --- M1 & M2 & M3
+
+            P1([<u>Plan_ID</u>]):::pk
+            P2([Name]):::attribute
+            P3([Price]):::attribute
+            P --- P1 & P2 & P3
+
+            T1([<u>Trainer_ID</u>]):::pk
+            T2([Name]):::attribute
+            T3([Phone]):::attribute
+            T4([Specialty]):::attribute
+            T5([Salary]):::attribute
+            T --- T1 & T2 & T3 & T4 & T5
+
+            Pr1([<u>Product_ID</u>]):::pk
+            Pr2([Name]):::attribute
+            Pr3([Price]):::attribute
+            Pr4([StockQty]):::attribute
+            Pr --- Pr1 & Pr2 & Pr3 & Pr4
+
+            S1([<u>Sale_ID</u>]):::pk
+            S2([SoldAt]):::attribute
+            S3([TotalAmount]):::attribute
+            S --- S1 & S2 & S3
+
+            D1([<u>Diet_ID</u>]):::pk
+            D2([PdfPath]):::attribute
+            D --- D1 & D2
+        </div>
+
+        <h2>6. Database Schema & Normalization Analysis</h2>
+        
+        <h3>6.1 Schema BEFORE Normalization (Flat JSON structure)</h3>
+        <p>In the original state, the system stores flat data where values are duplicated and non-atomic. This violates basic relational database design principles.</p>
+        <table>
+            <tr><th>Entity</th><th>Columns (Flat Structure)</th><th>Normalization Issues</th></tr>
+            <tr class="highlight-bad">
+                <td><strong>Members</strong></td>
+                <td>Id, FullName, Phone, Gender, <strong>PlanName, PriceText, DurationText</strong>, JoinDate</td>
+                <td>Violates 2NF. Plan details (Price, Duration) are duplicated for every member who buys the same plan.</td>
+            </tr>
+            <tr class="highlight-bad">
+                <td><strong>StoreSales</strong></td>
+                <td>Id, SoldAt, TotalAmount, <strong>Summary</strong></td>
+                <td>Violates 1NF. The Summary column contains a comma-separated list of items (e.g. "2x Water, 1x Towel"), which is not atomic.</td>
+            </tr>
+        </table>
+
+        <h3>6.2 Normalization Steps</h3>
+        <ul>
+            <li><strong>First Normal Form (1NF)</strong>: Ensure atomic values. The comma-separated <code>Summary</code> in StoreSales is extracted into a new <code>SaleItems</code> table.</li>
+            <li><strong>Second Normal Form (2NF)</strong>: Remove partial dependencies. The <code>Members</code> table previously held the Plan Name, Price, and Duration directly. We removed these and replaced them with a <code>PlanId</code>.</li>
+            <li><strong>Third Normal Form (3NF)</strong>: Eliminate transitive dependencies. By performing the 2NF split, 3NF is inherently achieved. All non-key attributes strictly depend on the Primary Key.</li>
+        </ul>
+
+        <h3>6.3 Schema AFTER Normalization (Target SQL Schema - 3NF)</h3>
+        <p>This is the final, fully normalized schema ready for SQL migration.</p>
+        <table>
+            <tr><th>Table Name</th><th>Column Name</th><th>Data Type</th><th>Constraints</th></tr>
+            <tr class="highlight-good"><td rowspan="4"><strong>Users</strong></td><td>User_ID</td><td>INT</td><td>PK, Identity</td></tr>
+            <tr class="highlight-good"><td>FullName</td><td>NVARCHAR(100)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>Username</td><td>VARCHAR(50)</td><td>UNIQUE, NOT NULL</td></tr>
+            <tr class="highlight-good"><td>PasswordHash</td><td>VARCHAR(255)</td><td>NOT NULL</td></tr>
+            
+            <tr class="highlight-good"><td rowspan="4"><strong>SubscriptionPlans</strong></td><td>Plan_ID</td><td>INT</td><td>PK, Identity</td></tr>
+            <tr class="highlight-good"><td>Name</td><td>NVARCHAR(100)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>Price</td><td>DECIMAL(10,2)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>DurationDays</td><td>INT</td><td>NOT NULL</td></tr>
+
+            <tr class="highlight-good"><td rowspan="5"><strong>Members</strong></td><td>Member_ID</td><td>INT</td><td>PK, Identity</td></tr>
+            <tr class="highlight-good"><td>FullName</td><td>NVARCHAR(150)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>Phone</td><td>VARCHAR(20)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>Plan_ID</td><td>INT</td><td>FK (SubscriptionPlans)</td></tr>
+            <tr class="highlight-good"><td>JoinDate</td><td>DATETIME</td><td>NOT NULL</td></tr>
+            
+            <tr class="highlight-good"><td rowspan="4"><strong>StoreSales</strong></td><td>Sale_ID</td><td>INT</td><td>PK, Identity</td></tr>
+            <tr class="highlight-good"><td>SoldAt</td><td>DATETIME</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td>TotalAmount</td><td>DECIMAL(10,2)</td><td>NOT NULL</td></tr>
+            <tr class="highlight-good"><td><em>(Removed)</em></td><td><em>Summary</em></td><td><em>Moved to SaleItems</em></td></tr>
+
+            <tr class="highlight-good"><td rowspan="4"><strong>SaleItems</strong><br><em>(New Table)</em></td><td>Detail_ID</td><td>INT</td><td>PK, Identity</td></tr>
+            <tr class="highlight-good"><td>Sale_ID</td><td>INT</td><td>FK (StoreSales)</td></tr>
+            <tr class="highlight-good"><td>Product_ID</td><td>INT</td><td>FK (StoreProducts)</td></tr>
+            <tr class="highlight-good"><td>Quantity</td><td>INT</td><td>NOT NULL</td></tr>
+        </table>
+
+        <h3>6.4 Visual Schema Diagram</h3>
+        <p>This diagram represents the physical layout of the target SQL database, including Primary Keys (PK), Foreign Keys (FK), and Data Types.</p>
+        <div class="mermaid">
+        erDiagram
+            USERS {
+                INT User_ID PK
+                NVARCHAR FullName
+                VARCHAR Username
+                VARCHAR PasswordHash
+            }
+            SUBSCRIPTION_PLANS {
+                INT Plan_ID PK
+                NVARCHAR Name
+                DECIMAL Price
+                INT DurationDays
+            }
+            MEMBERS {
+                INT Member_ID PK
+                NVARCHAR FullName
+                VARCHAR Phone
+                INT Plan_ID FK
+                DATETIME JoinDate
+            }
+            STORE_SALES {
+                INT Sale_ID PK
+                DATETIME SoldAt
+                DECIMAL TotalAmount
+            }
+            STORE_PRODUCTS {
+                INT Product_ID PK
+                NVARCHAR Name
+                DECIMAL Price
+                INT StockQty
+            }
+            SALE_ITEMS {
+                INT Detail_ID PK
+                INT Sale_ID FK
+                INT Product_ID FK
+                INT Quantity
+            }
+
+            SUBSCRIPTION_PLANS ||--o{ MEMBERS : "assigns"
+            STORE_SALES ||--|{ SALE_ITEMS : "contains"
+            STORE_PRODUCTS ||--o{ SALE_ITEMS : "included_in"
+        </div>
+
+        <h2>7. Static Testing & Code Quality Report</h2>
+        <p><strong>Tool Used:</strong> Microsoft Visual Studio Roslyn Analyzers<br>
+        <strong>Status:</strong> <span class="error">FAILED ❌</span> (Requires immediate refactoring)</p>
+
+        <table>
+            <tr><th>Code</th><th>File</th><th>Severity</th><th>Issue Description</th></tr>
+            <tr>
+                <td><strong>CA5389</strong></td>
+                <td>GymDataStore.cs</td>
+                <td class="error">Critical</td>
+                <td><strong>Insecure Cryptography / Plaintext Passwords.</strong> The system reads and writes passwords from gym_data.json without hashing. Must implement BCrypt or PBKDF2 immediately.</td>
+            </tr>
+            <tr>
+                <td><strong>CS4014</strong></td>
+                <td>DietPlanForm.cs</td>
+                <td class="error">Critical</td>
+                <td><strong>Fire-and-Forget Async Call.</strong> SendWhatsAppMessageAsync() is called without an await operator. Exceptions will crash the UI thread.</td>
+            </tr>
+            <tr>
+                <td><strong>CA2000</strong></td>
+                <td>ReportsForm.cs</td>
+                <td class="error">Critical</td>
+                <td><strong>Undisposed GDI+ Objects.</strong> Bitmap and Graphics created for the chart are never disposed, causing severe memory leaks.</td>
+            </tr>
+            <tr>
+                <td><strong>CA1031</strong></td>
+                <td>GymDataStore.cs</td>
+                <td class="warning">Warning</td>
+                <td><strong>Catching General Exceptions.</strong> <code>catch (Exception ex)</code> is used when reading JSON, which can mask critical ThreadAbort exceptions.</td>
+            </tr>
+            <tr>
+                <td><strong>CA1822</strong></td>
+                <td>WhatsAppWeb.cs</td>
+                <td class="warning">Warning</td>
+                <td><strong>Method should be static.</strong> FormatPhoneNumber() does not use instance variables. Make it static for performance.</td>
+            </tr>
+        </table>
+        
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>

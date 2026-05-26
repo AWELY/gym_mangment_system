@@ -311,5 +311,10 @@ namespace gym_mangment_system
                 WhatsAppWeb.OpenChat(_currentMemberPhone, msgWithPdf);
             }
         }
+
+        private void DietPlanForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

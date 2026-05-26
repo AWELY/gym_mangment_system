@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Glory Gym - Testing Documentation</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 0; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    h1 { color: #2c3e50; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; margin-bottom: 30px; text-align: center; }
+    h2 { color: #2980b9; margin-top: 40px; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; }
+    h3 { color: #16a085; margin-top: 25px; }
+    p, li { font-size: 16px; color: #555; }
+    ul { margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
+    th { background-color: #34495e; color: #fff; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: #fff; }
+    .b-static { background-color: #8e44ad; }
+    .b-unit { background-color: #27ae60; }
+    .b-integration { background-color: #d35400; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>وثيقة اختبارات النظام (Testing Documentation)<br><small style="color:#7f8c8d; font-size:18px;">Glory Gym Management System</small></h1>
+
+    <p>تحدد هذه الوثيقة استراتيجية الاختبارات الشاملة لنظام <strong>Glory Gym</strong> لضمان جودة الكود، صحة العمليات المنطقية، والتكامل السليم بين وحدات النظام المختلفة.</p>
+
+    <!-- 1. Static Testing -->
+    <h2><span class="badge b-static">1</span> الاختبار الساكن (Static Testing)</h2>
+    <p>الاختبار الساكن يتم إجراؤه <strong>دون تشغيل الكود</strong>، ويهدف لاكتشاف الأخطاء في وقت مبكر جداً من دورة التطوير.</p>
+    
+    <h3>1.1 مراجعة الكود (Code Review & Walkthroughs)</h3>
+    <ul>
+        <li><strong>مراجعة معايير التسمية:</strong> التأكد من اتباع معايير <code>C# Naming Conventions</code> (مثل PascalCase للكلاسات والطرق، camelCase للمتغيرات).</li>
+        <li><strong>مراجعة الأمان:</strong> التأكد من عدم تخزين كلمات المرور كنص صريح (Plain Text) في <code>UserDirectory.cs</code> (مطلوب تعديله لاستخدام التشفير Hashing).</li>
+        <li><strong>مراجعة واجهة المستخدم:</strong> التأكد من فصل كود الواجهة (UI) عن كود المنطق (Business Logic) قدر الإمكان.</li>
+    </ul>
+
+    <h3>1.2 التحليل الآلي (Static Code Analysis)</h3>
+    <ul>
+        <li>استخدام أدوات مثل <strong>SonarQube</strong> أو <strong>Roslyn Analyzers</strong> داخل Visual Studio.</li>
+        <li>البحث عن الكود الميت (Dead Code) والمتغيرات غير المستخدمة.</li>
+        <li>اكتشاف التسريبات المحتملة للذاكرة (Memory Leaks) خاصة في التخلص من كائنات الـ <code>Image</code> في <code>StoreForm.cs</code> (التأكد من استدعاء <code>.Dispose()</code>).</li>
+    </ul>
+
+    <!-- 2. Unit Testing -->
+    <h2><span class="badge b-unit">2</span> اختبار الوحدات (Unit Testing)</h2>
+    <p>يهدف لاختبار كل دالة (Function) أو فئة (Class) بشكل منفرد ومنعزل عن باقي النظام. الإطار المقترح للاختبار: <strong>xUnit</strong> أو <strong>NUnit</strong> مع <strong>Moq</strong>.</p>
+
+    <h3>2.1 أمثلة لحالات اختبار الوحدة (Unit Test Cases)</h3>
+    <table>
+        <tr>
+            <th>معرف الاختبار</th>
+            <th>الوحدة المختبرة (Class.Method)</th>
+            <th>وصف الاختبار</th>
+            <th>النتيجة المتوقعة</th>
+        </tr>
+        <tr>
+            <td>UT-01</td>
+            <td><code>UserDirectory.TryAuthenticate</code></td>
+            <td>إدخال اسم مستخدم صحيح وكلمة مرور صحيحة.</td>
+            <td>إرجاع <code>true</code> وتحديد دور المستخدم واسمه بنجاح.</td>
+        </tr>
+        <tr>
+            <td>UT-02</td>
+            <td><code>UserDirectory.TryAuthenticate</code></td>
+            <td>إدخال كلمة مرور خاطئة لحساب موجود.</td>
+            <td>إرجاع <code>false</code>.</td>
+        </tr>
+        <tr>
+            <td>UT-03</td>
+            <td><code>GymDataStore.ParsePriceFromMemberDisplay</code></td>
+            <td>إرسال نص يحتوي على رموز وأرقام (مثل "50.00 $").</td>
+            <td>إرجاع القيمة الرقمية الصحيحة (<code>50.00m</code>).</td>
+        </tr>
+        <tr>
+            <td>UT-04</td>
+            <td><code>GymDataStore.MembersExpiringWithinDays</code></td>
+            <td>إضافة عضو ينتهي اشتراكه بعد 5 أيام واستدعاء الدالة بمتغير (7 أيام).</td>
+            <td>إرجاع عدد (1) أو زيادة العدد الحالي بمقدار 1.</td>
+        </tr>
+    </table>
+
+    <!-- 3. Integration Testing -->
+    <h2><span class="badge b-integration">3</span> اختبار التكامل (Integration Testing)</h2>
+    <p>يهدف للتأكد من أن الوحدات المختلفة (أو الشاشات ومخازن البيانات) تعمل معاً بشكل صحيح.</p>
+
+    <h3>3.1 التكامل بين المتجر والمخزون (Store & Inventory Integration)</h3>
+    <table>
+        <tr>
+            <th>معرف الاختبار</th>
+            <th>السيناريو (Scenario)</th>
+            <th>الخطوات (Steps)</th>
+            <th>النتيجة المتوقعة (Expected Result)</th>
+        </tr>
+        <tr>
+            <td>INT-01</td>
+            <td>إتمام عملية بيع منتج وتحديث المخزون.</td>
+            <td>
+                1. إضافة 2 عبوة "واي بروتين" إلى السلة (المخزون الحالي 20).<br>
+                2. الضغط على زر "إتمام البيع".
+            </td>
+            <td>
+                - ظهور رسالة نجاح.<br>
+                - انخفاض المخزون لمنتج "واي بروتين" إلى 18.<br>
+                - إضافة سجل جديد في <code>StoreSales</code> بقيمة المبيعات.
+            </td>
+        </tr>
+        <tr>
+            <td>INT-02</td>
+            <td>تجاوز كمية المخزون المتاحة.</td>
+            <td>
+                1. محاولة إضافة 10 عبوات من منتج يتوفر منه 5 فقط.<br>
+                2. أو محاولة إتمام بيع والكمية بالسلة أكبر من المخزون الحالي.
+            </td>
+            <td>
+                - النظام يمنع العملية.<br>
+                - ظهور رسالة تنبيه (Warning) تحذر من تجاوز الكمية.<br>
+                - عدم تسجيل أي فاتورة.
+            </td>
+        </tr>
+    </table>
+
+    <h3>3.2 التكامل بين الأعضاء والتقارير المالية (Members & Financial Reports)</h3>
+    <table>
+        <tr>
+            <th>معرف الاختبار</th>
+            <th>السيناريو (Scenario)</th>
+            <th>الخطوات (Steps)</th>
+            <th>النتيجة المتوقعة (Expected Result)</th>
+        </tr>
+        <tr>
+            <td>INT-03</td>
+            <td>تأثير اشتراك عضو جديد على الإيرادات الشهرية.</td>
+            <td>
+                1. التحقق من إيرادات الشهر الحالية (مثلاً 0).<br>
+                2. تسجيل عضو جديد بباقة قيمتها 300 دولار بتاريخ اليوم.<br>
+                3. فتح شاشة التقارير أو صفحة Dashboard الرئيسية.
+            </td>
+            <td>
+                - زيادة مؤشر "إيرادات الشهر" بمقدار 300 دولار.<br>
+                - زيادة مؤشر "إجمالي الأعضاء" بمقدار 1.
+            </td>
+        </tr>
+    </table>
+
+    <h3>3.3 التكامل بين إدارة الصلاحيات والواجهة (Role & UI Integration)</h3>
+    <table>
+        <tr>
+            <th>معرف الاختبار</th>
+            <th>السيناريو (Scenario)</th>
+            <th>الخطوات (Steps)</th>
+            <th>النتيجة المتوقعة (Expected Result)</th>
+        </tr>
+        <tr>
+            <td>INT-04</td>
+            <td>تطبيق قيود واجهة المستخدم لموظف الاستقبال.</td>
+            <td>
+                1. تسجيل الدخول بحساب موظف استقبال (Receptionist).<br>
+                2. مراقبة القائمة الجانبية (Sidebar).
+            </td>
+            <td>
+                - أزرار (التقارير، المستخدمين، المدربين، الاشتراكات) يجب أن تكون مخفية.<br>
+                - الصفحة الافتراضية تكون "إدارة الأعضاء".
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 40px; text-align: center; color: #7f8c8d; font-size: 14px; border-top: 1px solid #ddd; padding-top: 20px;">
+        تم توليد هذه الوثيقة آلياً - نظام <b>Glory Gym</b>
+    </div>
+</div>
+
+</body>
+</html>

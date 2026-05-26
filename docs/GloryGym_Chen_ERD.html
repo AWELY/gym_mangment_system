@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Glory Gym - ERD (Chen Notation)</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 20px; background-color: #f4f7f6; }
+    h1 { color: #2c3e50; }
+    .mermaid { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; margin-top: 20px;}
+</style>
+</head>
+<body>
+    <h1>مخطط الكيانات والعلاقات (ERD الكلاسيكي) - نظام Glory Gym</h1>
+    <p>هذا المخطط مبني بالأسلوب الهندسي الكلاسيكي (Chen's Notation) المطابق للصورة التي أرسلتها.</p>
+    <ul style="list-style: none; padding: 0; color: #555;">
+        <li><b style="color:#2c3e50;">المستطيلات:</b> تمثل الجداول (الكيانات).</li>
+        <li><b style="color:#27ae60;">المعينات:</b> تمثل العلاقات بين الجداول.</li>
+        <li><b style="color:#7f8c8d;">الأشكال البيضاوية:</b> تمثل الأعمدة (الخصائص)، والمفتاح الأساسي تحته خط.</li>
+    </ul>
+    
+    <div class="mermaid">
+    flowchart TD
+        %% Define styles
+        classDef entity fill:#ecf0f1,stroke:#2c3e50,stroke-width:2px,color:#2c3e50,font-weight:bold
+        classDef relation fill:#dffeec,stroke:#27ae60,stroke-width:2px,color:#27ae60,font-weight:bold
+        classDef attribute fill:#ffffff,stroke:#7f8c8d,stroke-width:1px,color:#34495e
+        classDef pk fill:#ffffff,stroke:#c0392b,stroke-width:2px,color:#c0392b,font-weight:bold
+
+        %% Entities
+        U[SYSTEM_USERS]:::entity
+        M[MEMBERS]:::entity
+        P[SUBSCRIPTION_PLANS]:::entity
+        T[TRAINERS]:::entity
+        Pr[STORE_PRODUCTS]:::entity
+        S[STORE_SALES]:::entity
+
+        %% Relationships
+        Sub{يشترك في}:::relation
+        Sup{يشرف على}:::relation
+        Con{يُجري}:::relation
+        Inc{يشمل}:::relation
+
+        %% Connections (Entities to Relationships)
+        M ---|N| Sub
+        Sub ---|1| P
+
+        T ---|1| Sup
+        Sup ---|N| M
+
+        U ---|1| Con
+        Con ---|N| S
+
+        S ---|N| Inc
+        Inc ---|M| Pr
+
+        %% Attach Attributes to Entities
+        U1([<u>User_ID</u>]):::pk
+        U2([Full_Name]):::attribute
+        U3([Username]):::attribute
+        U --- U1 & U2 & U3
+
+        M1([<u>Member_ID</u>]):::pk
+        M2([Full_Name]):::attribute
+        M3([Phone]):::attribute
+        M --- M1 & M2 & M3
+
+        P1([<u>Plan_ID</u>]):::pk
+        P2([Plan_Name]):::attribute
+        P3([Price]):::attribute
+        P --- P1 & P2 & P3
+
+        T1([<u>Trainer_ID</u>]):::pk
+        T2([Trainer_Name]):::attribute
+        T3([Phone_Number]):::attribute
+        T4([Specialty]):::attribute
+        T5([Monthly_Salary]):::attribute
+        T6([Join_Date]):::attribute
+        T --- T1 & T2 & T3 & T4 & T5 & T6
+
+        Pr1([<u>Product_ID</u>]):::pk
+        Pr2([Product_Name]):::attribute
+        Pr3([Price]):::attribute
+        Pr4([Category]):::attribute
+        Pr5([Stock_Qty]):::attribute
+        Pr6([Expiry_Date]):::attribute
+        Pr --- Pr1 & Pr2 & Pr3 & Pr4 & Pr5 & Pr6
+
+        S1([<u>Sale_ID</u>]):::pk
+        S2([Sold_At]):::attribute
+        S3([Total_Amount]):::attribute
+        S --- S1 & S2 & S3
+
+        IncQty([Quantity]):::attribute
+        Inc --- IncQty
+    </div>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>

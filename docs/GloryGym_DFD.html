@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Glory Gym - Data Flow Diagram (DFD)</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 20px; background-color: #f4f7f6; }
+    h1 { color: #2c3e50; margin-bottom: 5px; }
+    h2 { color: #2980b9; margin-top: 0; }
+    .diagram-section { margin-bottom: 60px; }
+    .mermaid { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; margin-top: 10px;}
+    p.desc { color: #555; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.6; }
+</style>
+</head>
+<body>
+    <h1>مخطط تدفق البيانات (Data Flow Diagram)</h1>
+    <p class="desc">لنظام <b>Glory Gym</b> لإدارة الأندية الرياضية</p>
+
+    <!-- DFD Level 0 -->
+    <div class="diagram-section">
+        <h2>1. المستوى الصفر (Context Diagram - Level 0)</h2>
+        <p class="desc">يوضح النظام كعملية واحدة مركزية، الكيانات الخارجية التي تتفاعل معه، والبيانات المتبادلة بينها.</p>
+        
+        <div class="mermaid">
+        flowchart TD
+            %% Styles
+            classDef entity fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff,font-weight:bold
+            classDef process fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff,font-weight:bold,font-size:16px
+
+            %% Entities (External)
+            E1[👤 مدير النظام<br>Admin]:::entity
+            E2[🖥️ موظف الاستقبال<br>Receptionist]:::entity
+            E3[🏃 المشترك<br>Member]:::entity
+
+            %% Process (System)
+            P0((نظام إدارة<br>نادي غلوري<br>Glory Gym System)):::process
+
+            %% Data Flows
+            E1 -->|بيانات الإدارة والصلاحيات| P0
+            E2 -->|بيانات الأعضاء والمبيعات| P0
+            
+            P0 -->|تقارير مالية وإحصائيات| E1
+            P0 -->|إشعارات وتأكيد عمليات| E2
+            
+            P0 -->|إشعار انتهاء الاشتراك وخطط| E3
+            E3 -->|استفسارات ودفع رسوم| P0
+        </div>
+    </div>
+
+    <!-- DFD Level 1 -->
+    <div class="diagram-section">
+        <h2>2. المستوى الأول (Level 1 DFD)</h2>
+        <p class="desc">يفكك النظام إلى عملياته الرئيسية ويوضح كيفية تدفق البيانات بين الكيانات الخارجية، العمليات الداخلية، ومخازن البيانات (قواعد البيانات).</p>
+        
+        <div class="mermaid">
+        flowchart TD
+            %% Styles
+            classDef entity fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff,font-weight:bold
+            classDef process fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff,font-weight:bold
+            classDef store fill:#f1c40f,stroke:#f39c12,stroke-width:2px,color:#333,font-weight:bold
+
+            %% Entities
+            Admin[👤 مدير النظام]:::entity
+            Recep[🖥️ موظف الاستقبال]:::entity
+            Memb[🏃 المشترك]:::entity
+
+            %% Processes
+            P1([1. المصادقة وتسجيل الدخول]):::process
+            P2([2. إدارة الأعضاء والاشتراكات]):::process
+            P3([3. إدارة المتجر ونقاط البيع]):::process
+            P4([4. إدارة المدربين]):::process
+            P5([5. التقارير المالية]):::process
+            P6([6. إدارة خطط التغذية والتواصل]):::process
+
+            %% Data Stores
+            D1[(D1: SYSTEM_USERS)]:::store
+            D2[(D2: MEMBERS & PLANS)]:::store
+            D3[(D3: STORE & SALES)]:::store
+            D4[(D4: TRAINERS)]:::store
+            D5[(D5: FEEDING_PLANS)]:::store
+
+            %% Auth Flows
+            Admin -->|البيانات| P1
+            Recep -->|البيانات| P1
+            P1 <-->|تحقق| D1
+            P1 -->|جلسة| Admin
+            P1 -->|جلسة| Recep
+
+            %% Member Flows
+            Admin -->|إدارة الباقات| P2
+            Recep -->|بيانات المشتركين| P2
+            P2 <-->|قراءة / كتابة| D2
+            P2 -->|تنبيهات| Memb
+
+            %% Store Flows
+            Admin -->|المخزون| P3
+            Recep -->|فاتورة بيع| P3
+            P3 <-->|تحديث المخزون| D3
+            P3 -->|فاتورة| Recep
+
+            %% Trainer Flows
+            Admin -->|المدربين| P4
+            P4 <-->|تحديث| D4
+            P2 <-->|ربط المشتركين| D4
+
+            %% Reports Flows
+            Admin -->|طلب تقرير| P5
+            D2 -->|إيرادات| P5
+            D3 -->|مبيعات| P5
+            D4 -->|رواتب| P5
+            P5 -->|التقارير| Admin
+
+            %% Diet Flows
+            Admin -->|رفع خطة| P6
+            P6 <-->|حفظ| D5
+            Recep -->|أمر إرسال| P6
+            P6 -->|رسالة واتساب| Memb
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
