@@ -1,93 +1,95 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
     public partial class Form1 : Form, IThemeAware
     {
-        private bool _autoLoginOnFirstShow = true;
-
         public Form1()
         {
             InitializeComponent();
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
             ThemeManager.ThemeChanged += OnThemeManagerThemeChanged;
             this.FormClosed += (_, __) => ThemeManager.ThemeChanged -= OnThemeManagerThemeChanged;
-            ApplyBranding();
+
+            this.Paint += Form1_PaintBackground;
+            pnlIcon.Paint += PnlIcon_Paint;
+
+            chipAdmin.Click += (_, __) => FillCredentials("admin", "admin");
+            lblChipAdminRole.Click += (_, __) => FillCredentials("admin", "admin");
+            lblChipAdminCreds.Click += (_, __) => FillCredentials("admin", "admin");
+            chipReception.Click += (_, __) => FillCredentials("reception", "1234");
+            lblChipRecRole.Click += (_, __) => FillCredentials("reception", "1234");
+            lblChipRecCreds.Click += (_, __) => FillCredentials("reception", "1234");
+
+            EnableDrag(this);
+            EnableDrag(lblGymName);
+            EnableDrag(lblSubtitle);
+
+            AcceptButton = btnLogin;
             ApplyTheme(ThemeManager.Current);
-            txtUser.Text = "admin";
-            txtPass.Text = "admin";
-            this.Shown += Form1_Shown;
+            txtUser.Focus();
         }
 
-        private void OnThemeManagerThemeChanged(object sender, EventArgs e)
+        private void FillCredentials(string user, string pass)
         {
-            ApplyTheme(ThemeManager.Current);
-            ApplyBranding();
+            txtUser.Text = user;
+            txtPass.Text = pass;
+            btnLogin.Focus();
         }
 
+        private void OnThemeManagerThemeChanged(object sender, EventArgs e) => ApplyTheme(ThemeManager.Current);
+
+        // Login screen keeps the Figma purple identity regardless of the app theme.
         public void ApplyTheme(UiColorScheme s)
         {
-            BackColor = s.FormBackground;
-            topBar.BackColor = ThemeManager.IsLight ? s.StatusBar : Color.FromArgb(15, 15, 15);
-            lblTitleBar.ForeColor = s.TextPrimary;
-            btnClose.ForeColor = s.TextPrimary;
-
-            mainPanel.BackColor = ThemeManager.IsLight ? s.Panel : Color.FromArgb(30, 30, 30);
-            brandPanel.BackColor = ThemeManager.IsLight ? s.PanelElevated : Color.FromArgb(20, 20, 20);
-
-            lblTitle.ForeColor = s.TextPrimary;
-            if (lblGymName != null) lblGymName.ForeColor = s.TextPrimary;
-            lblUser.ForeColor = s.TextMuted;
-            lblPass.ForeColor = s.TextMuted;
-            chkRemember.ForeColor = s.TextMuted;
-
-            pnlUser.BackColor = s.InputBackground;
-            txtUser.FillColor = s.InputBackground;
-            txtUser.BorderColor = s.BorderSubtle;
-            txtUser.ForeColor = s.InputForeground;
-            pnlPass.BackColor = s.InputBackground;
-            txtPass.FillColor = s.InputBackground;
-            txtPass.BorderColor = s.BorderSubtle;
-            txtPass.ForeColor = s.InputForeground;
-
-            lblWelcome.ForeColor = s.TextPrimary;
-
             GunaUi.ApplyBrandGradient(btnLogin);
-            btnExit.FillColor = s.SecondaryButton;
-            btnExit.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
+            Invalidate();
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
+        // ── purple gradient backdrop (matches Figma login) ──
+        private void Form1_PaintBackground(object sender, PaintEventArgs e)
         {
-            if (!_autoLoginOnFirstShow) return;
-            _autoLoginOnFirstShow = false;
-            BtnLogin_Click(this, EventArgs.Empty);
-        }
-
-        private void ApplyBranding()
-        {
-            if (ThemeManager.IsLight)
+            var r = ClientRectangle;
+            if (r.Width <= 0 || r.Height <= 0) return;
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            using (var brush = new LinearGradientBrush(r, Color.FromArgb(0x24, 0x0B, 0x3E), Color.FromArgb(0x6B, 0x1F, 0x9C), LinearGradientMode.ForwardDiagonal))
             {
-                // Figma login is a clean light surface (no photo backdrop).
-                this.BackgroundImage = null;
-            }
-            else
-            {
-                Image bg = ImageAssets.TryLoad(ImageAssets.BgGym);
-                if (bg != null)
+                brush.InterpolationColors = new ColorBlend(3)
                 {
-                    this.BackgroundImage = ImageAssets.CreateWithOpacity(bg, 0.28f);
-                    this.BackgroundImageLayout = ImageLayout.Stretch;
-                }
+                    Colors = new[]
+                    {
+                        Color.FromArgb(0x1E, 0x09, 0x33),
+                        Color.FromArgb(0x47, 0x16, 0x7A),
+                        Color.FromArgb(0x7A, 0x1F, 0x9E)
+                    },
+                    Positions = new[] { 0f, 0.55f, 1f }
+                };
+                e.Graphics.FillRectangle(brush, r);
             }
+        }
 
-            Image logo = ImageAssets.TryLoad(ImageAssets.LogoHeartDumbbell);
-            if (logo != null && picLogo != null)
+        private void PnlIcon_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var r = new Rectangle(0, 0, pnlIcon.Width - 1, pnlIcon.Height - 1);
+            int d = 20, dd = d * 2;
+            using (var path = new GraphicsPath())
             {
-                picLogo.Image    = logo;
-                picLogo.SizeMode = PictureBoxSizeMode.Zoom;
+                path.AddArc(r.X, r.Y, dd, dd, 180, 90);
+                path.AddArc(r.Right - dd, r.Y, dd, dd, 270, 90);
+                path.AddArc(r.Right - dd, r.Bottom - dd, dd, dd, 0, 90);
+                path.AddArc(r.X, r.Bottom - dd, dd, dd, 90, 90);
+                path.CloseFigure();
+                using (var br = new LinearGradientBrush(r, FigmaPalette.LogoStart, FigmaPalette.LogoEnd, LinearGradientMode.ForwardDiagonal))
+                    e.Graphics.FillPath(br, path);
             }
+            TextRenderer.DrawText(e.Graphics, "🏋️", new Font("Segoe UI Emoji", 26F),
+                new Rectangle(0, 0, pnlIcon.Width, pnlIcon.Height), Color.White,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
         }
 
         private void BtnExit_Click(object sender, EventArgs e) => Application.Exit();
@@ -97,12 +99,6 @@ namespace gym_mangment_system
             string user = txtUser?.Text?.Trim() ?? "";
             string pass = txtPass?.Text ?? "";
 
-            if (string.IsNullOrEmpty(user) && string.IsNullOrEmpty(pass))
-            {
-                user = "admin";
-                pass = "admin";
-            }
-
             if (UserDirectory.TryAuthenticate(user, pass, out string displayName, out AppSession.UserRole role))
             {
                 AppSession.CurrentRole = role;
@@ -111,7 +107,7 @@ namespace gym_mangment_system
             else
             {
                 MessageBox.Show(
-                    "اسم المستخدم أو كلمة المرور غير صحيحة.\n\nافتراضي: admin / admin\nمستلم: reception / 1234\n(يمكن إضافة مستخدمين من شاشة المدير)",
+                    "اسم المستخدم أو كلمة المرور غير صحيحة.\n\nمدير: admin / admin\nاستقبال: reception / 1234",
                     "خطأ في تسجيل الدخول", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -122,13 +118,29 @@ namespace gym_mangment_system
             if (dashboard.RequestSignOut)
             {
                 AppSession.Username = "";
-                txtUser.Text = "admin";
-                txtPass.Text = "admin";
+                txtUser.Text = "";
+                txtPass.Text = "";
                 txtUser.Focus();
                 this.Show();
                 return;
             }
             this.Close();
+        }
+
+        // ── drag the borderless window ──────────────────────
+        [DllImport("user32.dll")] private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [DllImport("user32.dll")] private static extern bool ReleaseCapture();
+        private const int WM_NCLBUTTONDOWN = 0xA1;
+        private const int HT_CAPTION = 0x2;
+
+        private void EnableDrag(Control c)
+        {
+            c.MouseDown += (s, e) =>
+            {
+                if (e.Button != MouseButtons.Left) return;
+                ReleaseCapture();
+                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            };
         }
     }
 }

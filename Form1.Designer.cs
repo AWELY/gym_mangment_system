@@ -4,32 +4,33 @@
     {
         private System.ComponentModel.IContainer components = null;
 
-        private System.Windows.Forms.Panel topBar;
-        private System.Windows.Forms.Label lblTitleBar;
         private Guna.UI2.WinForms.Guna2Button btnClose;
-        private System.Windows.Forms.Panel mainPanel;
-        private System.Windows.Forms.Panel brandPanel;
-        private System.Windows.Forms.PictureBox picLogo;
+        private System.Windows.Forms.Panel pnlIcon;
         private System.Windows.Forms.Label lblGymName;
-        private System.Windows.Forms.Label lblWelcome;
-        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.Label lblSubtitle;
+
+        private Guna.UI2.WinForms.Guna2Panel card;
         private System.Windows.Forms.Label lblUser;
         private System.Windows.Forms.Panel pnlUser;
+        private System.Windows.Forms.Label lblUserIcon;
         private Guna.UI2.WinForms.Guna2TextBox txtUser;
         private System.Windows.Forms.Label lblPass;
         private System.Windows.Forms.Panel pnlPass;
+        private System.Windows.Forms.Label lblPassIcon;
         private Guna.UI2.WinForms.Guna2TextBox txtPass;
-        private System.Windows.Forms.CheckBox chkRemember;
-        private System.Windows.Forms.LinkLabel lnkForgot;
         private Guna.UI2.WinForms.Guna2GradientButton btnLogin;
-        private Guna.UI2.WinForms.Guna2Button btnExit;
+        private System.Windows.Forms.Label lblDefaults;
+        private Guna.UI2.WinForms.Guna2Panel chipAdmin;
+        private System.Windows.Forms.Label lblChipAdminRole;
+        private System.Windows.Forms.Label lblChipAdminCreds;
+        private Guna.UI2.WinForms.Guna2Panel chipReception;
+        private System.Windows.Forms.Label lblChipRecRole;
+        private System.Windows.Forms.Label lblChipRecCreds;
 
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
             base.Dispose(disposing);
         }
 
@@ -37,212 +38,256 @@
 
         private void InitializeComponent()
         {
-            this.topBar = new System.Windows.Forms.Panel();
-            this.lblTitleBar = new System.Windows.Forms.Label();
-            this.btnClose = new Guna.UI2.WinForms.Guna2Button();
-            this.mainPanel = new System.Windows.Forms.Panel();
-            this.brandPanel = new System.Windows.Forms.Panel();
-            this.picLogo = new System.Windows.Forms.PictureBox();
-            this.lblGymName = new System.Windows.Forms.Label();
-            this.lblWelcome = new System.Windows.Forms.Label();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.lblUser = new System.Windows.Forms.Label();
-            this.pnlUser = new System.Windows.Forms.Panel();
-            this.txtUser = new Guna.UI2.WinForms.Guna2TextBox();
-            this.lblPass = new System.Windows.Forms.Label();
-            this.pnlPass = new System.Windows.Forms.Panel();
-            this.txtPass = new Guna.UI2.WinForms.Guna2TextBox();
-            this.chkRemember = new System.Windows.Forms.CheckBox();
-            this.lnkForgot = new System.Windows.Forms.LinkLabel();
-            this.btnLogin = new Guna.UI2.WinForms.Guna2GradientButton();
-            this.btnExit = new Guna.UI2.WinForms.Guna2Button();
-            
-            this.topBar.SuspendLayout();
-            this.mainPanel.SuspendLayout();
-            this.brandPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
+            this.btnClose         = new Guna.UI2.WinForms.Guna2Button();
+            this.pnlIcon          = new System.Windows.Forms.Panel();
+            this.lblGymName       = new System.Windows.Forms.Label();
+            this.lblSubtitle      = new System.Windows.Forms.Label();
+            this.card             = new Guna.UI2.WinForms.Guna2Panel();
+            this.lblUser          = new System.Windows.Forms.Label();
+            this.pnlUser          = new System.Windows.Forms.Panel();
+            this.lblUserIcon      = new System.Windows.Forms.Label();
+            this.txtUser          = new Guna.UI2.WinForms.Guna2TextBox();
+            this.lblPass          = new System.Windows.Forms.Label();
+            this.pnlPass          = new System.Windows.Forms.Panel();
+            this.lblPassIcon      = new System.Windows.Forms.Label();
+            this.txtPass          = new Guna.UI2.WinForms.Guna2TextBox();
+            this.btnLogin         = new Guna.UI2.WinForms.Guna2GradientButton();
+            this.lblDefaults      = new System.Windows.Forms.Label();
+            this.chipAdmin        = new Guna.UI2.WinForms.Guna2Panel();
+            this.lblChipAdminRole = new System.Windows.Forms.Label();
+            this.lblChipAdminCreds= new System.Windows.Forms.Label();
+            this.chipReception    = new Guna.UI2.WinForms.Guna2Panel();
+            this.lblChipRecRole   = new System.Windows.Forms.Label();
+            this.lblChipRecCreds  = new System.Windows.Forms.Label();
+
+            this.card.SuspendLayout();
             this.pnlUser.SuspendLayout();
             this.pnlPass.SuspendLayout();
+            this.chipAdmin.SuspendLayout();
+            this.chipReception.SuspendLayout();
             this.SuspendLayout();
 
-            // topBar
-            this.topBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.topBar.Height = 30;
-            this.topBar.BackColor = System.Drawing.Color.FromArgb(15, 15, 15);
-            this.topBar.Controls.Add(this.lblTitleBar);
-            this.topBar.Controls.Add(this.btnClose);
-
-            // lblTitleBar
-            this.lblTitleBar.Text = "Gym Management System - Login";
-            this.lblTitleBar.ForeColor = System.Drawing.Color.White;
-            this.lblTitleBar.AutoSize = true;
-            this.lblTitleBar.Location = new System.Drawing.Point(10, 8);
-            this.lblTitleBar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular);
-
-            // btnClose
-            this.btnClose.Text = "X";
+            // btnClose (top-right)
+            this.btnClose.Text = "✕";
             this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.FillColor = System.Drawing.Color.FromArgb(15, 15, 15);
-            this.btnClose.BorderRadius = 0;
-            this.btnClose.Size = new System.Drawing.Size(30, 30);
-            this.btnClose.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnClose.FillColor = System.Drawing.Color.Transparent;
+            this.btnClose.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.btnClose.BorderRadius = 8;
+            this.btnClose.Size = new System.Drawing.Size(40, 36);
+            this.btnClose.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.btnClose.Location = new System.Drawing.Point(948, 14);
             this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClose.HoverState.FillColor = System.Drawing.Color.FromArgb(80, 255, 255, 255);
             this.btnClose.Click += new System.EventHandler(this.BtnExit_Click);
 
-            // mainPanel
-            this.mainPanel.Size = new System.Drawing.Size(540, 560);
-            this.mainPanel.Location = new System.Drawing.Point(40, 70);
-            this.mainPanel.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.mainPanel.Controls.Add(this.lblTitle);
-            this.mainPanel.Controls.Add(this.lblUser);
-            this.mainPanel.Controls.Add(this.pnlUser);
-            this.mainPanel.Controls.Add(this.lblPass);
-            this.mainPanel.Controls.Add(this.pnlPass);
-            this.mainPanel.Controls.Add(this.chkRemember);
-            this.mainPanel.Controls.Add(this.lnkForgot);
-            this.mainPanel.Controls.Add(this.btnLogin);
-            this.mainPanel.Controls.Add(this.btnExit);
-
-            // brandPanel (right)
-            this.brandPanel.Size = new System.Drawing.Size(430, 560);
-            this.brandPanel.Location = new System.Drawing.Point(600, 70);
-            this.brandPanel.BackColor = System.Drawing.Color.FromArgb(20, 20, 20);
-            this.brandPanel.Padding = new System.Windows.Forms.Padding(20);
-            this.brandPanel.Controls.Add(this.lblWelcome);
-            this.brandPanel.Controls.Add(this.lblGymName);
-            this.brandPanel.Controls.Add(this.picLogo);
-
-            // picLogo
-            this.picLogo.Location = new System.Drawing.Point(70, 50);
-            this.picLogo.Size = new System.Drawing.Size(290, 230);
-            this.picLogo.BackColor = System.Drawing.Color.Transparent;
+            // pnlIcon (gradient dumbbell square, painted at runtime)
+            this.pnlIcon.Size = new System.Drawing.Size(76, 76);
+            this.pnlIcon.Location = new System.Drawing.Point(462, 64);
+            this.pnlIcon.BackColor = System.Drawing.Color.Transparent;
+            this.pnlIcon.Anchor = System.Windows.Forms.AnchorStyles.Top;
 
             // lblGymName
-            this.lblGymName.Location = new System.Drawing.Point(70, 300);
-            this.lblGymName.Size = new System.Drawing.Size(290, 80);
-            this.lblGymName.Text = "GLORY";
-            this.lblGymName.Font = new System.Drawing.Font("Segoe UI", 34F, System.Drawing.FontStyle.Bold);
-            this.lblGymName.ForeColor = System.Drawing.Color.FromArgb(17, 24, 39);
+            this.lblGymName.Text = "Glory Gym";
+            this.lblGymName.Font = new System.Drawing.Font("Segoe UI", 30F, System.Drawing.FontStyle.Bold);
+            this.lblGymName.ForeColor = System.Drawing.Color.White;
+            this.lblGymName.Size = new System.Drawing.Size(500, 52);
+            this.lblGymName.Location = new System.Drawing.Point(250, 152);
             this.lblGymName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblGymName.BackColor = System.Drawing.Color.Transparent;
+            this.lblGymName.Anchor = System.Windows.Forms.AnchorStyles.Top;
 
-            // lblWelcome
-            this.lblWelcome.Location = new System.Drawing.Point(70, 390);
-            this.lblWelcome.Size = new System.Drawing.Size(290, 120);
-            this.lblWelcome.Text = "Welcome back!\r\nمرحباً بك في نظام Glory";
-            this.lblWelcome.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.lblWelcome.ForeColor = System.Drawing.Color.White;
-            this.lblWelcome.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // lblSubtitle
+            this.lblSubtitle.Text = "نظام إدارة الصالة الرياضية";
+            this.lblSubtitle.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(0xD6, 0xC7, 0xF0);
+            this.lblSubtitle.Size = new System.Drawing.Size(500, 26);
+            this.lblSubtitle.Location = new System.Drawing.Point(250, 206);
+            this.lblSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblSubtitle.BackColor = System.Drawing.Color.Transparent;
+            this.lblSubtitle.Anchor = System.Windows.Forms.AnchorStyles.Top;
 
-            // lblTitle
-            this.lblTitle.Text = "تسجيل الدخول";
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Location = new System.Drawing.Point(170, 55);
+            // card
+            this.card.FillColor = System.Drawing.Color.FromArgb(0x3A, 0x2A, 0x57);
+            this.card.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.card.BorderThickness = 1;
+            this.card.BorderRadius = 20;
+            this.card.Size = new System.Drawing.Size(440, 360);
+            this.card.Location = new System.Drawing.Point(280, 250);
+            this.card.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.card.ShadowDecoration.Enabled = true;
+            this.card.ShadowDecoration.Depth = 12;
+            this.card.Controls.Add(this.lblUser);
+            this.card.Controls.Add(this.pnlUser);
+            this.card.Controls.Add(this.lblPass);
+            this.card.Controls.Add(this.pnlPass);
+            this.card.Controls.Add(this.btnLogin);
+            this.card.Controls.Add(this.lblDefaults);
+            this.card.Controls.Add(this.chipAdmin);
+            this.card.Controls.Add(this.chipReception);
 
             // lblUser
-            this.lblUser.Text = "اسم المستخدم:";
+            this.lblUser.Text = "اسم المستخدم";
             this.lblUser.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblUser.ForeColor = System.Drawing.Color.LightGray;
-            this.lblUser.Location = new System.Drawing.Point(70, 160);
-            this.lblUser.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lblUser.AutoSize = true;
+            this.lblUser.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblUser.Size = new System.Drawing.Size(376, 22);
+            this.lblUser.Location = new System.Drawing.Point(32, 22);
+            this.lblUser.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblUser.BackColor = System.Drawing.Color.Transparent;
 
             // pnlUser
-            this.pnlUser.BackColor = System.Drawing.Color.FromArgb(45, 45, 45);
-            this.pnlUser.Size = new System.Drawing.Size(400, 38);
-            this.pnlUser.Location = new System.Drawing.Point(70, 185);
+            this.pnlUser.BackColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.pnlUser.Size = new System.Drawing.Size(376, 46);
+            this.pnlUser.Location = new System.Drawing.Point(32, 48);
             this.pnlUser.Controls.Add(this.txtUser);
+            this.pnlUser.Controls.Add(this.lblUserIcon);
+
+            // lblUserIcon
+            this.lblUserIcon.Text = "👤";
+            this.lblUserIcon.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lblUserIcon.Width = 40;
+            this.lblUserIcon.Font = new System.Drawing.Font("Segoe UI Emoji", 12F);
+            this.lblUserIcon.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblUserIcon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblUserIcon.BackColor = System.Drawing.Color.Transparent;
 
             // txtUser
-            this.txtUser.FillColor = System.Drawing.Color.FromArgb(45, 45, 45);
-            this.txtUser.ForeColor = System.Drawing.Color.White;
-            this.txtUser.BorderRadius = 8;
-            this.txtUser.BorderColor = System.Drawing.Color.FromArgb(209, 213, 219);
-            this.txtUser.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.txtUser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtUser.Text = "Admin";
+            this.txtUser.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.txtUser.ForeColor = System.Drawing.Color.White;
+            this.txtUser.BorderRadius = 10;
+            this.txtUser.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.txtUser.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.txtUser.PlaceholderText = "admin أو reception";
+            this.txtUser.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
 
             // lblPass
-            this.lblPass.Text = "كلمة المرور:";
+            this.lblPass.Text = "كلمة المرور";
             this.lblPass.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPass.ForeColor = System.Drawing.Color.LightGray;
-            this.lblPass.Location = new System.Drawing.Point(70, 250);
-            this.lblPass.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lblPass.AutoSize = true;
+            this.lblPass.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblPass.Size = new System.Drawing.Size(376, 22);
+            this.lblPass.Location = new System.Drawing.Point(32, 104);
+            this.lblPass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblPass.BackColor = System.Drawing.Color.Transparent;
 
             // pnlPass
-            this.pnlPass.BackColor = System.Drawing.Color.FromArgb(45, 45, 45);
-            this.pnlPass.Size = new System.Drawing.Size(400, 38);
-            this.pnlPass.Location = new System.Drawing.Point(70, 275);
+            this.pnlPass.BackColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.pnlPass.Size = new System.Drawing.Size(376, 46);
+            this.pnlPass.Location = new System.Drawing.Point(32, 130);
             this.pnlPass.Controls.Add(this.txtPass);
+            this.pnlPass.Controls.Add(this.lblPassIcon);
+
+            // lblPassIcon
+            this.lblPassIcon.Text = "🔒";
+            this.lblPassIcon.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lblPassIcon.Width = 40;
+            this.lblPassIcon.Font = new System.Drawing.Font("Segoe UI Emoji", 12F);
+            this.lblPassIcon.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblPassIcon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblPassIcon.BackColor = System.Drawing.Color.Transparent;
 
             // txtPass
-            this.txtPass.FillColor = System.Drawing.Color.FromArgb(45, 45, 45);
-            this.txtPass.ForeColor = System.Drawing.Color.White;
-            this.txtPass.BorderRadius = 8;
-            this.txtPass.BorderColor = System.Drawing.Color.FromArgb(209, 213, 219);
-            this.txtPass.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.txtPass.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPass.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.txtPass.ForeColor = System.Drawing.Color.White;
+            this.txtPass.BorderRadius = 10;
+            this.txtPass.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.txtPass.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.txtPass.PasswordChar = '•';
-            this.txtPass.Text = "Password";
-
-            // chkRemember
-            this.chkRemember.Text = "تذكرني";
-            this.chkRemember.ForeColor = System.Drawing.Color.LightGray;
-            this.chkRemember.Location = new System.Drawing.Point(70, 325);
-            this.chkRemember.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-
-            // lnkForgot
-            this.lnkForgot.Text = "نسيت كلمة المرور؟";
-            this.lnkForgot.LinkColor = System.Drawing.Color.SteelBlue;
-            this.lnkForgot.Location = new System.Drawing.Point(290, 327);
-            this.lnkForgot.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lnkForgot.AutoSize = true;
+            this.txtPass.PlaceholderText = "••••••••";
+            this.txtPass.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
 
             // btnLogin
-            this.btnLogin.Text = "تسجيل الدخول  [->";
-            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(152, 16, 250);
-            this.btnLogin.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
+            this.btnLogin.Text = "تسجيل الدخول";
+            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(0x98, 0x10, 0xFA);
+            this.btnLogin.FillColor2 = System.Drawing.Color.FromArgb(0xE6, 0x00, 0x76);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.BorderRadius = 14;
+            this.btnLogin.BorderRadius = 12;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnLogin.Size = new System.Drawing.Size(400, 50);
-            this.btnLogin.Location = new System.Drawing.Point(70, 385);
+            this.btnLogin.Size = new System.Drawing.Size(376, 48);
+            this.btnLogin.Location = new System.Drawing.Point(32, 190);
             this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnLogin.Click += new System.EventHandler(this.BtnLogin_Click);
 
-            // btnExit
-            this.btnExit.Text = "خروج";
-            this.btnExit.FillColor = System.Drawing.Color.FromArgb(50, 50, 50);
-            this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.BorderRadius = 10;
-            this.btnExit.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btnExit.Size = new System.Drawing.Size(400, 46);
-            this.btnExit.Location = new System.Drawing.Point(70, 445);
-            this.btnExit.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
+            // lblDefaults
+            this.lblDefaults.Text = "الحسابات الافتراضية";
+            this.lblDefaults.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblDefaults.ForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
+            this.lblDefaults.Size = new System.Drawing.Size(376, 22);
+            this.lblDefaults.Location = new System.Drawing.Point(32, 250);
+            this.lblDefaults.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblDefaults.BackColor = System.Drawing.Color.Transparent;
+
+            // chipAdmin
+            this.chipAdmin.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.chipAdmin.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.chipAdmin.BorderThickness = 1;
+            this.chipAdmin.BorderRadius = 12;
+            this.chipAdmin.Size = new System.Drawing.Size(182, 60);
+            this.chipAdmin.Location = new System.Drawing.Point(226, 280);
+            this.chipAdmin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chipAdmin.Controls.Add(this.lblChipAdminRole);
+            this.chipAdmin.Controls.Add(this.lblChipAdminCreds);
+
+            this.lblChipAdminRole.Text = "مدير";
+            this.lblChipAdminRole.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblChipAdminRole.ForeColor = System.Drawing.Color.White;
+            this.lblChipAdminRole.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblChipAdminRole.Height = 28;
+            this.lblChipAdminRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblChipAdminRole.BackColor = System.Drawing.Color.Transparent;
+
+            this.lblChipAdminCreds.Text = "admin / admin";
+            this.lblChipAdminCreds.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblChipAdminCreds.ForeColor = System.Drawing.Color.FromArgb(0xC4, 0xB5, 0xE0);
+            this.lblChipAdminCreds.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblChipAdminCreds.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lblChipAdminCreds.BackColor = System.Drawing.Color.Transparent;
+
+            // chipReception
+            this.chipReception.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.chipReception.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.chipReception.BorderThickness = 1;
+            this.chipReception.BorderRadius = 12;
+            this.chipReception.Size = new System.Drawing.Size(182, 60);
+            this.chipReception.Location = new System.Drawing.Point(32, 280);
+            this.chipReception.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chipReception.Controls.Add(this.lblChipRecRole);
+            this.chipReception.Controls.Add(this.lblChipRecCreds);
+
+            this.lblChipRecRole.Text = "استقبال";
+            this.lblChipRecRole.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblChipRecRole.ForeColor = System.Drawing.Color.White;
+            this.lblChipRecRole.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblChipRecRole.Height = 28;
+            this.lblChipRecRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblChipRecRole.BackColor = System.Drawing.Color.Transparent;
+
+            this.lblChipRecCreds.Text = "reception / 1234";
+            this.lblChipRecCreds.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblChipRecCreds.ForeColor = System.Drawing.Color.FromArgb(0xC4, 0xB5, 0xE0);
+            this.lblChipRecCreds.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblChipRecCreds.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lblChipRecCreds.BackColor = System.Drawing.Color.Transparent;
 
             // Form1
-            this.Text = "Gym Management System - Login";
-            this.BackColor = System.Drawing.Color.FromArgb(25, 25, 25);
-            this.ClientSize = new System.Drawing.Size(1080, 680);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(0x2A, 0x0D, 0x45);
+            this.ClientSize = new System.Drawing.Size(1000, 700);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Controls.Add(this.topBar);
-            this.Controls.Add(this.mainPanel);
-            this.Controls.Add(this.brandPanel);
+            this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Text = "Glory Gym - تسجيل الدخول";
+            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.pnlIcon);
+            this.Controls.Add(this.lblGymName);
+            this.Controls.Add(this.lblSubtitle);
+            this.Controls.Add(this.card);
 
-            this.topBar.ResumeLayout(false);
-            this.topBar.PerformLayout();
-            this.mainPanel.ResumeLayout(false);
-            this.mainPanel.PerformLayout();
-            this.brandPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
+            this.card.ResumeLayout(false);
             this.pnlUser.ResumeLayout(false);
-            this.pnlUser.PerformLayout();
             this.pnlPass.ResumeLayout(false);
-            this.pnlPass.PerformLayout();
+            this.chipAdmin.ResumeLayout(false);
+            this.chipReception.ResumeLayout(false);
             this.ResumeLayout(false);
         }
 

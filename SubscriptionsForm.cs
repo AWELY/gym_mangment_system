@@ -243,7 +243,7 @@ namespace gym_mangment_system
             lblTitle.Text = "📋 إعداد أنواع الاشتراك";
             lblType.Text = "اسم الخطة";
             lblDuration.Text = "المدة";
-            lblPrice.Text = "السعر $";
+            lblPrice.Text = "السعر (ريال)";
             lblHint.Text = "أضف نوع الاشتراك (اسم + مدة + سعر). الأنواع هنا تظهر في صفحة الأعضاء.";
 
             cmbMember.Visible = false;
@@ -294,7 +294,7 @@ namespace gym_mangment_system
             string durationUnit = cmbDurationUnit.SelectedItem?.ToString() ?? "شهر";
             decimal price = numPrice.Value;
             string durationLabel = BuildDurationLabel(durationValue, durationUnit);
-            string displayName = type + " - " + price.ToString("0.##") + "$ / " + durationLabel;
+            string displayName = type + " - " + price.ToString("0.##") + " ريال / " + durationLabel;
 
             if (_editingId == -1)
             {

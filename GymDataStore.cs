@@ -46,16 +46,16 @@ namespace gym_mangment_system
 
             s.Members.AddRange(new[]
             {
-                new MemberRecord { Id = 1, FullName = "أحمد محمد", Phone = "0501234567", Gender = "ذكر", PlanName = "Basic Plan", PriceText = "30 $", DurationText = "1 شهر", JoinDate = "2026-01-15" },
-                new MemberRecord { Id = 2, FullName = "سارة علي", Phone = "0559876543", Gender = "أنثى", PlanName = "Pro Plan", PriceText = "50 $", DurationText = "3 شهر", JoinDate = "2025-06-20" },
-                new MemberRecord { Id = 3, FullName = "خالد إبراهيم", Phone = "0561112233", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 $", DurationText = "1 سنة", JoinDate = "2025-11-01" },
-                new MemberRecord { Id = 4, FullName = "نورة حسن", Phone = "0547778899", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 $", DurationText = "1 شهر", JoinDate = "2026-02-10" },
-                new MemberRecord { Id = 5, FullName = "عمر فاروق", Phone = "0533334455", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 $", DurationText = "3 شهر", JoinDate = "2025-09-05" },
-                new MemberRecord { Id = 6, FullName = "ليلى أحمد", Phone = "0522225566", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 $", DurationText = "1 شهر", JoinDate = "2026-03-01" },
-                new MemberRecord { Id = 7, FullName = "يوسف كمال", Phone = "0511116677", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 $", DurationText = "1 سنة", JoinDate = "2025-08-15" },
-                new MemberRecord { Id = 8, FullName = "فاطمة سعيد", Phone = "0588889900", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 $", DurationText = "1 شهر", JoinDate = "2026-04-01" },
-                new MemberRecord { Id = 9, FullName = "محمود عادل", Phone = "0577771122", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 $", DurationText = "3 شهر", JoinDate = "2025-12-20" },
-                new MemberRecord { Id = 10, FullName = "هند محمود", Phone = "0566662233", Gender = "أنثى", PlanName = "Annual Plan", PriceText = "300 $", DurationText = "1 سنة", JoinDate = "2026-01-05" }
+                new MemberRecord { Id = 1, FullName = "أحمد محمد", Phone = "0501234567", Gender = "ذكر", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-01-15" },
+                new MemberRecord { Id = 2, FullName = "سارة علي", Phone = "0559876543", Gender = "أنثى", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-06-20" },
+                new MemberRecord { Id = 3, FullName = "خالد إبراهيم", Phone = "0561112233", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2025-11-01" },
+                new MemberRecord { Id = 4, FullName = "نورة حسن", Phone = "0547778899", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-02-10" },
+                new MemberRecord { Id = 5, FullName = "عمر فاروق", Phone = "0533334455", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-09-05" },
+                new MemberRecord { Id = 6, FullName = "ليلى أحمد", Phone = "0522225566", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-03-01" },
+                new MemberRecord { Id = 7, FullName = "يوسف كمال", Phone = "0511116677", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2025-08-15" },
+                new MemberRecord { Id = 8, FullName = "فاطمة سعيد", Phone = "0588889900", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-04-01" },
+                new MemberRecord { Id = 9, FullName = "محمود عادل", Phone = "0577771122", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-12-20" },
+                new MemberRecord { Id = 10, FullName = "هند محمود", Phone = "0566662233", Gender = "أنثى", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2026-01-05" }
             });
 
             s.Trainers.AddRange(new[]

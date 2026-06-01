@@ -181,7 +181,7 @@ namespace gym_mangment_system
 
             if (plan != null)
             {
-                txtFPlanPrice.Text  = plan.Price.ToString("0.##") + " $";
+                txtFPlanPrice.Text  = plan.Price.ToString("0.##") + " ريال";
                 txtFPlanMonths.Text = plan.DurationValue + " " + plan.DurationUnit;
             }
             else

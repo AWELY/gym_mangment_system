@@ -235,7 +235,7 @@ namespace gym_mangment_system
                 visual = new Label { Text = product.Emoji, Font = new Font("Segoe UI", 26F), Size = new Size(170, 48), Location = new Point(0, 6), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
             }
             Label name  = new Label { Text = product.Name,  Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = s.TextPrimary, Size = new Size(170, 20), Location = new Point(0, 56), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
-            Label price = new Label { Text = product.Price.ToString("0.00") + " $", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Size = new Size(170, 24), Location = new Point(0, 78), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
+            Label price = new Label { Text = product.Price.ToString("0.00") + " ريال", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Size = new Size(170, 24), Location = new Point(0, 78), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
             Color stockColor = lowStock ? Color.FromArgb(231, 0, 11) : Color.FromArgb(0, 166, 62);
             Label stock = new Label { Text = "كمية: " + product.StockQty, Font = new Font("Segoe UI", 8F), ForeColor = stockColor, Size = new Size(170, 18), Location = new Point(0, 104), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
@@ -319,7 +319,7 @@ namespace gym_mangment_system
                 Panel row = new Panel { Size = new Size(320, 55), BackColor = s.Panel, Margin = new Padding(2, 3, 2, 3) };
 
                 Label lblN = new Label { Text = item.Name, Font = new Font("Segoe UI", 11F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(165, 5), Size = new Size(150, 22), TextAlign = ContentAlignment.MiddleRight };
-                Label lblD = new Label { Text = item.Qty + " × " + item.Price.ToString("0.00") + " $ = " + line.ToString("0.00") + " $", Font = new Font("Segoe UI", 9F), ForeColor = Color.FromArgb(0, 166, 62), Location = new Point(100, 30), Size = new Size(215, 18), TextAlign = ContentAlignment.MiddleRight };
+                Label lblD = new Label { Text = item.Qty + " × " + item.Price.ToString("0.00") + " ريال = " + line.ToString("0.00") + " ريال", Font = new Font("Segoe UI", 9F), ForeColor = Color.FromArgb(0, 166, 62), Location = new Point(100, 30), Size = new Size(215, 18), TextAlign = ContentAlignment.MiddleRight };
 
                 Button btnRm = new Button { Text = "✕", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.FromArgb(231, 0, 11), BackColor = s.Panel, FlatStyle = FlatStyle.Flat, Size = new Size(30, 30), Location = new Point(8, 12), Cursor = Cursors.Hand, Tag = item };
                 btnRm.FlatAppearance.BorderSize = 0;
@@ -352,7 +352,7 @@ namespace gym_mangment_system
                 flowCartItems.Controls.Add(row);
             }
 
-            lblTotalValue.Text = total.ToString("0.00") + " $";
+            lblTotalValue.Text = total.ToString("0.00") + " ريال";
             lblCartCount.Text  = totalItems + " عنصر في السلة";
         }
 
@@ -432,7 +432,7 @@ namespace gym_mangment_system
             });
             GymDataStore.Save();
 
-            MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " $\nعدد المنتجات: " + _cart.Count,
+            MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " ريال\nعدد المنتجات: " + _cart.Count,
                 "✅ فاتورة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             _cart.Clear();
             RefreshCart();

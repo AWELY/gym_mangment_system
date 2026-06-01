@@ -241,7 +241,7 @@ namespace gym_mangment_system
                 for (int i = 0; i <= 6; i++)
                 {
                     int y = padT + (chartH * i / 6);
-                    string val = ((int)(maxVal - maxVal * i / 6)).ToString("N0") + "$";
+                    string val = ((int)(maxVal - maxVal * i / 6)).ToString("N0") + " ريال";
                     g.DrawString(val, axisFont, axisBrush, 2, y - 7);
                 }
             }
@@ -289,7 +289,7 @@ namespace gym_mangment_system
 
         private static string FormatMoney(decimal value)
         {
-            return value.ToString("N0") + " $";
+            return value.ToString("N0") + " ريال";
         }
     }
 }
