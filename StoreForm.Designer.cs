@@ -8,7 +8,7 @@
         private System.Windows.Forms.Panel pnlProducts;
         private System.Windows.Forms.Label lblProductsTitle;
         private System.Windows.Forms.FlowLayoutPanel flowProducts;
-        private Guna.UI2.WinForms.Guna2Button btnAddNewItem;
+        private Guna.UI2.WinForms.Guna2GradientButton btnAddNewItem;
 
         // Right: Cart
         private System.Windows.Forms.Panel pnlCart;
@@ -51,7 +51,7 @@
         {
             this.pnlProducts    = new System.Windows.Forms.Panel();
             this.flowProducts   = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnAddNewItem  = new Guna.UI2.WinForms.Guna2Button();
+            this.btnAddNewItem  = new Guna.UI2.WinForms.Guna2GradientButton();
             this.lblProductsTitle = new System.Windows.Forms.Label();
             this.pnlCart        = new System.Windows.Forms.Panel();
             this.pnlCartItems   = new System.Windows.Forms.Panel();
@@ -108,10 +108,11 @@
             this.flowProducts.Padding    = new System.Windows.Forms.Padding(5);
             this.flowProducts.TabIndex   = 2;
 
-            this.btnAddNewItem.FillColor = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnAddNewItem.FillColor = System.Drawing.Color.FromArgb(152, 16, 250);
+            this.btnAddNewItem.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
             this.btnAddNewItem.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnAddNewItem.Dock      = System.Windows.Forms.DockStyle.Bottom;
-            this.btnAddNewItem.BorderRadius = 10;
+            this.btnAddNewItem.BorderRadius = 12;
             this.btnAddNewItem.Font      = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
             this.btnAddNewItem.ForeColor = System.Drawing.Color.White;
             this.btnAddNewItem.Name      = "btnAddNewItem";

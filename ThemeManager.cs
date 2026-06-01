@@ -11,24 +11,36 @@ namespace gym_mangment_system
     /// </summary>
     public static class FigmaPalette
     {
-        // Brand / primary (indigo) — login button, logo, add buttons, prices
-        public static readonly Color Primary      = Color.FromArgb(0x4F, 0x39, 0xF6); // indigo-600
-        public static readonly Color PrimaryHover = Color.FromArgb(0x43, 0x2D, 0xD4); // indigo-700
-        public static readonly Color PrimarySoft  = Color.FromArgb(0xE0, 0xE7, 0xFF); // indigo-100 (active nav)
+        // Brand / primary — purple→pink gradient (Glory Gym redesign).
+        // Buttons, active nav pill, logo, prices, banner.
+        public static readonly Color Primary      = Color.FromArgb(0x98, 0x10, 0xFA); // purple-600
+        public static readonly Color PrimaryHover = Color.FromArgb(0x82, 0x0A, 0xD8); // purple-700
+        public static readonly Color PrimarySoft  = Color.FromArgb(0xF3, 0xE8, 0xFF); // purple-50 (soft borders / active nav tint)
 
-        // Welcome gradient banner (left → right)
-        public static readonly Color GradientStart = Color.FromArgb(0x63, 0x5D, 0xFF);
-        public static readonly Color GradientEnd   = Color.FromArgb(0x97, 0x15, 0xFA);
+        // Brand gradient (purple → pink) used by the active nav pill, primary buttons and banner.
+        public static readonly Color GradientStart = Color.FromArgb(0x98, 0x10, 0xFA); // purple-600
+        public static readonly Color GradientEnd   = Color.FromArgb(0xE6, 0x00, 0x76); // pink-600
+        public static readonly Color Pink          = Color.FromArgb(0xE6, 0x00, 0x76); // pink-600
+
+        // Logo icon square gradient (purple-500 → pink-500)
+        public static readonly Color LogoStart = Color.FromArgb(0xAD, 0x46, 0xFF); // purple-500
+        public static readonly Color LogoEnd   = Color.FromArgb(0xF6, 0x33, 0x9A); // pink-500
 
         // Accent colors
         public static readonly Color Blue     = Color.FromArgb(0x2B, 0x7F, 0xFF); // blue-500  (stat: members)
         public static readonly Color BlueBtn  = Color.FromArgb(0x15, 0x5D, 0xFC); // blue-600  (edit button)
         public static readonly Color Green    = Color.FromArgb(0x00, 0xC9, 0x51); // green-500 (value text)
-        public static readonly Color GreenBtn = Color.FromArgb(0x00, 0xA6, 0x3E); // green-600 (checkout / add-to-cart)
+        public static readonly Color GreenBtn = Color.FromArgb(0x00, 0xA6, 0x3E); // green-600 (checkout / add-to-cart / price)
         public static readonly Color Orange   = Color.FromArgb(0xFF, 0x69, 0x00); // orange-500
         public static readonly Color Purple   = Color.FromArgb(0xAD, 0x46, 0xFF); // purple-500 (cart / sales)
         public static readonly Color Red      = Color.FromArgb(0xE7, 0x00, 0x0B); // red-600   (delete)
         public static readonly Color Amber    = Color.FromArgb(0xF0, 0xB1, 0x00); // amber     (ticker banner)
+
+        // Semantic badge colors (member gender / user role pills)
+        public static readonly Color BadgeMaleBg     = Color.FromArgb(0xDB, 0xEA, 0xFE); // blue-100
+        public static readonly Color BadgeMaleText   = Color.FromArgb(0x14, 0x47, 0xE6); // blue-700
+        public static readonly Color BadgeFemaleBg   = Color.FromArgb(0xFC, 0xE7, 0xF3); // pink-100
+        public static readonly Color BadgeFemaleText = Color.FromArgb(0xC6, 0x00, 0x5C); // pink-700
 
         // Neutrals (gray scale)
         public static readonly Color Gray50  = Color.FromArgb(0xF9, 0xFA, 0xFB);
@@ -40,6 +52,18 @@ namespace gym_mangment_system
         public static readonly Color Gray700 = Color.FromArgb(0x37, 0x41, 0x51);
         public static readonly Color Gray900 = Color.FromArgb(0x11, 0x18, 0x27);
         public static readonly Color White   = Color.White;
+
+        /// <summary>Soft purple→pink table header band (matches Figma thead tint).</summary>
+        public static readonly Color TableHeaderTint = Color.FromArgb(0xFA, 0xF1, 0xFC);
+
+        /// <summary>Brand purple→pink gradient brush (horizontal). Caller owns/disposes it.</summary>
+        public static System.Drawing.Drawing2D.LinearGradientBrush BrandBrush(Rectangle r)
+        {
+            if (r.Width <= 0) r.Width = 1;
+            if (r.Height <= 0) r.Height = 1;
+            return new System.Drawing.Drawing2D.LinearGradientBrush(
+                r, GradientStart, GradientEnd, System.Drawing.Drawing2D.LinearGradientMode.Horizontal);
+        }
     }
 
     public sealed class UiColorScheme
@@ -132,39 +156,39 @@ namespace gym_mangment_system
         }
 
         public static UiColorScheme Dark { get; } = new UiColorScheme(
-            formBackground: Color.FromArgb(18, 18, 22),
-            sidebar: Color.FromArgb(22, 22, 26),
-            sidebarNav: Color.FromArgb(22, 22, 26),
-            sidebarNavActive: Color.FromArgb(40, 40, 48),
-            topBar: Color.FromArgb(26, 26, 30),
-            statusBar: Color.FromArgb(18, 18, 22),
-            contentHost: Color.FromArgb(18, 18, 22),
-            textPrimary: Color.White,
+            formBackground: Color.FromArgb(10, 10, 10),
+            sidebar: Color.FromArgb(19, 19, 22),
+            sidebarNav: Color.FromArgb(19, 19, 22),
+            sidebarNavActive: Color.FromArgb(38, 30, 48),
+            topBar: Color.FromArgb(19, 19, 22),
+            statusBar: Color.FromArgb(10, 10, 10),
+            contentHost: Color.FromArgb(10, 10, 10),
+            textPrimary: Color.FromArgb(250, 250, 250),
             textMuted: Color.FromArgb(160, 160, 170),
             textOnAccent: Color.White,
-            panel: Color.FromArgb(32, 32, 38),
-            panelElevated: Color.FromArgb(38, 38, 45),
-            card: Color.FromArgb(32, 32, 40),
-            cardHover: Color.FromArgb(42, 42, 52),
-            notifCard: Color.FromArgb(38, 38, 45),
-            notifCardHover: Color.FromArgb(48, 48, 55),
-            quickPanel: Color.FromArgb(22, 22, 28),
-            tableHeaderBand: Color.FromArgb(70, 70, 82),
-            inputBackground: Color.FromArgb(38, 38, 45),
+            panel: Color.FromArgb(26, 26, 32),
+            panelElevated: Color.FromArgb(32, 32, 40),
+            card: Color.FromArgb(26, 26, 36),
+            cardHover: Color.FromArgb(38, 38, 50),
+            notifCard: Color.FromArgb(32, 32, 40),
+            notifCardHover: Color.FromArgb(44, 44, 54),
+            quickPanel: Color.FromArgb(19, 19, 24),
+            tableHeaderBand: Color.FromArgb(45, 35, 58),
+            inputBackground: Color.FromArgb(32, 32, 40),
             inputForeground: Color.White,
-            listBackground: Color.FromArgb(30, 30, 36),
+            listBackground: Color.FromArgb(26, 26, 34),
             listForeground: Color.White,
-            gridBackground: Color.FromArgb(12, 12, 14),
+            gridBackground: Color.FromArgb(10, 10, 12),
             gridRow: Color.FromArgb(18, 18, 24),
             gridRowAlt: Color.FromArgb(24, 24, 30),
-            gridHeader: Color.FromArgb(30, 30, 38),
-            gridSelection: Color.FromArgb(40, 40, 52),
+            gridHeader: Color.FromArgb(28, 28, 36),
+            gridSelection: Color.FromArgb(45, 35, 58),
             gridSelectionFore: Color.White,
-            gridLines: Color.FromArgb(50, 50, 50),
-            secondaryButton: Color.FromArgb(55, 55, 65),
-            secondaryButtonHover: Color.FromArgb(75, 75, 88),
-            borderSubtle: Color.FromArgb(50, 50, 58),
-            topBarButtonHover: Color.FromArgb(45, 45, 50)
+            gridLines: Color.FromArgb(38, 38, 38),
+            secondaryButton: Color.FromArgb(45, 45, 55),
+            secondaryButtonHover: Color.FromArgb(64, 64, 78),
+            borderSubtle: Color.FromArgb(38, 38, 38),
+            topBarButtonHover: Color.FromArgb(40, 40, 48)
         );
 
         // Light theme = exact Glory Gym Figma palette.
@@ -186,7 +210,7 @@ namespace gym_mangment_system
             notifCard: FigmaPalette.White,
             notifCardHover: FigmaPalette.Gray100,
             quickPanel: FigmaPalette.Gray50,
-            tableHeaderBand: FigmaPalette.Gray100,
+            tableHeaderBand: FigmaPalette.TableHeaderTint,
             inputBackground: FigmaPalette.White,
             inputForeground: FigmaPalette.Gray900,
             listBackground: FigmaPalette.White,
@@ -194,13 +218,13 @@ namespace gym_mangment_system
             gridBackground: FigmaPalette.White,
             gridRow: FigmaPalette.White,
             gridRowAlt: FigmaPalette.Gray50,
-            gridHeader: FigmaPalette.Gray100,
+            gridHeader: FigmaPalette.TableHeaderTint,
             gridSelection: FigmaPalette.PrimarySoft,
             gridSelectionFore: FigmaPalette.Gray900,
             gridLines: FigmaPalette.Gray200,
             secondaryButton: FigmaPalette.Gray100,
             secondaryButtonHover: FigmaPalette.Gray200,
-            borderSubtle: FigmaPalette.Gray200,
+            borderSubtle: FigmaPalette.PrimarySoft,
             topBarButtonHover: FigmaPalette.Gray100
         );
     }

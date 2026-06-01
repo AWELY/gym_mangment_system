@@ -69,7 +69,7 @@ namespace gym_mangment_system
             btnFormCancel.FillColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
             btnFormSave.FillColor = FigmaPalette.GreenBtn;
-            btnAddMember.FillColor = FigmaPalette.Primary;
+            GunaUi.ApplyBrandGradient(btnAddMember);
         }
 
         private void ApplyBackgroundBranding()
@@ -113,6 +113,30 @@ namespace gym_mangment_system
             gridMembers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             if (gridMembers.Columns.Contains("ID"))
                 gridMembers.Columns["ID"].Visible = false;
+
+            // Figma: green prices + blue/pink gender pills. Cell-level styling wins
+            // over the theme's row defaults, so colours survive ApplyTheme().
+            gridMembers.CellFormatting -= GridMembers_CellFormatting;
+            gridMembers.CellFormatting += GridMembers_CellFormatting;
+        }
+
+        private void GridMembers_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            string col = gridMembers.Columns[e.ColumnIndex].Name;
+            if (col == "السعر")
+            {
+                e.CellStyle.ForeColor = FigmaPalette.GreenBtn;
+                e.CellStyle.Font = new Font(gridMembers.Font, FontStyle.Bold);
+            }
+            else if (col == "الجنس")
+            {
+                string v = e.Value?.ToString() ?? "";
+                if (v.Contains("ذكر"))
+                    e.CellStyle.ForeColor = FigmaPalette.BadgeMaleText;
+                else if (v.Contains("أنثى") || v.Contains("انثى"))
+                    e.CellStyle.ForeColor = FigmaPalette.BadgeFemaleText;
+            }
         }
 
         private void RebindMembersFromStore()

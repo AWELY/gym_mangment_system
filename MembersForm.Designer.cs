@@ -8,7 +8,7 @@
         private System.Windows.Forms.Panel pnlSearch;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
-        private Guna.UI2.WinForms.Guna2Button btnAddMember;
+        private Guna.UI2.WinForms.Guna2GradientButton btnAddMember;
         private Guna.UI2.WinForms.Guna2DataGridView gridMembers;
         private System.Windows.Forms.Panel pnlActions;
         private Guna.UI2.WinForms.Guna2Button btnEdit;
@@ -44,7 +44,7 @@
         {
             this.lblTitle       = new System.Windows.Forms.Label();
             this.pnlSearch      = new System.Windows.Forms.Panel();
-            this.btnAddMember   = new Guna.UI2.WinForms.Guna2Button();
+            this.btnAddMember   = new Guna.UI2.WinForms.Guna2GradientButton();
             this.txtSearch      = new System.Windows.Forms.TextBox();
             this.lblSearch      = new System.Windows.Forms.Label();
             this.gridMembers    = new Guna.UI2.WinForms.Guna2DataGridView();
@@ -118,9 +118,10 @@
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddMember.FillColor  = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnAddMember.FillColor  = System.Drawing.Color.FromArgb(152, 16, 250);
+            this.btnAddMember.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
             this.btnAddMember.Cursor     = System.Windows.Forms.Cursors.Hand;
-            this.btnAddMember.BorderRadius = 8;
+            this.btnAddMember.BorderRadius = 12;
             this.btnAddMember.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnAddMember.ForeColor  = System.Drawing.Color.White;
             this.btnAddMember.Location   = new System.Drawing.Point(25, 10);

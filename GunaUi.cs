@@ -43,20 +43,42 @@ namespace gym_mangment_system
             };
         }
 
-        /// <summary>A larger primary toolbar button (e.g. "+ إضافة").</summary>
+        /// <summary>
+        /// A larger primary toolbar button (e.g. "+ إضافة"). Rendered with the brand
+        /// purple→pink gradient to match the Figma design. The <paramref name="fill"/>
+        /// argument is kept for call-site compatibility but the brand gradient is used.
+        /// </summary>
         internal static Guna2Button ToolbarButton(string text, Color fill, Point location)
         {
-            return new Guna2Button
+            return new Guna2GradientButton
             {
                 Text         = text,
-                FillColor    = fill,
+                FillColor    = FigmaPalette.GradientStart,
+                FillColor2   = FigmaPalette.GradientEnd,
                 ForeColor    = Color.White,
                 Font         = new Font("Segoe UI", 11F, FontStyle.Bold),
-                BorderRadius = 9,
+                BorderRadius = 12,
                 Location     = location,
                 Size         = new Size(165, 40),
                 Cursor       = Cursors.Hand
             };
+        }
+
+        /// <summary>Turn an existing Guna2 button into the brand purple→pink gradient style.</summary>
+        internal static void ApplyBrandGradient(Guna2Button btn)
+        {
+            if (btn == null) return;
+            if (btn is Guna2GradientButton gb)
+            {
+                gb.FillColor  = FigmaPalette.GradientStart;
+                gb.FillColor2 = FigmaPalette.GradientEnd;
+            }
+            else
+            {
+                btn.FillColor = FigmaPalette.Primary;
+            }
+            btn.ForeColor = Color.White;
+            if (btn.BorderRadius < 10) btn.BorderRadius = 12;
         }
     }
 }

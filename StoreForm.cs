@@ -150,7 +150,7 @@ namespace gym_mangment_system
             btnClearCart.FillColor = s.SecondaryButton;
             btnClearCart.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
             btnCheckout.FillColor = FigmaPalette.GreenBtn;
-            btnAddNewItem.FillColor = FigmaPalette.Primary;
+            GunaUi.ApplyBrandGradient(btnAddNewItem);
 
             pnlAddItem.FillColor = s.Card;
             pnlAddItem.BorderColor = s.BorderSubtle;

@@ -53,8 +53,7 @@ namespace gym_mangment_system
 
             lblWelcome.ForeColor = s.TextPrimary;
 
-            btnLogin.FillColor = FigmaPalette.Primary;
-            btnLogin.ForeColor = Color.White;
+            GunaUi.ApplyBrandGradient(btnLogin);
             btnExit.FillColor = s.SecondaryButton;
             btnExit.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
         }

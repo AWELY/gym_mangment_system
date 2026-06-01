@@ -67,7 +67,8 @@ namespace gym_mangment_system
 
             string title = string.IsNullOrWhiteSpace(u.FullName) ? u.Username : u.FullName;
             Label name = new Label { Text = title, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label role = new Label { Text = "الصلاحية: " + roleText, Font = new Font("Segoe UI", 9.5F), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 44), Size = new Size(innerW, 20), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Color roleColor = u.Role == AppSession.UserRole.Admin ? FigmaPalette.Primary : FigmaPalette.BadgeMaleText;
+            Label role = new Label { Text = "الصلاحية: " + roleText, Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), ForeColor = roleColor, Location = new Point(pad, 44), Size = new Size(innerW, 20), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label user = new Label { Text = "اسم المستخدم: " + u.Username, Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 70), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label pass = new Label { Text = "كلمة المرور: " + u.Password, Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 96), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 

@@ -21,7 +21,7 @@
         private Guna.UI2.WinForms.Guna2TextBox txtPass;
         private System.Windows.Forms.CheckBox chkRemember;
         private System.Windows.Forms.LinkLabel lnkForgot;
-        private Guna.UI2.WinForms.Guna2Button btnLogin;
+        private Guna.UI2.WinForms.Guna2GradientButton btnLogin;
         private Guna.UI2.WinForms.Guna2Button btnExit;
 
         protected override void Dispose(bool disposing)
@@ -54,7 +54,7 @@
             this.txtPass = new Guna.UI2.WinForms.Guna2TextBox();
             this.chkRemember = new System.Windows.Forms.CheckBox();
             this.lnkForgot = new System.Windows.Forms.LinkLabel();
-            this.btnLogin = new Guna.UI2.WinForms.Guna2Button();
+            this.btnLogin = new Guna.UI2.WinForms.Guna2GradientButton();
             this.btnExit = new Guna.UI2.WinForms.Guna2Button();
             
             this.topBar.SuspendLayout();
@@ -202,9 +202,10 @@
 
             // btnLogin
             this.btnLogin.Text = "تسجيل الدخول  [->";
-            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(152, 16, 250);
+            this.btnLogin.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.BorderRadius = 10;
+            this.btnLogin.BorderRadius = 14;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnLogin.Size = new System.Drawing.Size(400, 50);
             this.btnLogin.Location = new System.Drawing.Point(70, 385);

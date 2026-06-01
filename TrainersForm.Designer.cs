@@ -8,7 +8,7 @@
         private System.Windows.Forms.Panel pnlSearch;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
-        private Guna.UI2.WinForms.Guna2Button btnAddTrainer;
+        private Guna.UI2.WinForms.Guna2GradientButton btnAddTrainer;
         private System.Windows.Forms.DataGridView gridTrainers;
         private System.Windows.Forms.Panel pnlActions;
         private System.Windows.Forms.Button btnEdit;
@@ -41,7 +41,7 @@
         {
             this.lblTitle      = new System.Windows.Forms.Label();
             this.pnlSearch     = new System.Windows.Forms.Panel();
-            this.btnAddTrainer = new Guna.UI2.WinForms.Guna2Button();
+            this.btnAddTrainer = new Guna.UI2.WinForms.Guna2GradientButton();
             this.txtSearch     = new System.Windows.Forms.TextBox();
             this.lblSearch     = new System.Windows.Forms.Label();
             this.gridTrainers  = new System.Windows.Forms.DataGridView();
@@ -112,9 +112,10 @@
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddTrainer.FillColor  = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnAddTrainer.FillColor  = System.Drawing.Color.FromArgb(152, 16, 250);
+            this.btnAddTrainer.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
             this.btnAddTrainer.Cursor     = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTrainer.BorderRadius = 8;
+            this.btnAddTrainer.BorderRadius = 12;
             this.btnAddTrainer.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnAddTrainer.ForeColor  = System.Drawing.Color.White;
             this.btnAddTrainer.Location   = new System.Drawing.Point(25, 10);

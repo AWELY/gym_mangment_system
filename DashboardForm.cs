@@ -34,6 +34,7 @@ namespace gym_mangment_system
             ApplyBrandImages();
             ApplyArabicTypography(this);
             AssignNavEvents();
+            SetupNavPainting();
             _activeNavButton = btnNavHome;
             HighlightNavButton(btnNavHome);
             BuildDashboardQuickPanel();
@@ -219,6 +220,15 @@ namespace gym_mangment_system
                     Location  = new Point(18, (cardH - badgeSz) / 2)
                 };
                 badge.Region = new Region(RoundedRect(new Rectangle(0, 0, badgeSz, badgeSz), 12));
+                Color badgeAccent = accent;
+                Color badgeAccent2 = ControlPaint.Light(accent, 0.4f);
+                badge.Paint += (bs, be) =>
+                {
+                    be.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    using (var bp = RoundedRect(new Rectangle(0, 0, badgeSz, badgeSz), 12))
+                    using (var bb = new LinearGradientBrush(new Rectangle(0, 0, badgeSz, badgeSz), badgeAccent, badgeAccent2, LinearGradientMode.ForwardDiagonal))
+                        be.Graphics.FillPath(bb, bp);
+                };
                 Label lblIcon = new Label
                 {
                     Text      = icon,
@@ -574,22 +584,65 @@ namespace gym_mangment_system
             BuildNotificationItems();
         }
 
+        // Each nav button paints a brand purple→pink gradient "pill" when it is the
+        // active page (matches the Figma sidebar). Non-active buttons render normally.
+        private void SetupNavPainting()
+        {
+            foreach (Control c in sidebar.Controls)
+            {
+                if (c is Button b)
+                {
+                    b.FlatStyle = FlatStyle.Flat;
+                    b.FlatAppearance.BorderSize = 0;
+                    b.Paint += NavButton_Paint;
+                }
+            }
+        }
+
+        private void NavButton_Paint(object sender, PaintEventArgs e)
+        {
+            Button b = sender as Button;
+            if (b == null || b != _activeNavButton) return;
+
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            int mx = 10, my = 7;
+            Rectangle pill = new Rectangle(mx, my, b.Width - mx * 2, b.Height - my * 2);
+            if (pill.Width <= 2 || pill.Height <= 2) return;
+
+            using (var path = RoundedRect(pill, 14))
+            using (var brush = new LinearGradientBrush(pill, FigmaPalette.GradientStart, FigmaPalette.GradientEnd, LinearGradientMode.Horizontal))
+                g.FillPath(brush, path);
+
+            // Redraw the label/icon on top of the gradient (base text is hidden by the fill).
+            Rectangle textR = new Rectangle(pill.X + 6, pill.Y, pill.Width - 18, pill.Height);
+            TextRenderer.DrawText(g, b.Text, b.Font, textR, Color.White,
+                TextFormatFlags.Right | TextFormatFlags.VerticalCenter | TextFormatFlags.RightToLeft | TextFormatFlags.NoPrefix);
+        }
+
         private void HighlightNavButton(Button btn)
         {
             UiColorScheme t = ThemeManager.Current;
             Color normalBg = t.SidebarNav;
-            Color activeBg = t.SidebarNavActive;
             Color normalFg = t.TextMuted;
-            Color activeFg = ThemeManager.IsLight ? FigmaPalette.Primary : t.TextPrimary;
 
             foreach (Control c in sidebar.Controls)
                 if (c is Button b && b != btn)
-                { b.BackColor = normalBg; b.ForeColor = normalFg; }
+                {
+                    b.BackColor = normalBg;
+                    b.ForeColor = normalFg;
+                    b.FlatAppearance.MouseOverBackColor = t.SidebarNavActive;
+                    b.Invalidate();
+                }
 
             if (btn != null)
             {
-                btn.BackColor  = activeBg;
-                btn.ForeColor  = activeFg;
+                // Margins around the gradient pill blend into the sidebar surface.
+                btn.BackColor = t.Sidebar;
+                btn.ForeColor = Color.White;
+                btn.FlatAppearance.MouseOverBackColor = t.Sidebar;
+                btn.Invalidate();
             }
             _activeNavButton = btn;
         }
@@ -724,8 +777,15 @@ namespace gym_mangment_system
                 using (var path = RoundedRect(new Rectangle(0, 0, r.Width - 1, r.Height - 1), 16))
                 using (var brush = new LinearGradientBrush(
                     new Rectangle(0, 0, r.Width, r.Height),
-                    FigmaPalette.GradientStart, FigmaPalette.GradientEnd, LinearGradientMode.Horizontal))
+                    FigmaPalette.GradientStart, FigmaPalette.GradientStart, LinearGradientMode.Horizontal))
                 {
+                    // Purple → pink → purple, matching the Figma banner.
+                    var blend = new ColorBlend(3)
+                    {
+                        Colors    = new[] { FigmaPalette.GradientStart, FigmaPalette.GradientEnd, FigmaPalette.GradientStart },
+                        Positions = new[] { 0f, 0.5f, 1f }
+                    };
+                    brush.InterpolationColors = blend;
                     e.Graphics.FillPath(brush, path);
                 }
             };

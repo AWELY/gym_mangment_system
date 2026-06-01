@@ -149,7 +149,7 @@ namespace gym_mangment_system
             txtFName.ForeColor = txtFPhone.ForeColor = txtFSpecialty.ForeColor = numFSalary.ForeColor = s.InputForeground;
             dtpFJoinDate.CalendarMonthBackground = s.InputBackground;
             dtpFJoinDate.CalendarForeColor = s.InputForeground;
-            btnAddTrainer.FillColor = FigmaPalette.Primary;
+            GunaUi.ApplyBrandGradient(btnAddTrainer);
             btnFormSave.FillColor = FigmaPalette.GreenBtn;
             btnFormCancel.FillColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
