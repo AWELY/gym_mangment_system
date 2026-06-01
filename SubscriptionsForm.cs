@@ -10,6 +10,9 @@ namespace gym_mangment_system
     {
         private DataTable _dt;
         private int _editingId = -1;
+        private FlowLayoutPanel _cardHost;
+        private Button _btnAddPlan;
+        private Label _lblEditorTitle;
 
         public SubscriptionsForm()
             : this(false)
@@ -22,15 +25,160 @@ namespace gym_mangment_system
             ApplyBackgroundBranding();
             ConfigureEditorForPlanCatalog();
             LoadPlanData();
+            BuildCardHost();
             WireEvents();
             ResetForm();
             ApplyTheme(ThemeManager.Current);
 
             if (startAddMode)
+                ShowEditorOverlay(isNew: true);
+        }
+
+        // ── Figma card layout + overlay editor ─────────────
+        private void BuildCardHost()
+        {
+            gridSubs.Visible = false;
+
+            _cardHost = new FlowLayoutPanel
             {
-                // Editor is inline on this screen; just focus the input.
-                txtType.Focus();
-            }
+                Dock          = DockStyle.Fill,
+                AutoScroll    = true,
+                FlowDirection = FlowDirection.RightToLeft,
+                WrapContents  = true,
+                Padding       = new Padding(18, 10, 18, 18),
+                BackColor     = ThemeManager.Current.ContentHost
+            };
+            Controls.Add(_cardHost);
+            _cardHost.SendToBack();
+
+            _btnAddPlan = new Button
+            {
+                Text      = "➕ إضافة خطة",
+                BackColor = FigmaPalette.Primary,
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
+                Size      = new Size(160, 38),
+                Location  = new Point(30, 26),
+                Cursor    = Cursors.Hand,
+                UseVisualStyleBackColor = false
+            };
+            _btnAddPlan.FlatAppearance.BorderSize = 0;
+            _btnAddPlan.Click += (_, __) => ShowEditorOverlay(isNew: true);
+            Controls.Add(_btnAddPlan);
+            _btnAddPlan.BringToFront();
+
+            // Turn the inline editor into a centered overlay (Figma opens a form).
+            pnlEditor.Dock = DockStyle.None;
+            pnlEditor.Size = new Size(440, 320);
+            pnlEditor.Visible = false;
+            btnDeleteSubscription.Visible = false; // delete is per-card now
+
+            _lblEditorTitle = new Label
+            {
+                Text      = "إضافة خطة اشتراك",
+                Font      = new Font("Segoe UI", 15F, FontStyle.Bold),
+                Location  = new Point(20, 14),
+                Size      = new Size(400, 32),
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
+            };
+            pnlEditor.Controls.Add(_lblEditorTitle);
+            LayoutEditorOverlay();
+        }
+
+        private void LayoutEditorOverlay()
+        {
+            // Stack the catalog fields vertically for the modal.
+            lblType.AutoSize = false;
+            lblType.Location = new Point(220, 56); lblType.Size = new Size(200, 22); lblType.TextAlign = ContentAlignment.MiddleRight;
+            txtType.Location = new Point(20, 80);  txtType.Size = new Size(400, 27);
+
+            lblDuration.AutoSize = false;
+            lblDuration.Location = new Point(220, 116); lblDuration.Size = new Size(200, 22); lblDuration.TextAlign = ContentAlignment.MiddleRight;
+            numDuration.Location = new Point(230, 140); numDuration.Size = new Size(190, 27);
+            cmbDurationUnit.Location = new Point(20, 140); cmbDurationUnit.Size = new Size(190, 27);
+
+            lblPrice.AutoSize = false;
+            lblPrice.Location = new Point(220, 176); lblPrice.Size = new Size(200, 22); lblPrice.TextAlign = ContentAlignment.MiddleRight;
+            numPrice.Location = new Point(20, 200); numPrice.Size = new Size(400, 27);
+
+            btnSaveSubscription.Location = new Point(20, 250);  btnSaveSubscription.Size = new Size(195, 40); btnSaveSubscription.Text = "💾 حفظ";
+            btnClearForm.Location = new Point(225, 250); btnClearForm.Size = new Size(195, 40); btnClearForm.Text = "إلغاء";
+
+            lblHint.Visible = false;
+        }
+
+        private void ShowEditorOverlay(bool isNew)
+        {
+            if (isNew) ResetForm();
+            _lblEditorTitle.Text = isNew ? "إضافة خطة اشتراك" : "تعديل خطة الاشتراك";
+            pnlEditor.Location = new Point((ClientSize.Width - pnlEditor.Width) / 2, (ClientSize.Height - pnlEditor.Height) / 2);
+            pnlEditor.Visible = true;
+            pnlEditor.BringToFront();
+            txtType.Focus();
+        }
+
+        private void HideEditorOverlay() => pnlEditor.Visible = false;
+
+        private void BuildPlanCards()
+        {
+            if (_cardHost == null) return;
+            UiColorScheme s = ThemeManager.Current;
+            _cardHost.SuspendLayout();
+            foreach (Control c in _cardHost.Controls) c.Dispose();
+            _cardHost.Controls.Clear();
+
+            foreach (SubscriptionPlan plan in SubscriptionPlanCatalog.GetPlans())
+                _cardHost.Controls.Add(BuildPlanCard(plan, s));
+
+            _cardHost.ResumeLayout();
+        }
+
+        private Panel BuildPlanCard(SubscriptionPlan plan, UiColorScheme s)
+        {
+            int w = 320, h = 180, pad = 18, innerW = w - pad * 2;
+            Panel card = new Panel { Size = new Size(w, h), Margin = new Padding(10), BackColor = s.Card };
+            DashboardForm.StyleAsRoundedCard(card, s.BorderSubtle, 14);
+
+            Label name = new Label { Text = plan.Name, Font = new Font("Segoe UI", 14F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 30), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label price = new Label { Text = plan.Price.ToString("0") + " ريال", Font = new Font("Segoe UI", 17F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 50), Size = new Size(innerW, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label dur = new Label { Text = "المدة: " + BuildDurationLabel(plan.DurationValue, plan.DurationUnit), Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 86), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+
+            int btnW = (innerW - 10) / 2, btnY = 126, btnH = 36;
+            Button del = TrainersForm.MakeCardButton("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
+            Button edit = TrainersForm.MakeCardButton("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
+            int id = plan.Id;
+            string nm = plan.Name;
+            del.Click += (_, __) => DeletePlan(id, nm);
+            edit.Click += (_, __) => EditPlan(id);
+
+            card.Controls.Add(name); card.Controls.Add(price); card.Controls.Add(dur);
+            card.Controls.Add(del); card.Controls.Add(edit);
+            return card;
+        }
+
+        private void EditPlan(int id)
+        {
+            var plan = SubscriptionPlanCatalog.GetPlans().FirstOrDefault(p => p.Id == id);
+            if (plan == null) return;
+            _editingId = id;
+            txtType.Text = plan.Name;
+            numDuration.Value = Math.Max(numDuration.Minimum, Math.Min(numDuration.Maximum, plan.DurationValue));
+            cmbDurationUnit.SelectedItem = plan.DurationUnit == "سنة" ? "سنة" : "شهر";
+            numPrice.Value = Math.Max(numPrice.Minimum, Math.Min(numPrice.Maximum, plan.Price));
+            ShowEditorOverlay(isNew: false);
+        }
+
+        private void DeletePlan(int id, string name)
+        {
+            if (MessageBox.Show("حذف نوع الاشتراك: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                return;
+            SubscriptionPlanCatalog.Delete(id);
+            DataRow row = _dt.AsEnumerable().FirstOrDefault(r => r.Field<int>("ID") == id);
+            if (row != null) row.Delete();
+            _dt.AcceptChanges();
+            BuildPlanCards();
         }
 
         public void ApplyTheme(UiColorScheme s)
@@ -63,6 +211,13 @@ namespace gym_mangment_system
             btnClearForm.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
 
             ThemeManager.StyleDataGridView(gridSubs, s);
+
+            if (_lblEditorTitle != null) _lblEditorTitle.ForeColor = s.TextPrimary;
+            if (_cardHost != null)
+            {
+                _cardHost.BackColor = s.ContentHost;
+                BuildPlanCards();
+            }
         }
 
         private void ApplyBackgroundBranding()
@@ -117,9 +272,8 @@ namespace gym_mangment_system
         private void WireEvents()
         {
             btnSaveSubscription.Click += BtnSaveSubscription_Click;
-            btnClearForm.Click += (s, e) => ResetForm();
+            btnClearForm.Click += (s, e) => HideEditorOverlay();
             btnDeleteSubscription.Click += BtnDeleteSubscription_Click;
-            gridSubs.SelectionChanged += GridSubs_SelectionChanged;
         }
 
         private void BtnSaveSubscription_Click(object sender, EventArgs e)
@@ -159,6 +313,8 @@ namespace gym_mangment_system
             }
 
             ResetForm();
+            BuildPlanCards();
+            HideEditorOverlay();
         }
 
         private void GridSubs_SelectionChanged(object sender, EventArgs e)

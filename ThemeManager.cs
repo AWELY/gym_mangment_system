@@ -265,8 +265,15 @@ namespace gym_mangment_system
             dgv.DefaultCellStyle.ForeColor = s.TextPrimary;
             dgv.DefaultCellStyle.SelectionBackColor = s.GridSelection;
             dgv.DefaultCellStyle.SelectionForeColor = s.GridSelectionFore;
+            // RowsDefaultCellStyle is set (dark) in the designers and takes
+            // precedence over DefaultCellStyle for non-alternating rows; override
+            // it so light mode does not show dark row striping.
+            dgv.RowsDefaultCellStyle.BackColor = s.GridRow;
+            dgv.RowsDefaultCellStyle.ForeColor = s.TextPrimary;
+            dgv.RowsDefaultCellStyle.SelectionBackColor = s.GridSelection;
+            dgv.RowsDefaultCellStyle.SelectionForeColor = s.GridSelectionFore;
             dgv.ColumnHeadersDefaultCellStyle.BackColor = s.GridHeader;
-            dgv.ColumnHeadersDefaultCellStyle.ForeColor = IsLight ? s.TextPrimary : Color.White;
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = IsLight ? s.TextMuted : Color.White;
             dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = s.GridHeader;
             dgv.ColumnHeadersDefaultCellStyle.SelectionForeColor = dgv.ColumnHeadersDefaultCellStyle.ForeColor;
             dgv.AlternatingRowsDefaultCellStyle.BackColor = s.GridRowAlt;

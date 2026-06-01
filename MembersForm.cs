@@ -34,6 +34,8 @@ namespace gym_mangment_system
         public void ApplyTheme(UiColorScheme s)
         {
             BackColor = s.ContentHost;
+            pnlSearch.BackColor = s.ContentHost;
+            pnlActions.BackColor = s.ContentHost;
             lblTitle.ForeColor = s.TextPrimary;
             lblSearch.ForeColor = s.TextMuted;
             txtSearch.BackColor = s.InputBackground;

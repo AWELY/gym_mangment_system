@@ -11,19 +11,124 @@ namespace gym_mangment_system
         private DataTable _dt;
         private bool _isEditing      = false;
         private int  _editingRowIndex = -1;
+        private FlowLayoutPanel _cardHost;
 
         public UsersForm()
         {
             InitializeComponent();
             LoadMockData();
+            BuildCardHost();
             WireEvents();
             ApplyTheme(ThemeManager.Current);
             UpdateCount();
         }
 
+        // ── Figma card layout (replaces the grid) ──────────
+        private void BuildCardHost()
+        {
+            gridUsers.Visible   = false;
+            pnlActions.Visible  = false;
+
+            _cardHost = new FlowLayoutPanel
+            {
+                Dock          = DockStyle.Fill,
+                AutoScroll    = true,
+                FlowDirection = FlowDirection.RightToLeft,
+                WrapContents  = true,
+                Padding       = new Padding(18, 10, 18, 18),
+                BackColor     = ThemeManager.Current.ContentHost
+            };
+            Controls.Add(_cardHost);
+            _cardHost.SendToBack();
+        }
+
+        private void BuildUserCards()
+        {
+            if (_cardHost == null) return;
+            UiColorScheme s = ThemeManager.Current;
+            _cardHost.SuspendLayout();
+            foreach (Control c in _cardHost.Controls) c.Dispose();
+            _cardHost.Controls.Clear();
+
+            foreach (var u in GymDataStore.Data.Users.OrderBy(x => x.Id))
+                _cardHost.Controls.Add(BuildUserCard(u, s));
+
+            _cardHost.ResumeLayout();
+        }
+
+        private Panel BuildUserCard(UserDirectoryEntry u, UiColorScheme s)
+        {
+            int w = 330, h = 196, pad = 18, innerW = w - pad * 2;
+            bool isAdmin = u.Username.Equals("admin", StringComparison.OrdinalIgnoreCase);
+            string roleText = u.Role == AppSession.UserRole.Admin ? "مدير" : "موظف استقبال";
+
+            Panel card = new Panel { Size = new Size(w, h), Margin = new Padding(10), BackColor = s.Card };
+            DashboardForm.StyleAsRoundedCard(card, s.BorderSubtle, 14);
+
+            string title = string.IsNullOrWhiteSpace(u.FullName) ? u.Username : u.FullName;
+            Label name = new Label { Text = title, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label role = new Label { Text = "الصلاحية: " + roleText, Font = new Font("Segoe UI", 9.5F), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 44), Size = new Size(innerW, 20), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label user = new Label { Text = "اسم المستخدم: " + u.Username, Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 70), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label pass = new Label { Text = "كلمة المرور: " + u.Password, Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 96), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+
+            int btnW = (innerW - 10) / 2, btnY = 148, btnH = 34;
+            Button del = TrainersForm.MakeCardButton("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
+            Button edit = TrainersForm.MakeCardButton("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
+            if (isAdmin)
+            {
+                del.Enabled = false;
+                del.BackColor = s.SecondaryButton;
+                del.ForeColor = s.TextMuted;
+            }
+            int id = u.Id;
+            string uname = u.Username;
+            del.Click += (_, __) => DeleteUser(id, uname);
+            edit.Click += (_, __) => LoadUserIntoForm(id);
+
+            card.Controls.Add(name); card.Controls.Add(role); card.Controls.Add(user);
+            card.Controls.Add(pass); card.Controls.Add(del); card.Controls.Add(edit);
+            return card;
+        }
+
+        private void DeleteUser(int id, string username)
+        {
+            if (username.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("لا يمكن حذف حساب المدير الافتراضي", "محظور", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
+            if (MessageBox.Show("هل أنت متأكد من حذف المستخدم: " + username + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                return;
+            if (UserDirectory.Remove(id))
+            {
+                UserDirectory.FillDataTable(_dt);
+                UpdateCount();
+            }
+        }
+
+        private void LoadUserIntoForm(int id)
+        {
+            var u = GymDataStore.Data.Users.FirstOrDefault(x => x.Id == id);
+            if (u == null) return;
+            _isEditing = true;
+            var rowIdx = -1;
+            for (int i = 0; i < gridUsers.Rows.Count; i++)
+            {
+                if (gridUsers.Rows[i].DataBoundItem is DataRowView drv && Convert.ToInt32(drv["ID"]) == id) { rowIdx = i; break; }
+            }
+            _editingRowIndex = rowIdx;
+            txtFFullName.Text = u.FullName;
+            txtFUsername.Text = u.Username;
+            txtFPassword.Text = "";
+            cmbFRole.SelectedIndex = u.Role == AppSession.UserRole.Admin ? 0 : 1;
+            lblFormTitle.Text = "✏️  تعديل بيانات المستخدم";
+            ShowForm();
+        }
+
         public void ApplyTheme(UiColorScheme s)
         {
             BackColor = s.ContentHost;
+            pnlActions.BackColor = s.ContentHost;
             lblTitle.ForeColor = s.TextPrimary;
             ThemeManager.StyleDataGridView(gridUsers, s);
             lblCount.ForeColor = s.TextMuted;
@@ -36,6 +141,12 @@ namespace gym_mangment_system
             btnFormCancel.BackColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
             btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+
+            if (_cardHost != null)
+            {
+                _cardHost.BackColor = s.ContentHost;
+                BuildUserCards();
+            }
         }
 
         private void LoadMockData()
@@ -157,6 +268,10 @@ namespace gym_mangment_system
 
         private void HideForm() => pnlForm.Visible = false;
 
-        private void UpdateCount() => lblCount.Text = "المستخدمون: " + _dt.DefaultView.Count;
+        private void UpdateCount()
+        {
+            lblCount.Text = "المستخدمون: " + _dt.DefaultView.Count;
+            BuildUserCards();
+        }
     }
 }

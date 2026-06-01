@@ -47,6 +47,12 @@ namespace gym_mangment_system
 
         public static Image TryLoadToughBackground(string context, float opacity)
         {
+            // Figma design is a clean, flat light surface — no photographic
+            // backdrop. Skip the gym background entirely in light mode so every
+            // page matches the Figma look.
+            if (ThemeManager.IsLight)
+                return null;
+
             // The context parameter was intended for future different backgrounds,
             // For now, always use the main background image
             Image bg = TryLoad(BgGym);
