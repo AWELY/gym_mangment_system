@@ -188,18 +188,18 @@ namespace gym_mangment_system
             int activeSubs = GymDataStore.Data.Members.Count(m => !string.IsNullOrWhiteSpace(m.PlanName));
             decimal monthTotal = GymDataStore.StoreRevenueThisMonth() + GymDataStore.SubscriptionCashInThisMonth();
 
-            var statSpecs = new (string Icon, string Title, string Value, Color Accent)[]
+            var statSpecs = new (string Icon, string Title, string Value, Color Accent, Action OnClick)[]
             {
-                ("👥", "إجمالي الأعضاء",         GymDataStore.Data.Members.Count.ToString("N0"),                    Color.FromArgb(43, 127, 255)),
-                ("✅", "اشتراك مسجّل",           activeSubs.ToString("N0"),                                         Color.FromArgb(0, 166, 62)),
-                ("⚠️", "تنتهي خلال 21 يوماً", GymDataStore.MembersExpiringWithinDays(21).ToString("N0"),        Color.FromArgb(255, 105, 0)),
-                ("💰", "إيرادات الشهر (تقدير)", monthTotal.ToString("N0") + " $",                                  Color.FromArgb(0, 166, 62)),
-                ("🛒", "مبيعات المتجر اليوم",   GymDataStore.StoreSalesToday().ToString("N0") + " $",               Color.FromArgb(173, 70, 255)),
-                ("🏋️", "المدربون",              GymDataStore.Data.Trainers.Count.ToString("N0"),                   Color.FromArgb(43, 127, 255)),
+                ("👥", "إجمالي الأعضاء",         GymDataStore.Data.Members.Count.ToString("N0"),                    Color.FromArgb(43, 127, 255), (Action)(() => ShowEmbeddedPage(new MembersForm(),       btnNavMembers,  "👥  إدارة الأعضاء"))),
+                ("✅", "اشتراك مسجّل",           activeSubs.ToString("N0"),                                         Color.FromArgb(0, 166, 62),  (Action)(() => ShowEmbeddedPage(new SubscriptionsForm(), btnNavSubs,     "📋  الاشتراكات"))),
+                ("⚠️", "تنتهي خلال 21 يوماً", GymDataStore.MembersExpiringWithinDays(21).ToString("N0"),        Color.FromArgb(255, 105, 0), (Action)(() => ShowEmbeddedPage(new SubscriptionsForm(), btnNavSubs,     "📋  الاشتراكات"))),
+                ("💰", "إيرادات الشهر (تقدير)", monthTotal.ToString("N0") + " $",                                  Color.FromArgb(0, 166, 62),  (Action)(() => ShowEmbeddedPage(new ReportsForm(),       btnNavReports,  "📊  المالية"))),
+                ("🛒", "مبيعات المتجر اليوم",   GymDataStore.StoreSalesToday().ToString("N0") + " $",               Color.FromArgb(173, 70, 255), (Action)(() => ShowEmbeddedPage(new StoreForm(),         btnNavStore,    "🛒  المتجر (POS)"))),
+                ("🏋️", "المدربون",              GymDataStore.Data.Trainers.Count.ToString("N0"),                   Color.FromArgb(43, 127, 255), (Action)(() => ShowEmbeddedPage(new TrainersForm(),      btnNavTrainers, "🏋️  إدارة المدربين"))),
             };
 
             int cardW = 250, cardH = 116;
-            foreach (var (icon, title, value, accent) in statSpecs)
+            foreach (var (icon, title, value, accent, onClick) in statSpecs)
             {
                 Panel card = new Panel
                 {
@@ -257,21 +257,49 @@ namespace gym_mangment_system
 
                 Color hover = t.CardHover;
                 Color normal = t.Card;
-                card.MouseEnter += (s, e) => card.BackColor = hover;
-                card.MouseLeave += (s, e) => card.BackColor = normal;
-                foreach (Control c in new Control[] { lblTitle, lblVal })
+                Color accentBorder = accent;
+                Color subtleBorder = t.BorderSubtle;
+                Action navigate = onClick;
+                bool[] hv = { false };
+
+                // Accent border + value tint while hovering -> clear "this is clickable" cue.
+                card.Paint += (s, e) =>
                 {
-                    c.MouseEnter += (s, e) => card.BackColor = hover;
-                    c.MouseLeave += (s, e) => card.BackColor = normal;
-                }
+                    e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    using (var p = RoundedRect(new Rectangle(0, 0, card.Width - 1, card.Height - 1), 14))
+                    using (var pen = new Pen(hv[0] ? accentBorder : subtleBorder, hv[0] ? 2f : 1f))
+                        e.Graphics.DrawPath(pen, p);
+                };
+
+                void Enter(object s, EventArgs e) { hv[0] = true;  card.BackColor = hover;  card.Invalidate(); }
+                void Leave(object s, EventArgs e) { hv[0] = false; card.BackColor = normal; card.Invalidate(); }
+                void Go(object s, EventArgs e) { navigate?.Invoke(); }
 
                 card.Controls.Add(badge);
                 card.Controls.Add(lblTitle);
                 card.Controls.Add(lblVal);
+
+                // Whole card (and every child) is clickable + hover-aware.
+                foreach (Control c in EnumerateSelfAndChildren(card))
+                {
+                    c.Cursor      = Cursors.Hand;
+                    c.MouseEnter += Enter;
+                    c.MouseLeave += Leave;
+                    c.Click      += Go;
+                }
+
                 flowStatCards.Controls.Add(card);
             }
 
             RefreshQuickLists();
+        }
+
+        private static System.Collections.Generic.IEnumerable<Control> EnumerateSelfAndChildren(Control root)
+        {
+            yield return root;
+            foreach (Control child in root.Controls)
+                foreach (Control c in EnumerateSelfAndChildren(child))
+                    yield return c;
         }
 
         private void BuildDashboardQuickPanel()

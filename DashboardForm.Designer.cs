@@ -230,7 +230,7 @@
 
             this.flowStatCards.AutoScroll    = true;
             this.flowStatCards.Dock          = System.Windows.Forms.DockStyle.Fill;
-            this.flowStatCards.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
+            this.flowStatCards.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
             this.flowStatCards.Name          = "flowStatCards";
             this.flowStatCards.Padding       = new System.Windows.Forms.Padding(5);
             this.flowStatCards.WrapContents  = true;

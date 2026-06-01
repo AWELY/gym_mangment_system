@@ -14,6 +14,7 @@ namespace gym_mangment_system
         private FlowLayoutPanel _cardHost;
         private Guna2Button _btnAddPlan;
         private Label _lblEditorTitle;
+        private Panel _rootPanel;
 
         public SubscriptionsForm()
             : this(false)
@@ -40,22 +41,35 @@ namespace gym_mangment_system
         {
             gridSubs.Visible = false;
 
+            UiColorScheme s0 = ThemeManager.Current;
+
+            // Root holds a toolbar row (add button) on top and the scrolling cards below,
+            // so the button sits in its own band instead of floating over the cards.
+            _rootPanel = new Panel { Dock = DockStyle.Fill, BackColor = s0.ContentHost };
+            var tlp = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, BackColor = Color.Transparent };
+            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 64));
+            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+            var toolbar = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent };
+            _btnAddPlan = GunaUi.ToolbarButton("➕ إضافة خطة", FigmaPalette.Primary, new Point(18, 14));
+            _btnAddPlan.Click += (_, __) => ShowEditorOverlay(isNew: true);
+            toolbar.Controls.Add(_btnAddPlan);
+
             _cardHost = new FlowLayoutPanel
             {
                 Dock          = DockStyle.Fill,
                 AutoScroll    = true,
                 FlowDirection = FlowDirection.RightToLeft,
                 WrapContents  = true,
-                Padding       = new Padding(18, 10, 18, 18),
-                BackColor     = ThemeManager.Current.ContentHost
+                Padding       = new Padding(18, 0, 18, 18),
+                BackColor     = s0.ContentHost
             };
-            Controls.Add(_cardHost);
-            _cardHost.BringToFront();
 
-            _btnAddPlan = GunaUi.ToolbarButton("➕ إضافة خطة", FigmaPalette.Primary, new Point(30, 26));
-            _btnAddPlan.Click += (_, __) => ShowEditorOverlay(isNew: true);
-            Controls.Add(_btnAddPlan);
-            _btnAddPlan.BringToFront();
+            tlp.Controls.Add(toolbar, 0, 0);
+            tlp.Controls.Add(_cardHost, 0, 1);
+            _rootPanel.Controls.Add(tlp);
+            Controls.Add(_rootPanel);
+            _rootPanel.BringToFront();
 
             // Turn the inline editor into a centered overlay (Figma opens a form).
             pnlEditor.Dock = DockStyle.None;
@@ -203,6 +217,7 @@ namespace gym_mangment_system
             ThemeManager.StyleDataGridView(gridSubs, s);
 
             if (_lblEditorTitle != null) _lblEditorTitle.ForeColor = s.TextPrimary;
+            if (_rootPanel != null) _rootPanel.BackColor = s.ContentHost;
             if (_cardHost != null)
             {
                 _cardHost.BackColor = s.ContentHost;
