@@ -40,6 +40,15 @@ namespace gym_mangment_system
             WireEvents();
             BuildDietLayout();
             ApplyTheme(ThemeManager.Current);
+            this.Resize += (_, __) => { if (pnlCreatePlan.Visible) RecenterCreatePlan(); };
+        }
+
+        private void RecenterCreatePlan()
+        {
+            int w = Math.Min(pnlCreatePlan.Width, ClientSize.Width);
+            int h = Math.Min(pnlCreatePlan.Height, ClientSize.Height);
+            pnlCreatePlan.Location = new Point(Math.Max(0, (ClientSize.Width - w) / 2),
+                                               Math.Max(0, (ClientSize.Height - h) / 2));
         }
 
         public void ApplyTheme(UiColorScheme s)
@@ -175,7 +184,7 @@ namespace gym_mangment_system
                 txtPlanName.Text = p?.Name ?? "";
                 txtPlanPdf.Text  = p?.PdfPath ?? "";
             }
-            pnlCreatePlan.Location = new Point((ClientSize.Width - pnlCreatePlan.Width) / 2, (ClientSize.Height - pnlCreatePlan.Height) / 2);
+            RecenterCreatePlan();
             pnlCreatePlan.Visible = true;
             pnlCreatePlan.BringToFront();
             txtPlanName.Focus();

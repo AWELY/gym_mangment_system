@@ -36,9 +36,12 @@ namespace gym_mangment_system
 
             s.SubscriptionPlans.AddRange(new[]
             {
-                new SubscriptionPlan { Id = 1, Name = "Basic Plan", Price = 30.00m, DurationValue = 1, DurationUnit = "شهر" },
-                new SubscriptionPlan { Id = 2, Name = "Pro Plan", Price = 50.00m, DurationValue = 3, DurationUnit = "شهر" },
-                new SubscriptionPlan { Id = 3, Name = "Annual Plan", Price = 300.00m, DurationValue = 1, DurationUnit = "سنة" }
+                new SubscriptionPlan { Id = 1, Name = "Basic Plan", Price = 30.00m, DurationValue = 1, DurationUnit = "شهر",
+                    Features = new List<string> { "دخول غير محدود", "خزانة خاصة" } },
+                new SubscriptionPlan { Id = 2, Name = "Pro Plan", Price = 50.00m, DurationValue = 3, DurationUnit = "شهر",
+                    Features = new List<string> { "دخول غير محدود", "حصص جماعية", "خزانة خاصة", "خصم على المتجر" } },
+                new SubscriptionPlan { Id = 3, Name = "Annual Plan", Price = 300.00m, DurationValue = 1, DurationUnit = "سنة",
+                    Features = new List<string> { "دخول غير محدود", "حصص جماعية", "مدرب شخصي", "غرفة ساونا", "خزانة خاصة", "خصم على المتجر", "خطة تغذية" } }
             });
 
             s.Users.Add(new UserDirectoryEntry { Id = 1, FullName = "المدير العام", Username = "admin", Password = "admin", Role = AppSession.UserRole.Admin });

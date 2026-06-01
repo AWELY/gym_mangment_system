@@ -13,6 +13,14 @@ namespace gym_mangment_system
         private int  _editingMemberId = -1;
         private readonly bool _startAddMode;
 
+        // ── Gender filter (added programmatically) ──
+        private Label _lblFilterGender;
+        private ComboBox _cmbFilterGender;
+
+        // ── Plan features view inside the add/edit overlay ──
+        private Label _lblFormFeaturesTitle;
+        private Label _lblFormFeatures;
+
         public MembersForm() : this(false) { }
 
         public MembersForm(bool startAddMode)
@@ -20,6 +28,7 @@ namespace gym_mangment_system
             _startAddMode = startAddMode;
             InitializeComponent();
             ApplyBackgroundBranding();
+            BuildExtraControls();
             LoadSubscriptionPlans();
             InitMembersTable();
             RebindMembersFromStore();
@@ -29,6 +38,69 @@ namespace gym_mangment_system
 
             if (_startAddMode)
                 BtnAddMember_Click(this, EventArgs.Empty);
+        }
+
+        // ═══════════════════════════════════════════
+        //  EXTRA UI: gender filter + plan-features view
+        // ═══════════════════════════════════════════
+        private void BuildExtraControls()
+        {
+            // Gender filter in the search bar (anchored to the right, left of the search box).
+            _lblFilterGender = new Label
+            {
+                Text      = "الجنس:",
+                Font      = new Font("Segoe UI", 12F),
+                AutoSize  = true,
+                Location  = new Point(300, 16),
+                Anchor    = AnchorStyles.Top | AnchorStyles.Right,
+                BackColor = Color.Transparent
+            };
+            _cmbFilterGender = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FlatStyle     = FlatStyle.Flat,
+                Font          = new Font("Segoe UI", 11F),
+                RightToLeft   = RightToLeft.Yes,
+                Location      = new Point(360, 12),
+                Size          = new Size(150, 29),
+                Anchor        = AnchorStyles.Top | AnchorStyles.Right
+            };
+            _cmbFilterGender.Items.AddRange(new object[] { "الكل", "ذكر", "أنثى" });
+            _cmbFilterGender.SelectedIndex = 0;
+            _cmbFilterGender.SelectedIndexChanged += (_, __) => ApplyFilters();
+
+            pnlSearch.Controls.Add(_lblFilterGender);
+            pnlSearch.Controls.Add(_cmbFilterGender);
+
+            // Plan-features view inside the add/edit overlay.
+            pnlForm.Size = new Size(500, 600);
+            pnlForm.AutoScroll = true;
+
+            _lblFormFeaturesTitle = new Label
+            {
+                Text      = "مميزات الاشتراك:",
+                Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
+                AutoSize  = true,
+                Location  = new Point(388, 360),
+                BackColor = Color.Transparent
+            };
+            _lblFormFeatures = new Label
+            {
+                Text       = "—",
+                Font       = new Font("Segoe UI", 10F),
+                Location   = new Point(35, 388),
+                Size       = new Size(435, 150),
+                TextAlign  = ContentAlignment.TopRight,
+                BackColor  = Color.Transparent,
+                ForeColor  = FigmaPalette.GreenBtn
+            };
+
+            pnlForm.Controls.Add(_lblFormFeaturesTitle);
+            pnlForm.Controls.Add(_lblFormFeatures);
+
+            // Push the action buttons below the features list.
+            btnFormSave.Location   = new Point(245, 548);
+            btnFormCancel.Location = new Point(35, 548);
         }
 
         public void ApplyTheme(UiColorScheme s)
@@ -42,6 +114,14 @@ namespace gym_mangment_system
             txtSearch.ForeColor = s.InputForeground;
             ThemeManager.StyleDataGridView(gridMembers, s);
             lblMemberCount.ForeColor = s.TextMuted;
+
+            if (_lblFilterGender != null) _lblFilterGender.ForeColor = s.TextMuted;
+            if (_cmbFilterGender != null)
+            {
+                _cmbFilterGender.BackColor = s.InputBackground;
+                _cmbFilterGender.ForeColor = s.InputForeground;
+            }
+            if (_lblFormFeaturesTitle != null) _lblFormFeaturesTitle.ForeColor = s.TextPrimary;
 
             pnlForm.FillColor = s.Card;
             pnlForm.BorderColor = s.BorderSubtle;
@@ -163,6 +243,7 @@ namespace gym_mangment_system
             btnFormCancel.Click  += BtnFormCancel_Click;
             txtSearch.TextChanged += TxtSearch_TextChanged;
             cmbFPlan.SelectedIndexChanged += CmbFPlan_SelectedIndexChanged;
+            this.Resize += (_, __) => { if (pnlForm.Visible) CenterForm(); };
         }
 
         // ── Auto-fetch price & duration when plan changes ──
@@ -189,17 +270,45 @@ namespace gym_mangment_system
                 txtFPlanPrice.Text  = "";
                 txtFPlanMonths.Text = "";
             }
+
+            UpdateFeaturesView(plan);
+        }
+
+        private void UpdateFeaturesView(SubscriptionPlan plan)
+        {
+            if (_lblFormFeatures == null) return;
+            if (plan == null || plan.Features == null || plan.Features.Count == 0)
+            {
+                _lblFormFeatures.Text = "لا توجد مميزات لهذا الاشتراك";
+                _lblFormFeatures.ForeColor = ThemeManager.Current.TextMuted;
+                return;
+            }
+
+            _lblFormFeatures.Text = string.Join("\n", plan.Features.ConvertAll(f => "✓  " + f));
+            _lblFormFeatures.ForeColor = FigmaPalette.GreenBtn;
         }
 
         // ═══════════════════════════════════════════
         //  SEARCH
         // ═══════════════════════════════════════════
-        private void TxtSearch_TextChanged(object sender, EventArgs e)
+        private void TxtSearch_TextChanged(object sender, EventArgs e) => ApplyFilters();
+
+        // Combined search + gender filter applied to the grid's DefaultView.
+        private void ApplyFilters()
         {
+            if (_dt == null) return;
+
+            var clauses = new System.Collections.Generic.List<string>();
+
             string filter = txtSearch.Text.Trim().Replace("'", "''");
-            _dt.DefaultView.RowFilter = string.IsNullOrEmpty(filter)
-                ? ""
-                : $"الاسم LIKE '%{filter}%' OR الهاتف LIKE '%{filter}%'";
+            if (!string.IsNullOrEmpty(filter))
+                clauses.Add($"(الاسم LIKE '%{filter}%' OR الهاتف LIKE '%{filter}%')");
+
+            string gender = _cmbFilterGender?.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(gender) && gender != "الكل")
+                clauses.Add($"الجنس = '{gender.Replace("'", "''")}'");
+
+            _dt.DefaultView.RowFilter = string.Join(" AND ", clauses);
             UpdateMemberCount();
         }
 
@@ -359,11 +468,18 @@ namespace gym_mangment_system
 
         private void ShowForm()
         {
-            pnlForm.Location = new Point((ClientSize.Width - pnlForm.Width) / 2,
-                                         (ClientSize.Height - pnlForm.Height) / 2);
+            CenterForm();
             pnlForm.Visible = true;
             pnlForm.BringToFront();
             txtFName.Focus();
+        }
+
+        private void CenterForm()
+        {
+            int w = Math.Min(pnlForm.Width, ClientSize.Width);
+            int h = Math.Min(pnlForm.Height, ClientSize.Height);
+            pnlForm.Location = new Point(Math.Max(0, (ClientSize.Width - w) / 2),
+                                         Math.Max(0, (ClientSize.Height - h) / 2));
         }
 
         private void HideForm() => pnlForm.Visible = false;

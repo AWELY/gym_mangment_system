@@ -14,7 +14,28 @@ namespace gym_mangment_system
         public int DurationValue { get; set; }
         public string DurationUnit { get; set; }
 
+        /// <summary>المميزات: feature/benefit lines shown on the plan card and member form.</summary>
+        public List<string> Features { get; set; } = new List<string>();
+
         public string DisplayName => $"{Name} - {Price.ToString("0.##")}$ / {DurationValue} {DurationUnit}";
+    }
+
+    /// <summary>Default catalogue of gym features (المميزات) offered as checkboxes per plan.</summary>
+    public static class SubscriptionFeatureCatalog
+    {
+        public static readonly string[] DefaultFeatures =
+        {
+            "دخول غير محدود",
+            "حصص جماعية",
+            "مدرب شخصي",
+            "غرفة ساونا",
+            "خزانة خاصة",
+            "خصم على المتجر",
+            "خطة تغذية",
+            "مواقف سيارات",
+            "مناشف مجانية",
+            "تقييم لياقة شهري"
+        };
     }
 
     public static class SubscriptionPlanCatalog
@@ -31,6 +52,7 @@ namespace gym_mangment_system
                 existing.Price = plan.Price;
                 existing.DurationValue = plan.DurationValue;
                 existing.DurationUnit = plan.DurationUnit;
+                existing.Features = plan.Features ?? new List<string>();
             }
             else
             {

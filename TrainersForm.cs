@@ -29,9 +29,18 @@ namespace gym_mangment_system
             WireEvents();
             ApplyTheme(ThemeManager.Current);
             UpdateCount();
+            this.Resize += (_, __) => { if (pnlForm.Visible) RecenterForm(); };
 
             if (_startAddMode)
                 BtnAddTrainer_Click(this, EventArgs.Empty);
+        }
+
+        private void RecenterForm()
+        {
+            int w = Math.Min(pnlForm.Width, ClientSize.Width);
+            int h = Math.Min(pnlForm.Height, ClientSize.Height);
+            pnlForm.Location = new Point(Math.Max(0, (ClientSize.Width - w) / 2),
+                                         Math.Max(0, (ClientSize.Height - h) / 2));
         }
 
         // ── Figma card layout (replaces the grid) ──────────
@@ -287,7 +296,7 @@ namespace gym_mangment_system
 
         private void ShowForm()
         {
-            pnlForm.Location = new Point((ClientSize.Width - pnlForm.Width) / 2, (ClientSize.Height - pnlForm.Height) / 2);
+            RecenterForm();
             pnlForm.Visible = true; pnlForm.BringToFront(); txtFName.Focus();
         }
 
