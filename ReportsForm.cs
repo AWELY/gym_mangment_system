@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 
 namespace gym_mangment_system
 {
@@ -85,14 +86,17 @@ namespace gym_mangment_system
             cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(231, 0, 11), s), 1, 0);
             cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(0, 166, 62) : Color.FromArgb(231, 0, 11), s), 0, 0);
 
-            var summary = new Panel
+            var summary = new Guna2Panel
             {
                 Dock = DockStyle.Top,
                 Height = 150,
-                BackColor = s.PanelElevated,
+                FillColor = s.PanelElevated,
+                BorderColor = s.BorderSubtle,
+                BorderRadius = 12,
                 Padding = new Padding(20, 12, 20, 12),
                 Margin = new Padding(0, 12, 0, 12)
             };
+            summary.ShadowDecoration.Enabled = true;
 
             var formula = new Label
             {
@@ -146,14 +150,17 @@ namespace gym_mangment_system
             Controls.Add(title);
         }
 
-        private Panel CreateFinancialCard(string title, string value, Color accent, UiColorScheme s)
+        private Control CreateFinancialCard(string title, string value, Color accent, UiColorScheme s)
         {
-            var panel = new Panel
+            var panel = new Guna2Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = s.PanelElevated,
+                FillColor = s.PanelElevated,
+                BorderColor = s.BorderSubtle,
+                BorderRadius = 12,
                 Margin = new Padding(8)
             };
+            panel.ShadowDecoration.Enabled = true;
 
             var titleLabel = new Label
             {

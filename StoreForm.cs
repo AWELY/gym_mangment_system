@@ -147,11 +147,13 @@ namespace gym_mangment_system
             lblCartCount.ForeColor = s.TextMuted;
             lblTotalLabel.ForeColor = s.TextMuted;
 
-            btnClearCart.BackColor = s.SecondaryButton;
+            btnClearCart.FillColor = s.SecondaryButton;
             btnClearCart.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
-            btnClearCart.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+            btnCheckout.FillColor = FigmaPalette.GreenBtn;
+            btnAddNewItem.FillColor = FigmaPalette.Primary;
 
-            pnlAddItem.BackColor = s.Card;
+            pnlAddItem.FillColor = s.Card;
+            pnlAddItem.BorderColor = s.BorderSubtle;
             lblAddItemTitle.ForeColor = s.TextPrimary;
             foreach (Label lb in new[] { lblNewName, lblNewPrice, lblNewStock, lblNewExpiry, lblNewCategory, lblNewImage })
             {
@@ -168,9 +170,10 @@ namespace gym_mangment_system
             dtpNewExpiry.CalendarMonthBackground = s.InputBackground;
             dtpNewExpiry.CalendarForeColor = s.InputForeground;
             picNewImage.BackColor = s.InputBackground;
-            btnBrowseImage.BackColor = s.SecondaryButton;
+            btnBrowseImage.FillColor = s.SecondaryButton;
             btnBrowseImage.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
-            btnCancelAdd.BackColor = s.SecondaryButton;
+            btnConfirmAdd.FillColor = FigmaPalette.GreenBtn;
+            btnCancelAdd.FillColor = s.SecondaryButton;
             btnCancelAdd.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
 
             PopulateProducts();

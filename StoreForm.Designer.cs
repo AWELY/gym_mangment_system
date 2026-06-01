@@ -8,7 +8,7 @@
         private System.Windows.Forms.Panel pnlProducts;
         private System.Windows.Forms.Label lblProductsTitle;
         private System.Windows.Forms.FlowLayoutPanel flowProducts;
-        private System.Windows.Forms.Button btnAddNewItem;
+        private Guna.UI2.WinForms.Guna2Button btnAddNewItem;
 
         // Right: Cart
         private System.Windows.Forms.Panel pnlCart;
@@ -19,11 +19,11 @@
         private System.Windows.Forms.Panel pnlCartFooter;
         private System.Windows.Forms.Label lblTotalLabel;
         private System.Windows.Forms.Label lblTotalValue;
-        private System.Windows.Forms.Button btnCheckout;
-        private System.Windows.Forms.Button btnClearCart;
+        private Guna.UI2.WinForms.Guna2Button btnCheckout;
+        private Guna.UI2.WinForms.Guna2Button btnClearCart;
 
         // Add Item Dialog
-        private System.Windows.Forms.Panel pnlAddItem;
+        private Guna.UI2.WinForms.Guna2Panel pnlAddItem;
         private System.Windows.Forms.Label lblAddItemTitle;
         private System.Windows.Forms.Label lblNewName;
         private System.Windows.Forms.TextBox txtNewName;
@@ -37,9 +37,9 @@
         private System.Windows.Forms.DateTimePicker dtpNewExpiry;
         private System.Windows.Forms.Label lblNewImage;
         private System.Windows.Forms.PictureBox picNewImage;
-        private System.Windows.Forms.Button btnBrowseImage;
-        private System.Windows.Forms.Button btnConfirmAdd;
-        private System.Windows.Forms.Button btnCancelAdd;
+        private Guna.UI2.WinForms.Guna2Button btnBrowseImage;
+        private Guna.UI2.WinForms.Guna2Button btnConfirmAdd;
+        private Guna.UI2.WinForms.Guna2Button btnCancelAdd;
 
         protected override void Dispose(bool disposing)
         {
@@ -51,21 +51,21 @@
         {
             this.pnlProducts    = new System.Windows.Forms.Panel();
             this.flowProducts   = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnAddNewItem  = new System.Windows.Forms.Button();
+            this.btnAddNewItem  = new Guna.UI2.WinForms.Guna2Button();
             this.lblProductsTitle = new System.Windows.Forms.Label();
             this.pnlCart        = new System.Windows.Forms.Panel();
             this.pnlCartItems   = new System.Windows.Forms.Panel();
             this.flowCartItems  = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlCartFooter  = new System.Windows.Forms.Panel();
-            this.btnClearCart   = new System.Windows.Forms.Button();
-            this.btnCheckout    = new System.Windows.Forms.Button();
+            this.btnClearCart   = new Guna.UI2.WinForms.Guna2Button();
+            this.btnCheckout    = new Guna.UI2.WinForms.Guna2Button();
             this.lblTotalValue  = new System.Windows.Forms.Label();
             this.lblTotalLabel  = new System.Windows.Forms.Label();
             this.lblCartCount   = new System.Windows.Forms.Label();
             this.lblCartTitle   = new System.Windows.Forms.Label();
-            this.pnlAddItem     = new System.Windows.Forms.Panel();
-            this.btnCancelAdd   = new System.Windows.Forms.Button();
-            this.btnConfirmAdd  = new System.Windows.Forms.Button();
+            this.pnlAddItem     = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnCancelAdd   = new Guna.UI2.WinForms.Guna2Button();
+            this.btnConfirmAdd  = new Guna.UI2.WinForms.Guna2Button();
             this.cmbNewCategory = new System.Windows.Forms.ComboBox();
             this.lblNewCategory = new System.Windows.Forms.Label();
             this.numNewPrice    = new System.Windows.Forms.NumericUpDown();
@@ -79,7 +79,7 @@
             this.lblAddItemTitle = new System.Windows.Forms.Label();
             this.lblNewImage    = new System.Windows.Forms.Label();
             this.picNewImage    = new System.Windows.Forms.PictureBox();
-            this.btnBrowseImage = new System.Windows.Forms.Button();
+            this.btnBrowseImage = new Guna.UI2.WinForms.Guna2Button();
 
             this.pnlProducts.SuspendLayout();
             this.pnlCart.SuspendLayout();
@@ -108,18 +108,16 @@
             this.flowProducts.Padding    = new System.Windows.Forms.Padding(5);
             this.flowProducts.TabIndex   = 2;
 
-            this.btnAddNewItem.BackColor = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnAddNewItem.FillColor = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnAddNewItem.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnAddNewItem.Dock      = System.Windows.Forms.DockStyle.Bottom;
-            this.btnAddNewItem.FlatAppearance.BorderSize = 0;
-            this.btnAddNewItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddNewItem.BorderRadius = 10;
             this.btnAddNewItem.Font      = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
             this.btnAddNewItem.ForeColor = System.Drawing.Color.White;
             this.btnAddNewItem.Name      = "btnAddNewItem";
             this.btnAddNewItem.Size      = new System.Drawing.Size(560, 50);
             this.btnAddNewItem.TabIndex  = 1;
             this.btnAddNewItem.Text      = "➕  إضافة منتج جديد";
-            this.btnAddNewItem.UseVisualStyleBackColor = false;
 
             this.lblProductsTitle.Dock      = System.Windows.Forms.DockStyle.Top;
             this.lblProductsTitle.Font      = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
@@ -164,10 +162,9 @@
             this.pnlCartFooter.Size     = new System.Drawing.Size(336, 150);
             this.pnlCartFooter.TabIndex = 2;
 
-            this.btnClearCart.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
+            this.btnClearCart.FillColor = System.Drawing.Color.FromArgb(60, 60, 60);
             this.btnClearCart.Cursor    = System.Windows.Forms.Cursors.Hand;
-            this.btnClearCart.FlatAppearance.BorderSize = 0;
-            this.btnClearCart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearCart.BorderRadius = 6;
             this.btnClearCart.Font      = new System.Drawing.Font("Segoe UI", 10F);
             this.btnClearCart.ForeColor = System.Drawing.Color.LightGray;
             this.btnClearCart.Location  = new System.Drawing.Point(0, 130);
@@ -175,12 +172,10 @@
             this.btnClearCart.Size      = new System.Drawing.Size(336, 20);
             this.btnClearCart.TabIndex  = 3;
             this.btnClearCart.Text      = "مسح السلة";
-            this.btnClearCart.UseVisualStyleBackColor = false;
 
-            this.btnCheckout.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
+            this.btnCheckout.FillColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnCheckout.Cursor    = System.Windows.Forms.Cursors.Hand;
-            this.btnCheckout.FlatAppearance.BorderSize = 0;
-            this.btnCheckout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCheckout.BorderRadius = 10;
             this.btnCheckout.Font      = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
             this.btnCheckout.ForeColor = System.Drawing.Color.White;
             this.btnCheckout.Location  = new System.Drawing.Point(0, 82);
@@ -188,7 +183,6 @@
             this.btnCheckout.Size      = new System.Drawing.Size(336, 45);
             this.btnCheckout.TabIndex  = 2;
             this.btnCheckout.Text      = "✅  إصدار الفاتورة";
-            this.btnCheckout.UseVisualStyleBackColor = false;
 
             this.lblTotalValue.Dock      = System.Windows.Forms.DockStyle.Top;
             this.lblTotalValue.Font      = new System.Drawing.Font("Segoe UI", 26F, System.Drawing.FontStyle.Bold);
@@ -228,7 +222,9 @@
             this.lblCartTitle.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
             // ── Add Item Dialog (now taller to fit extra fields) ──
-            this.pnlAddItem.BackColor = System.Drawing.Color.FromArgb(35, 35, 35);
+            this.pnlAddItem.FillColor = System.Drawing.Color.FromArgb(35, 35, 35);
+            this.pnlAddItem.BorderRadius = 14;
+            this.pnlAddItem.ShadowDecoration.Enabled = true;
             this.pnlAddItem.Controls.Add(this.btnCancelAdd);
             this.pnlAddItem.Controls.Add(this.btnConfirmAdd);
             this.pnlAddItem.Controls.Add(this.picNewImage);
@@ -378,21 +374,19 @@
             this.picNewImage.SizeMode    = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picNewImage.TabIndex    = 14;
 
-            this.btnBrowseImage.BackColor  = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnBrowseImage.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowseImage.FillColor  = System.Drawing.Color.FromArgb(60, 60, 60);
+            this.btnBrowseImage.BorderRadius = 6;
             this.btnBrowseImage.ForeColor  = System.Drawing.Color.White;
             this.btnBrowseImage.Location   = new System.Drawing.Point(30, 420);
             this.btnBrowseImage.Name       = "btnBrowseImage";
             this.btnBrowseImage.Size       = new System.Drawing.Size(80, 30);
             this.btnBrowseImage.TabIndex   = 15;
             this.btnBrowseImage.Text       = "استعراض";
-            this.btnBrowseImage.UseVisualStyleBackColor = false;
 
             // Buttons
-            this.btnConfirmAdd.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
+            this.btnConfirmAdd.FillColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnConfirmAdd.Cursor    = System.Windows.Forms.Cursors.Hand;
-            this.btnConfirmAdd.FlatAppearance.BorderSize = 0;
-            this.btnConfirmAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfirmAdd.BorderRadius = 8;
             this.btnConfirmAdd.Font      = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnConfirmAdd.ForeColor = System.Drawing.Color.White;
             this.btnConfirmAdd.Location  = new System.Drawing.Point(215, 500);
@@ -400,12 +394,10 @@
             this.btnConfirmAdd.Size      = new System.Drawing.Size(175, 40);
             this.btnConfirmAdd.TabIndex  = 11;
             this.btnConfirmAdd.Text      = "✓  إضافة";
-            this.btnConfirmAdd.UseVisualStyleBackColor = false;
 
-            this.btnCancelAdd.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
+            this.btnCancelAdd.FillColor = System.Drawing.Color.FromArgb(60, 60, 60);
             this.btnCancelAdd.Cursor    = System.Windows.Forms.Cursors.Hand;
-            this.btnCancelAdd.FlatAppearance.BorderSize = 0;
-            this.btnCancelAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelAdd.BorderRadius = 8;
             this.btnCancelAdd.Font      = new System.Drawing.Font("Segoe UI", 12F);
             this.btnCancelAdd.ForeColor = System.Drawing.Color.LightGray;
             this.btnCancelAdd.Location  = new System.Drawing.Point(30, 500);
@@ -413,7 +405,6 @@
             this.btnCancelAdd.Size      = new System.Drawing.Size(175, 40);
             this.btnCancelAdd.TabIndex  = 12;
             this.btnCancelAdd.Text      = "إلغاء";
-            this.btnCancelAdd.UseVisualStyleBackColor = false;
 
             // StoreForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);

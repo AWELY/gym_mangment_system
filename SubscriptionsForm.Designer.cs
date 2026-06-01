@@ -6,7 +6,7 @@
 
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.DataGridView gridSubs;
-        private System.Windows.Forms.Panel pnlEditor;
+        private Guna.UI2.WinForms.Guna2Panel pnlEditor;
         private System.Windows.Forms.Label lblMember;
         private System.Windows.Forms.ComboBox cmbMember;
         private System.Windows.Forms.Label lblType;
@@ -18,9 +18,9 @@
         private System.Windows.Forms.NumericUpDown numPrice;
         private System.Windows.Forms.Label lblStartDate;
         private System.Windows.Forms.DateTimePicker dtpStartDate;
-        private System.Windows.Forms.Button btnSaveSubscription;
-        private System.Windows.Forms.Button btnClearForm;
-        private System.Windows.Forms.Button btnDeleteSubscription;
+        private Guna.UI2.WinForms.Guna2Button btnSaveSubscription;
+        private Guna.UI2.WinForms.Guna2Button btnClearForm;
+        private Guna.UI2.WinForms.Guna2Button btnDeleteSubscription;
         private System.Windows.Forms.Label lblHint;
 
         protected override void Dispose(bool disposing)
@@ -36,11 +36,11 @@
         {
             this.lblTitle = new System.Windows.Forms.Label();
             this.gridSubs = new System.Windows.Forms.DataGridView();
-            this.pnlEditor = new System.Windows.Forms.Panel();
+            this.pnlEditor = new Guna.UI2.WinForms.Guna2Panel();
             this.lblHint = new System.Windows.Forms.Label();
-            this.btnDeleteSubscription = new System.Windows.Forms.Button();
-            this.btnClearForm = new System.Windows.Forms.Button();
-            this.btnSaveSubscription = new System.Windows.Forms.Button();
+            this.btnDeleteSubscription = new Guna.UI2.WinForms.Guna2Button();
+            this.btnClearForm = new Guna.UI2.WinForms.Guna2Button();
+            this.btnSaveSubscription = new Guna.UI2.WinForms.Guna2Button();
             this.dtpStartDate = new System.Windows.Forms.DateTimePicker();
             this.lblStartDate = new System.Windows.Forms.Label();
             this.numPrice = new System.Windows.Forms.NumericUpDown();
@@ -126,6 +126,8 @@
             this.pnlEditor.Name = "pnlEditor";
             this.pnlEditor.Padding = new System.Windows.Forms.Padding(15);
             this.pnlEditor.Size = new System.Drawing.Size(910, 160);
+            this.pnlEditor.BorderRadius = 14;
+            this.pnlEditor.ShadowDecoration.Enabled = true;
             this.pnlEditor.TabIndex = 2;
             // 
             // lblHint
@@ -140,9 +142,8 @@
             // 
             // btnDeleteSubscription
             // 
-            this.btnDeleteSubscription.BackColor = System.Drawing.Color.FromArgb(231, 0, 11);
-            this.btnDeleteSubscription.FlatAppearance.BorderSize = 0;
-            this.btnDeleteSubscription.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeleteSubscription.FillColor = System.Drawing.Color.FromArgb(231, 0, 11);
+            this.btnDeleteSubscription.BorderRadius = 8;
             this.btnDeleteSubscription.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnDeleteSubscription.ForeColor = System.Drawing.Color.White;
             this.btnDeleteSubscription.Location = new System.Drawing.Point(15, 111);
@@ -150,13 +151,11 @@
             this.btnDeleteSubscription.Size = new System.Drawing.Size(130, 34);
             this.btnDeleteSubscription.TabIndex = 13;
             this.btnDeleteSubscription.Text = "🗑 حذف المحدد";
-            this.btnDeleteSubscription.UseVisualStyleBackColor = false;
             // 
             // btnClearForm
             // 
-            this.btnClearForm.BackColor = System.Drawing.Color.FromArgb(90, 90, 90);
-            this.btnClearForm.FlatAppearance.BorderSize = 0;
-            this.btnClearForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClearForm.FillColor = System.Drawing.Color.FromArgb(90, 90, 90);
+            this.btnClearForm.BorderRadius = 8;
             this.btnClearForm.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnClearForm.ForeColor = System.Drawing.Color.White;
             this.btnClearForm.Location = new System.Drawing.Point(151, 111);
@@ -164,13 +163,11 @@
             this.btnClearForm.Size = new System.Drawing.Size(120, 34);
             this.btnClearForm.TabIndex = 12;
             this.btnClearForm.Text = "تفريغ";
-            this.btnClearForm.UseVisualStyleBackColor = false;
             // 
             // btnSaveSubscription
             // 
-            this.btnSaveSubscription.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
-            this.btnSaveSubscription.FlatAppearance.BorderSize = 0;
-            this.btnSaveSubscription.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveSubscription.FillColor = System.Drawing.Color.FromArgb(0, 166, 62);
+            this.btnSaveSubscription.BorderRadius = 8;
             this.btnSaveSubscription.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnSaveSubscription.ForeColor = System.Drawing.Color.White;
             this.btnSaveSubscription.Location = new System.Drawing.Point(277, 111);
@@ -178,7 +175,6 @@
             this.btnSaveSubscription.Size = new System.Drawing.Size(150, 34);
             this.btnSaveSubscription.TabIndex = 11;
             this.btnSaveSubscription.Text = "💾 حفظ الاشتراك";
-            this.btnSaveSubscription.UseVisualStyleBackColor = false;
             // 
             // dtpStartDate
             // 

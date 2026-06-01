@@ -6,7 +6,7 @@
 
         private System.Windows.Forms.Panel topBar;
         private System.Windows.Forms.Label lblTitleBar;
-        private System.Windows.Forms.Button btnClose;
+        private Guna.UI2.WinForms.Guna2Button btnClose;
         private System.Windows.Forms.Panel mainPanel;
         private System.Windows.Forms.Panel brandPanel;
         private System.Windows.Forms.PictureBox picLogo;
@@ -15,14 +15,14 @@
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label lblUser;
         private System.Windows.Forms.Panel pnlUser;
-        private System.Windows.Forms.TextBox txtUser;
+        private Guna.UI2.WinForms.Guna2TextBox txtUser;
         private System.Windows.Forms.Label lblPass;
         private System.Windows.Forms.Panel pnlPass;
-        private System.Windows.Forms.TextBox txtPass;
+        private Guna.UI2.WinForms.Guna2TextBox txtPass;
         private System.Windows.Forms.CheckBox chkRemember;
         private System.Windows.Forms.LinkLabel lnkForgot;
-        private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.Button btnExit;
+        private Guna.UI2.WinForms.Guna2Button btnLogin;
+        private Guna.UI2.WinForms.Guna2Button btnExit;
 
         protected override void Dispose(bool disposing)
         {
@@ -39,7 +39,7 @@
         {
             this.topBar = new System.Windows.Forms.Panel();
             this.lblTitleBar = new System.Windows.Forms.Label();
-            this.btnClose = new System.Windows.Forms.Button();
+            this.btnClose = new Guna.UI2.WinForms.Guna2Button();
             this.mainPanel = new System.Windows.Forms.Panel();
             this.brandPanel = new System.Windows.Forms.Panel();
             this.picLogo = new System.Windows.Forms.PictureBox();
@@ -48,14 +48,14 @@
             this.lblTitle = new System.Windows.Forms.Label();
             this.lblUser = new System.Windows.Forms.Label();
             this.pnlUser = new System.Windows.Forms.Panel();
-            this.txtUser = new System.Windows.Forms.TextBox();
+            this.txtUser = new Guna.UI2.WinForms.Guna2TextBox();
             this.lblPass = new System.Windows.Forms.Label();
             this.pnlPass = new System.Windows.Forms.Panel();
-            this.txtPass = new System.Windows.Forms.TextBox();
+            this.txtPass = new Guna.UI2.WinForms.Guna2TextBox();
             this.chkRemember = new System.Windows.Forms.CheckBox();
             this.lnkForgot = new System.Windows.Forms.LinkLabel();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.btnExit = new System.Windows.Forms.Button();
+            this.btnLogin = new Guna.UI2.WinForms.Guna2Button();
+            this.btnExit = new Guna.UI2.WinForms.Guna2Button();
             
             this.topBar.SuspendLayout();
             this.mainPanel.SuspendLayout();
@@ -82,8 +82,8 @@
             // btnClose
             this.btnClose.Text = "X";
             this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClose.FlatAppearance.BorderSize = 0;
+            this.btnClose.FillColor = System.Drawing.Color.FromArgb(15, 15, 15);
+            this.btnClose.BorderRadius = 0;
             this.btnClose.Size = new System.Drawing.Size(30, 30);
             this.btnClose.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -155,12 +155,12 @@
             this.pnlUser.Controls.Add(this.txtUser);
 
             // txtUser
-            this.txtUser.BackColor = System.Drawing.Color.FromArgb(45, 45, 45);
+            this.txtUser.FillColor = System.Drawing.Color.FromArgb(45, 45, 45);
             this.txtUser.ForeColor = System.Drawing.Color.White;
-            this.txtUser.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtUser.BorderRadius = 8;
+            this.txtUser.BorderColor = System.Drawing.Color.FromArgb(209, 213, 219);
             this.txtUser.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.txtUser.Location = new System.Drawing.Point(10, 7);
-            this.txtUser.Size = new System.Drawing.Size(380, 25);
+            this.txtUser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtUser.Text = "Admin";
 
             // lblPass
@@ -178,12 +178,12 @@
             this.pnlPass.Controls.Add(this.txtPass);
 
             // txtPass
-            this.txtPass.BackColor = System.Drawing.Color.FromArgb(45, 45, 45);
+            this.txtPass.FillColor = System.Drawing.Color.FromArgb(45, 45, 45);
             this.txtPass.ForeColor = System.Drawing.Color.White;
-            this.txtPass.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPass.BorderRadius = 8;
+            this.txtPass.BorderColor = System.Drawing.Color.FromArgb(209, 213, 219);
             this.txtPass.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.txtPass.Location = new System.Drawing.Point(10, 7);
-            this.txtPass.Size = new System.Drawing.Size(380, 25);
+            this.txtPass.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtPass.PasswordChar = '•';
             this.txtPass.Text = "Password";
 
@@ -202,11 +202,9 @@
 
             // btnLogin
             this.btnLogin.Text = "تسجيل الدخول  [->";
-            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLogin.FlatAppearance.BorderSize = 0;
-            this.btnLogin.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(67, 45, 212);
+            this.btnLogin.BorderRadius = 10;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnLogin.Size = new System.Drawing.Size(400, 50);
             this.btnLogin.Location = new System.Drawing.Point(70, 385);
@@ -215,10 +213,9 @@
 
             // btnExit
             this.btnExit.Text = "خروج";
-            this.btnExit.BackColor = System.Drawing.Color.FromArgb(50, 50, 50);
+            this.btnExit.FillColor = System.Drawing.Color.FromArgb(50, 50, 50);
             this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExit.FlatAppearance.BorderSize = 0;
+            this.btnExit.BorderRadius = 10;
             this.btnExit.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.btnExit.Size = new System.Drawing.Size(400, 46);
             this.btnExit.Location = new System.Drawing.Point(70, 445);

@@ -24,14 +24,14 @@ namespace gym_mangment_system
         private System.Windows.Forms.Label lblRightTitle;
 
         // Create new plan group
-        private System.Windows.Forms.Panel pnlCreatePlan;
+        private Guna.UI2.WinForms.Guna2Panel pnlCreatePlan;
         private System.Windows.Forms.Label lblCreateTitle;
         private System.Windows.Forms.Label lblPlanName;
         private System.Windows.Forms.TextBox txtPlanName;
         private System.Windows.Forms.Label lblPlanPdf;
         private System.Windows.Forms.TextBox txtPlanPdf;
-        private System.Windows.Forms.Button btnBrowsePlanPdf;
-        private System.Windows.Forms.Button btnSavePlan;
+        private Guna.UI2.WinForms.Guna2Button btnBrowsePlanPdf;
+        private Guna.UI2.WinForms.Guna2Button btnSavePlan;
 
         // Select & send plan group
         private System.Windows.Forms.Label lblSelectPlan;
@@ -63,9 +63,9 @@ namespace gym_mangment_system
             this.txtSelectedPlanPdf = new System.Windows.Forms.TextBox();
             this.cmbSelectPlan = new System.Windows.Forms.ComboBox();
             this.lblSelectPlan = new System.Windows.Forms.Label();
-            this.pnlCreatePlan = new System.Windows.Forms.Panel();
-            this.btnSavePlan = new System.Windows.Forms.Button();
-            this.btnBrowsePlanPdf = new System.Windows.Forms.Button();
+            this.pnlCreatePlan = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnSavePlan = new Guna.UI2.WinForms.Guna2Button();
+            this.btnBrowsePlanPdf = new Guna.UI2.WinForms.Guna2Button();
             this.txtPlanPdf = new System.Windows.Forms.TextBox();
             this.lblPlanPdf = new System.Windows.Forms.Label();
             this.txtPlanName = new System.Windows.Forms.TextBox();
@@ -282,8 +282,9 @@ namespace gym_mangment_system
             // 
             // pnlCreatePlan
             // 
-            this.pnlCreatePlan.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(38)))), ((int)(((byte)(48)))));
-            this.pnlCreatePlan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlCreatePlan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(38)))), ((int)(((byte)(48)))));
+            this.pnlCreatePlan.BorderRadius = 14;
+            this.pnlCreatePlan.ShadowDecoration.Enabled = true;
             this.pnlCreatePlan.Controls.Add(this.btnSavePlan);
             this.pnlCreatePlan.Controls.Add(this.btnBrowsePlanPdf);
             this.pnlCreatePlan.Controls.Add(this.txtPlanPdf);
@@ -299,10 +300,9 @@ namespace gym_mangment_system
             // 
             // btnSavePlan
             // 
-            this.btnSavePlan.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnSavePlan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
             this.btnSavePlan.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnSavePlan.FlatAppearance.BorderSize = 0;
-            this.btnSavePlan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSavePlan.BorderRadius = 8;
             this.btnSavePlan.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnSavePlan.ForeColor = System.Drawing.Color.White;
             this.btnSavePlan.Location = new System.Drawing.Point(12, 168);
@@ -310,13 +310,11 @@ namespace gym_mangment_system
             this.btnSavePlan.Size = new System.Drawing.Size(362, 40);
             this.btnSavePlan.TabIndex = 6;
             this.btnSavePlan.Text = "✓  حفظ الخطة";
-            this.btnSavePlan.UseVisualStyleBackColor = false;
             // 
             // btnBrowsePlanPdf
             // 
-            this.btnBrowsePlanPdf.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
-            this.btnBrowsePlanPdf.FlatAppearance.BorderSize = 0;
-            this.btnBrowsePlanPdf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowsePlanPdf.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.btnBrowsePlanPdf.BorderRadius = 6;
             this.btnBrowsePlanPdf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnBrowsePlanPdf.ForeColor = System.Drawing.Color.White;
             this.btnBrowsePlanPdf.Location = new System.Drawing.Point(288, 124);
@@ -324,7 +322,6 @@ namespace gym_mangment_system
             this.btnBrowsePlanPdf.Size = new System.Drawing.Size(86, 25);
             this.btnBrowsePlanPdf.TabIndex = 5;
             this.btnBrowsePlanPdf.Text = "📁 اختيار";
-            this.btnBrowsePlanPdf.UseVisualStyleBackColor = false;
             // 
             // txtPlanPdf
             // 

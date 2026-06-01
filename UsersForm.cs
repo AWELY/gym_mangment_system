@@ -133,14 +133,15 @@ namespace gym_mangment_system
             ThemeManager.StyleDataGridView(gridUsers, s);
             lblCount.ForeColor = s.TextMuted;
 
-            pnlForm.BackColor = s.Card;
+            pnlForm.FillColor = s.Card;
+            pnlForm.BorderColor = s.BorderSubtle;
             lblFormTitle.ForeColor = s.TextPrimary;
             lblFFullName.ForeColor = lblFUsername.ForeColor = lblFPassword.ForeColor = lblFRole.ForeColor = s.TextMuted;
             txtFFullName.BackColor = txtFUsername.BackColor = txtFPassword.BackColor = cmbFRole.BackColor = s.InputBackground;
             txtFFullName.ForeColor = txtFUsername.ForeColor = txtFPassword.ForeColor = cmbFRole.ForeColor = s.InputForeground;
-            btnFormCancel.BackColor = s.SecondaryButton;
+            btnFormSave.FillColor = FigmaPalette.GreenBtn;
+            btnFormCancel.FillColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
-            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
 
             if (_cardHost != null)
             {

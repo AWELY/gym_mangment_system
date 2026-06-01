@@ -26,7 +26,6 @@ namespace gym_mangment_system
         // Figma card layout
         private FlowLayoutPanel _cardHost;
         private Panel _root;
-        private Panel _logPanel;
         private Guna2Button _btnAddPlan;
         private Guna2Button _btnCancelPlan;
         private string _editingPlanName = null;
@@ -50,7 +49,8 @@ namespace gym_mangment_system
             lblTitle.ForeColor = s.TextPrimary;
 
             // overlay editor card
-            pnlCreatePlan.BackColor = s.Card;
+            pnlCreatePlan.FillColor = s.Card;
+            pnlCreatePlan.BorderColor = s.BorderSubtle;
             lblCreateTitle.ForeColor = s.TextPrimary;
             lblPlanName.ForeColor = s.TextMuted;
             lblPlanPdf.ForeColor = s.TextMuted;
@@ -59,13 +59,7 @@ namespace gym_mangment_system
             txtPlanPdf.BackColor = s.InputBackground;
             txtPlanPdf.ForeColor = s.InputForeground;
 
-            // log section
-            lblSectionHistory.ForeColor = s.TextMuted;
-            listHistory.BackColor = s.ListBackground;
-            listHistory.ForeColor = s.ListForeground;
-
-            if (_root != null)     _root.BackColor = s.ContentHost;
-            if (_logPanel != null) _logPanel.BackColor = s.ContentHost;
+            if (_root != null) _root.BackColor = s.ContentHost;
             if (_btnCancelPlan != null)
             {
                 _btnCancelPlan.FillColor = s.SecondaryButton;
@@ -84,14 +78,15 @@ namespace gym_mangment_system
             pnlLeft.Visible  = false;
             pnlRight.Visible = false;
 
-            pnlLeft.Controls.Remove(listHistory);
-            pnlLeft.Controls.Remove(lblSectionHistory);
+            // History is still recorded in the background, but the on-screen
+            // "سجل الإرسال" section is removed per request — keep the list hidden.
+            listHistory.Visible = false;
+            lblSectionHistory.Visible = false;
             pnlRight.Controls.Remove(pnlCreatePlan);
 
             // overlay editor
             Controls.Add(pnlCreatePlan);
             pnlCreatePlan.Dock        = DockStyle.None;
-            pnlCreatePlan.BorderStyle = BorderStyle.None;
             pnlCreatePlan.Size        = new Size(400, 250);
             pnlCreatePlan.Visible     = false;
             btnSavePlan.Size     = new Size(178, 38);
@@ -102,10 +97,9 @@ namespace gym_mangment_system
             pnlCreatePlan.Controls.Add(_btnCancelPlan);
 
             _root = new Panel { Dock = DockStyle.Fill };
-            var tlp = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3 };
+            var tlp = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2 };
             tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 56));
             tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 210));
 
             var toolbar = new Panel { Dock = DockStyle.Fill };
             _btnAddPlan = GunaUi.ToolbarButton("➕ إضافة خطة", FigmaPalette.Primary, new Point(18, 9));
@@ -121,20 +115,8 @@ namespace gym_mangment_system
                 Padding       = new Padding(14)
             };
 
-            _logPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(16, 4, 16, 12) };
-            listHistory.Dock = DockStyle.Fill;
-            listHistory.BorderStyle = BorderStyle.None;
-            lblSectionHistory.Dock = DockStyle.Top;
-            lblSectionHistory.Height = 28;
-            lblSectionHistory.AutoSize = false;
-            lblSectionHistory.Text = "📋  سجل الإرسال";
-            lblSectionHistory.TextAlign = ContentAlignment.MiddleRight;
-            _logPanel.Controls.Add(listHistory);
-            _logPanel.Controls.Add(lblSectionHistory);
-
             tlp.Controls.Add(toolbar, 0, 0);
             tlp.Controls.Add(_cardHost, 0, 1);
-            tlp.Controls.Add(_logPanel, 0, 2);
             _root.Controls.Add(tlp);
 
             Controls.Add(_root);

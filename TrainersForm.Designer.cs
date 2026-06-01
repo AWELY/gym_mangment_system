@@ -8,7 +8,7 @@
         private System.Windows.Forms.Panel pnlSearch;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label lblSearch;
-        private System.Windows.Forms.Button btnAddTrainer;
+        private Guna.UI2.WinForms.Guna2Button btnAddTrainer;
         private System.Windows.Forms.DataGridView gridTrainers;
         private System.Windows.Forms.Panel pnlActions;
         private System.Windows.Forms.Button btnEdit;
@@ -16,7 +16,7 @@
         private System.Windows.Forms.Label lblCount;
 
         // Overlay form panel
-        private System.Windows.Forms.Panel pnlForm;
+        private Guna.UI2.WinForms.Guna2Panel pnlForm;
         private System.Windows.Forms.Label lblFormTitle;
         private System.Windows.Forms.Label lblFName;
         private System.Windows.Forms.TextBox txtFName;
@@ -28,8 +28,8 @@
         private System.Windows.Forms.NumericUpDown numFSalary;
         private System.Windows.Forms.Label lblFJoinDate;
         private System.Windows.Forms.DateTimePicker dtpFJoinDate;
-        private System.Windows.Forms.Button btnFormSave;
-        private System.Windows.Forms.Button btnFormCancel;
+        private Guna.UI2.WinForms.Guna2Button btnFormSave;
+        private Guna.UI2.WinForms.Guna2Button btnFormCancel;
 
         protected override void Dispose(bool disposing)
         {
@@ -41,7 +41,7 @@
         {
             this.lblTitle      = new System.Windows.Forms.Label();
             this.pnlSearch     = new System.Windows.Forms.Panel();
-            this.btnAddTrainer = new System.Windows.Forms.Button();
+            this.btnAddTrainer = new Guna.UI2.WinForms.Guna2Button();
             this.txtSearch     = new System.Windows.Forms.TextBox();
             this.lblSearch     = new System.Windows.Forms.Label();
             this.gridTrainers  = new System.Windows.Forms.DataGridView();
@@ -49,9 +49,9 @@
             this.lblCount      = new System.Windows.Forms.Label();
             this.btnDelete     = new System.Windows.Forms.Button();
             this.btnEdit       = new System.Windows.Forms.Button();
-            this.pnlForm       = new System.Windows.Forms.Panel();
-            this.btnFormCancel = new System.Windows.Forms.Button();
-            this.btnFormSave   = new System.Windows.Forms.Button();
+            this.pnlForm       = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnFormCancel = new Guna.UI2.WinForms.Guna2Button();
+            this.btnFormSave   = new Guna.UI2.WinForms.Guna2Button();
             this.dtpFJoinDate  = new System.Windows.Forms.DateTimePicker();
             this.lblFJoinDate  = new System.Windows.Forms.Label();
             this.numFSalary    = new System.Windows.Forms.NumericUpDown();
@@ -112,10 +112,9 @@
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddTrainer.BackColor  = System.Drawing.Color.FromArgb(79, 57, 246);
+            this.btnAddTrainer.FillColor  = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnAddTrainer.Cursor     = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTrainer.FlatAppearance.BorderSize = 0;
-            this.btnAddTrainer.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTrainer.BorderRadius = 8;
             this.btnAddTrainer.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnAddTrainer.ForeColor  = System.Drawing.Color.White;
             this.btnAddTrainer.Location   = new System.Drawing.Point(25, 10);
@@ -123,7 +122,6 @@
             this.btnAddTrainer.Size       = new System.Drawing.Size(190, 35);
             this.btnAddTrainer.TabIndex   = 2;
             this.btnAddTrainer.Text       = "➕ إضافة مدرب جديد";
-            this.btnAddTrainer.UseVisualStyleBackColor = false;
 
             // gridTrainers
             this.gridTrainers.AllowUserToAddRows    = false;
@@ -206,7 +204,9 @@
             this.lblCount.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
             // ── pnlForm overlay ──
-            this.pnlForm.BackColor = System.Drawing.Color.FromArgb(32, 32, 40);
+            this.pnlForm.FillColor = System.Drawing.Color.FromArgb(32, 32, 40);
+            this.pnlForm.BorderRadius = 14;
+            this.pnlForm.ShadowDecoration.Enabled = true;
             this.pnlForm.Controls.Add(this.btnFormCancel);
             this.pnlForm.Controls.Add(this.btnFormSave);
             this.pnlForm.Controls.Add(this.dtpFJoinDate);
@@ -289,19 +289,17 @@
             this.dtpFJoinDate.Size    = new System.Drawing.Size(435, 27); this.dtpFJoinDate.TabIndex = 10;
 
             // Save/Cancel
-            this.btnFormSave.BackColor = System.Drawing.Color.FromArgb(0, 166, 62); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnFormSave.FlatAppearance.BorderSize = 0; this.btnFormSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFormSave.FillColor = System.Drawing.Color.FromArgb(0, 166, 62); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnFormSave.BorderRadius = 8;
             this.btnFormSave.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold); this.btnFormSave.ForeColor = System.Drawing.Color.White;
             this.btnFormSave.Location = new System.Drawing.Point(245, 362); this.btnFormSave.Name = "btnFormSave";
             this.btnFormSave.Size = new System.Drawing.Size(225, 40); this.btnFormSave.TabIndex = 11; this.btnFormSave.Text = "✓  حفظ";
-            this.btnFormSave.UseVisualStyleBackColor = false;
 
-            this.btnFormCancel.BackColor = System.Drawing.Color.FromArgb(55,55,65); this.btnFormCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnFormCancel.FlatAppearance.BorderSize = 0; this.btnFormCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFormCancel.FillColor = System.Drawing.Color.FromArgb(55,55,65); this.btnFormCancel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnFormCancel.BorderRadius = 8;
             this.btnFormCancel.Font = new System.Drawing.Font("Segoe UI", 12F); this.btnFormCancel.ForeColor = System.Drawing.Color.LightGray;
             this.btnFormCancel.Location = new System.Drawing.Point(35, 362); this.btnFormCancel.Name = "btnFormCancel";
             this.btnFormCancel.Size = new System.Drawing.Size(200, 40); this.btnFormCancel.TabIndex = 12; this.btnFormCancel.Text = "إلغاء";
-            this.btnFormCancel.UseVisualStyleBackColor = false;
 
             // TrainersForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);

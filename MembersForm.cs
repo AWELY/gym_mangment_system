@@ -43,7 +43,8 @@ namespace gym_mangment_system
             ThemeManager.StyleDataGridView(gridMembers, s);
             lblMemberCount.ForeColor = s.TextMuted;
 
-            pnlForm.BackColor = s.Card;
+            pnlForm.FillColor = s.Card;
+            pnlForm.BorderColor = s.BorderSubtle;
             lblFormTitle.ForeColor = s.TextPrimary;
             Color labelMuted = s.TextMuted;
             lblFName.ForeColor = labelMuted;
@@ -65,9 +66,10 @@ namespace gym_mangment_system
             txtFPlanPrice.BackColor = s.PanelElevated;
             txtFPlanMonths.BackColor = s.PanelElevated;
 
-            btnFormCancel.BackColor = s.SecondaryButton;
+            btnFormCancel.FillColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
-            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+            btnFormSave.FillColor = FigmaPalette.GreenBtn;
+            btnAddMember.FillColor = FigmaPalette.Primary;
         }
 
         private void ApplyBackgroundBranding()

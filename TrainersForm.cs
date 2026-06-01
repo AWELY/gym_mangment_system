@@ -140,7 +140,8 @@ namespace gym_mangment_system
 
             lblCount.ForeColor = s.TextMuted;
 
-            pnlForm.BackColor = s.Card;
+            pnlForm.FillColor = s.Card;
+            pnlForm.BorderColor = s.BorderSubtle;
             lblFormTitle.ForeColor = s.TextPrimary;
             foreach (Label lb in new[] { lblFName, lblFPhone, lblFSpecialty, lblFSalary, lblFJoinDate })
                 lb.ForeColor = s.TextMuted;
@@ -148,9 +149,10 @@ namespace gym_mangment_system
             txtFName.ForeColor = txtFPhone.ForeColor = txtFSpecialty.ForeColor = numFSalary.ForeColor = s.InputForeground;
             dtpFJoinDate.CalendarMonthBackground = s.InputBackground;
             dtpFJoinDate.CalendarForeColor = s.InputForeground;
-            btnFormCancel.BackColor = s.SecondaryButton;
+            btnAddTrainer.FillColor = FigmaPalette.Primary;
+            btnFormSave.FillColor = FigmaPalette.GreenBtn;
+            btnFormCancel.FillColor = s.SecondaryButton;
             btnFormCancel.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.LightGray;
-            btnFormCancel.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
 
             if (_lblSubtitle != null) _lblSubtitle.ForeColor = s.TextMuted;
             if (_cardHost != null)

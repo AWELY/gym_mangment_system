@@ -43,17 +43,20 @@ namespace gym_mangment_system
             chkRemember.ForeColor = s.TextMuted;
 
             pnlUser.BackColor = s.InputBackground;
-            txtUser.BackColor = s.InputBackground;
+            txtUser.FillColor = s.InputBackground;
+            txtUser.BorderColor = s.BorderSubtle;
             txtUser.ForeColor = s.InputForeground;
             pnlPass.BackColor = s.InputBackground;
-            txtPass.BackColor = s.InputBackground;
+            txtPass.FillColor = s.InputBackground;
+            txtPass.BorderColor = s.BorderSubtle;
             txtPass.ForeColor = s.InputForeground;
 
             lblWelcome.ForeColor = s.TextPrimary;
 
-            btnExit.BackColor = s.SecondaryButton;
+            btnLogin.FillColor = FigmaPalette.Primary;
+            btnLogin.ForeColor = Color.White;
+            btnExit.FillColor = s.SecondaryButton;
             btnExit.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
-            btnExit.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -123,7 +126,6 @@ namespace gym_mangment_system
                 txtUser.Text = "admin";
                 txtPass.Text = "admin";
                 txtUser.Focus();
-                txtUser.SelectAll();
                 this.Show();
                 return;
             }

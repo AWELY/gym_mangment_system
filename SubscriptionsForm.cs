@@ -173,7 +173,8 @@ namespace gym_mangment_system
         {
             BackColor = s.ContentHost;
             lblTitle.ForeColor = s.TextPrimary;
-            pnlEditor.BackColor = s.Panel;
+            pnlEditor.FillColor = s.Panel;
+            pnlEditor.BorderColor = s.BorderSubtle;
             lblHint.ForeColor = s.TextMuted;
             lblMember.ForeColor = s.TextPrimary;
             lblType.ForeColor = s.TextPrimary;
@@ -194,9 +195,10 @@ namespace gym_mangment_system
             dtpStartDate.CalendarMonthBackground = s.InputBackground;
             dtpStartDate.CalendarForeColor = s.InputForeground;
 
-            btnClearForm.BackColor = s.SecondaryButton;
+            btnClearForm.FillColor = s.SecondaryButton;
             btnClearForm.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
-            btnClearForm.FlatAppearance.MouseOverBackColor = s.SecondaryButtonHover;
+            btnSaveSubscription.FillColor = FigmaPalette.GreenBtn;
+            btnDeleteSubscription.FillColor = FigmaPalette.Red;
 
             ThemeManager.StyleDataGridView(gridSubs, s);
 
