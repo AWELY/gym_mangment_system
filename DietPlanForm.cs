@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -67,7 +67,7 @@ namespace gym_mangment_system
             cmbSelectPlan.BackColor = s.InputBackground;
             cmbSelectPlan.ForeColor = s.InputForeground;
             txtSelectedPlanPdf.BackColor = s.PanelElevated;
-            txtSelectedPlanPdf.ForeColor = Color.FromArgb(33, 150, 243);
+            txtSelectedPlanPdf.ForeColor = Color.FromArgb(43, 127, 255);
         }
 
         private void SetupPhoneAutoComplete()
@@ -133,7 +133,7 @@ namespace gym_mangment_system
             if (found == null)
             {
                 lblFoundName.Text  = "❌  لم يُعثر على عضو بهذا الرقم";
-                lblFoundName.ForeColor = Color.FromArgb(220, 53, 69);
+                lblFoundName.ForeColor = Color.FromArgb(231, 0, 11);
                 lblFoundPhone.Text = "";
                 lblFoundPlan.Text  = "";
                 _currentMemberName  = "";

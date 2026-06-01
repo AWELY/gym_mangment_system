@@ -37,6 +37,7 @@ namespace gym_mangment_system
             brandPanel.BackColor = ThemeManager.IsLight ? s.PanelElevated : Color.FromArgb(20, 20, 20);
 
             lblTitle.ForeColor = s.TextPrimary;
+            if (lblGymName != null) lblGymName.ForeColor = s.TextPrimary;
             lblUser.ForeColor = s.TextMuted;
             lblPass.ForeColor = s.TextMuted;
             chkRemember.ForeColor = s.TextMuted;
@@ -64,12 +65,19 @@ namespace gym_mangment_system
 
         private void ApplyBranding()
         {
-            Image bg = ImageAssets.TryLoad(ImageAssets.BgGym);
-            if (bg != null)
+            if (ThemeManager.IsLight)
             {
-                float op = ThemeManager.IsLight ? 0.14f : 0.28f;
-                this.BackgroundImage = ImageAssets.CreateWithOpacity(bg, op);
-                this.BackgroundImageLayout = ImageLayout.Stretch;
+                // Figma login is a clean light surface (no photo backdrop).
+                this.BackgroundImage = null;
+            }
+            else
+            {
+                Image bg = ImageAssets.TryLoad(ImageAssets.BgGym);
+                if (bg != null)
+                {
+                    this.BackgroundImage = ImageAssets.CreateWithOpacity(bg, 0.28f);
+                    this.BackgroundImageLayout = ImageLayout.Stretch;
+                }
             }
 
             Image logo = ImageAssets.TryLoad(ImageAssets.LogoHeartDumbbell);

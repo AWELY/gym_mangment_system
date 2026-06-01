@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -80,10 +80,10 @@ namespace gym_mangment_system
             cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 
-            cards.Controls.Add(CreateFinancialCard("💵 ربح الاشتراكات", FormatMoney(_monthlySubscriptions), Color.FromArgb(33, 150, 243), s), 3, 0);
-            cards.Controls.Add(CreateFinancialCard("🛒 ربح المتجر", FormatMoney(_monthlyStore), Color.FromArgb(76, 175, 80), s), 2, 0);
-            cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(244, 67, 54), s), 1, 0);
-            cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(76, 175, 80) : Color.FromArgb(244, 67, 54), s), 0, 0);
+            cards.Controls.Add(CreateFinancialCard("💵 ربح الاشتراكات", FormatMoney(_monthlySubscriptions), Color.FromArgb(43, 127, 255), s), 3, 0);
+            cards.Controls.Add(CreateFinancialCard("🛒 ربح المتجر", FormatMoney(_monthlyStore), Color.FromArgb(0, 166, 62), s), 2, 0);
+            cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(231, 0, 11), s), 1, 0);
+            cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(0, 166, 62) : Color.FromArgb(231, 0, 11), s), 0, 0);
 
             var summary = new Panel
             {
@@ -244,15 +244,15 @@ namespace gym_mangment_system
                 int x = padL + (chartW * i / 12) + barW;
 
                 int hGross = (int)(chartH * gross[i] / maxVal);
-                using (Brush bGross = new SolidBrush(Color.FromArgb(76, 175, 80)))
+                using (Brush bGross = new SolidBrush(Color.FromArgb(0, 166, 62)))
                     g.FillRectangle(bGross, x, padT + chartH - hGross, barW, hGross);
 
                 int hSalary = (int)(chartH * salary / maxVal);
-                using (Brush bSalary = new SolidBrush(Color.FromArgb(244, 67, 54)))
+                using (Brush bSalary = new SolidBrush(Color.FromArgb(231, 0, 11)))
                     g.FillRectangle(bSalary, x + barW + 2, padT + chartH - hSalary, barW, hSalary);
 
                 int hNet = (int)(chartH * Math.Abs(net[i]) / maxVal);
-                Color netColor = net[i] >= 0 ? Color.FromArgb(33, 150, 243) : Color.FromArgb(255, 152, 0);
+                Color netColor = net[i] >= 0 ? Color.FromArgb(43, 127, 255) : Color.FromArgb(255, 105, 0);
                 using (Brush bNet = new SolidBrush(netColor))
                     g.FillRectangle(bNet, x + (barW * 2) + 4, padT + chartH - hNet, barW, hNet);
 
@@ -265,9 +265,9 @@ namespace gym_mangment_system
             int ly = 8;
             using (Font lFont = new Font("Segoe UI", 9F, FontStyle.Bold))
             using (Brush legBrush = new SolidBrush(s.TextPrimary))
-            using (Brush incomeBrush = new SolidBrush(Color.FromArgb(76, 175, 80)))
-            using (Brush salaryBrush = new SolidBrush(Color.FromArgb(244, 67, 54)))
-            using (Brush netBrush = new SolidBrush(Color.FromArgb(33, 150, 243)))
+            using (Brush incomeBrush = new SolidBrush(Color.FromArgb(0, 166, 62)))
+            using (Brush salaryBrush = new SolidBrush(Color.FromArgb(231, 0, 11)))
+            using (Brush netBrush = new SolidBrush(Color.FromArgb(43, 127, 255)))
             {
                 g.FillRectangle(incomeBrush, lx, ly + 28, 14, 14);
                 g.DrawString("الدخل", lFont, legBrush, lx + 20, ly + 25);

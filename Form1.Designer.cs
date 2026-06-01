@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class Form1
     {
@@ -122,7 +122,7 @@ namespace gym_mangment_system
             this.lblGymName.Size = new System.Drawing.Size(290, 80);
             this.lblGymName.Text = "GLORY";
             this.lblGymName.Font = new System.Drawing.Font("Segoe UI", 34F, System.Drawing.FontStyle.Bold);
-            this.lblGymName.ForeColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.lblGymName.ForeColor = System.Drawing.Color.FromArgb(17, 24, 39);
             this.lblGymName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
             // lblWelcome
@@ -202,10 +202,11 @@ namespace gym_mangment_system
 
             // btnLogin
             this.btnLogin.Text = "تسجيل الدخول  [->";
-            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.FlatAppearance.BorderSize = 0;
+            this.btnLogin.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(67, 45, 212);
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnLogin.Size = new System.Drawing.Size(400, 50);
             this.btnLogin.Location = new System.Drawing.Point(70, 385);

@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class DashboardForm
     {
@@ -129,7 +129,7 @@ namespace gym_mangment_system
 
             this.lblLogo.Dock      = System.Windows.Forms.DockStyle.Fill;
             this.lblLogo.Font      = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
-            this.lblLogo.ForeColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.lblLogo.ForeColor = System.Drawing.Color.FromArgb(17, 24, 39);
             this.lblLogo.Name      = "lblLogo";
             this.lblLogo.Size      = new System.Drawing.Size(250, 100);
             this.lblLogo.TabIndex  = 0;
@@ -267,7 +267,7 @@ namespace gym_mangment_system
             this.lblStatusLeft.AutoSize  = true;
             this.lblStatusLeft.Dock      = System.Windows.Forms.DockStyle.Left;
             this.lblStatusLeft.Font      = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblStatusLeft.ForeColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.lblStatusLeft.ForeColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.lblStatusLeft.Name      = "lblStatusLeft";
             this.lblStatusLeft.Padding   = new System.Windows.Forms.Padding(10, 7, 0, 0);
             this.lblStatusLeft.TabIndex  = 0;

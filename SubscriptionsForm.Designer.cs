@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class SubscriptionsForm
     {
@@ -140,7 +140,7 @@ namespace gym_mangment_system
             // 
             // btnDeleteSubscription
             // 
-            this.btnDeleteSubscription.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.btnDeleteSubscription.BackColor = System.Drawing.Color.FromArgb(231, 0, 11);
             this.btnDeleteSubscription.FlatAppearance.BorderSize = 0;
             this.btnDeleteSubscription.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteSubscription.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
@@ -168,7 +168,7 @@ namespace gym_mangment_system
             // 
             // btnSaveSubscription
             // 
-            this.btnSaveSubscription.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.btnSaveSubscription.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnSaveSubscription.FlatAppearance.BorderSize = 0;
             this.btnSaveSubscription.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveSubscription.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);

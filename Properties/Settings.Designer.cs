@@ -19,7 +19,7 @@ namespace gym_mangment_system.Properties
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UseLightTheme
         {
             get => (bool)(this["UseLightTheme"]);

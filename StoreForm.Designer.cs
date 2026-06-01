@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class StoreForm
     {
@@ -108,7 +108,7 @@ namespace gym_mangment_system
             this.flowProducts.Padding    = new System.Windows.Forms.Padding(5);
             this.flowProducts.TabIndex   = 2;
 
-            this.btnAddNewItem.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.btnAddNewItem.BackColor = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnAddNewItem.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnAddNewItem.Dock      = System.Windows.Forms.DockStyle.Bottom;
             this.btnAddNewItem.FlatAppearance.BorderSize = 0;
@@ -177,7 +177,7 @@ namespace gym_mangment_system
             this.btnClearCart.Text      = "مسح السلة";
             this.btnClearCart.UseVisualStyleBackColor = false;
 
-            this.btnCheckout.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.btnCheckout.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnCheckout.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnCheckout.FlatAppearance.BorderSize = 0;
             this.btnCheckout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -192,7 +192,7 @@ namespace gym_mangment_system
 
             this.lblTotalValue.Dock      = System.Windows.Forms.DockStyle.Top;
             this.lblTotalValue.Font      = new System.Drawing.Font("Segoe UI", 26F, System.Drawing.FontStyle.Bold);
-            this.lblTotalValue.ForeColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.lblTotalValue.ForeColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.lblTotalValue.Location  = new System.Drawing.Point(0, 25);
             this.lblTotalValue.Name      = "lblTotalValue";
             this.lblTotalValue.Size      = new System.Drawing.Size(336, 50);
@@ -389,7 +389,7 @@ namespace gym_mangment_system
             this.btnBrowseImage.UseVisualStyleBackColor = false;
 
             // Buttons
-            this.btnConfirmAdd.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.btnConfirmAdd.BackColor = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnConfirmAdd.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnConfirmAdd.FlatAppearance.BorderSize = 0;
             this.btnConfirmAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

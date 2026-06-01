@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class MembersForm
     {
@@ -118,7 +118,7 @@ namespace gym_mangment_system
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddMember.BackColor  = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.btnAddMember.BackColor  = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnAddMember.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnAddMember.FlatAppearance.BorderSize = 0;
             this.btnAddMember.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;
@@ -191,7 +191,7 @@ namespace gym_mangment_system
             this.btnWhatsApp.Text       = "📱 واتساب";
             this.btnWhatsApp.UseVisualStyleBackColor = false;
 
-            this.btnEdit.BackColor  = System.Drawing.Color.FromArgb(33, 150, 243);
+            this.btnEdit.BackColor  = System.Drawing.Color.FromArgb(43, 127, 255);
             this.btnEdit.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnEdit.Dock       = System.Windows.Forms.DockStyle.Left;
             this.btnEdit.FlatAppearance.BorderSize = 0;
@@ -204,7 +204,7 @@ namespace gym_mangment_system
             this.btnEdit.Text       = "✏️ تعديل العضو";
             this.btnEdit.UseVisualStyleBackColor = false;
 
-            this.btnDelete.BackColor  = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.btnDelete.BackColor  = System.Drawing.Color.FromArgb(231, 0, 11);
             this.btnDelete.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnDelete.Dock       = System.Windows.Forms.DockStyle.Left;
             this.btnDelete.FlatAppearance.BorderSize = 0;
@@ -351,7 +351,7 @@ namespace gym_mangment_system
             this.txtFPlanPrice.BackColor   = System.Drawing.Color.FromArgb(30, 30, 38);
             this.txtFPlanPrice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFPlanPrice.Font        = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtFPlanPrice.ForeColor   = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.txtFPlanPrice.ForeColor   = System.Drawing.Color.FromArgb(0, 166, 62);
             this.txtFPlanPrice.Location    = new System.Drawing.Point(235, 320);
             this.txtFPlanPrice.Name        = "txtFPlanPrice";
             this.txtFPlanPrice.ReadOnly    = true;
@@ -370,7 +370,7 @@ namespace gym_mangment_system
             this.txtFPlanMonths.BackColor   = System.Drawing.Color.FromArgb(30, 30, 38);
             this.txtFPlanMonths.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFPlanMonths.Font        = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtFPlanMonths.ForeColor   = System.Drawing.Color.FromArgb(33, 150, 243);
+            this.txtFPlanMonths.ForeColor   = System.Drawing.Color.FromArgb(43, 127, 255);
             this.txtFPlanMonths.Location    = new System.Drawing.Point(35, 320);
             this.txtFPlanMonths.Name        = "txtFPlanMonths";
             this.txtFPlanMonths.ReadOnly    = true;
@@ -378,7 +378,7 @@ namespace gym_mangment_system
             this.txtFPlanMonths.TabIndex    = 12;
 
             // Save / Cancel
-            this.btnFormSave.BackColor  = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.btnFormSave.BackColor  = System.Drawing.Color.FromArgb(0, 166, 62);
             this.btnFormSave.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnFormSave.FlatAppearance.BorderSize = 0;
             this.btnFormSave.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;

@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class TrainersForm
     {
@@ -112,7 +112,7 @@ namespace gym_mangment_system
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddTrainer.BackColor  = System.Drawing.Color.FromArgb(156, 39, 176);
+            this.btnAddTrainer.BackColor  = System.Drawing.Color.FromArgb(79, 57, 246);
             this.btnAddTrainer.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnAddTrainer.FlatAppearance.BorderSize = 0;
             this.btnAddTrainer.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;
@@ -169,7 +169,7 @@ namespace gym_mangment_system
             this.pnlActions.Size     = new System.Drawing.Size(950, 55);
             this.pnlActions.TabIndex = 3;
 
-            this.btnEdit.BackColor  = System.Drawing.Color.FromArgb(33, 150, 243);
+            this.btnEdit.BackColor  = System.Drawing.Color.FromArgb(43, 127, 255);
             this.btnEdit.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnEdit.Dock       = System.Windows.Forms.DockStyle.Left;
             this.btnEdit.FlatAppearance.BorderSize = 0;
@@ -182,7 +182,7 @@ namespace gym_mangment_system
             this.btnEdit.Text       = "✏️ تعديل المدرب";
             this.btnEdit.UseVisualStyleBackColor = false;
 
-            this.btnDelete.BackColor  = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.btnDelete.BackColor  = System.Drawing.Color.FromArgb(231, 0, 11);
             this.btnDelete.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnDelete.Dock       = System.Windows.Forms.DockStyle.Left;
             this.btnDelete.FlatAppearance.BorderSize = 0;
@@ -289,7 +289,7 @@ namespace gym_mangment_system
             this.dtpFJoinDate.Size    = new System.Drawing.Size(435, 27); this.dtpFJoinDate.TabIndex = 10;
 
             // Save/Cancel
-            this.btnFormSave.BackColor = System.Drawing.Color.FromArgb(76,175,80); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnFormSave.BackColor = System.Drawing.Color.FromArgb(0, 166, 62); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnFormSave.FlatAppearance.BorderSize = 0; this.btnFormSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFormSave.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold); this.btnFormSave.ForeColor = System.Drawing.Color.White;
             this.btnFormSave.Location = new System.Drawing.Point(245, 362); this.btnFormSave.Name = "btnFormSave";

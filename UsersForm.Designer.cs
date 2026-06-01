@@ -1,4 +1,4 @@
-namespace gym_mangment_system
+﻿namespace gym_mangment_system
 {
     partial class UsersForm
     {
@@ -124,9 +124,9 @@ namespace gym_mangment_system
                 b.Size = new System.Drawing.Size(160, 39); b.TabIndex = tab; b.Text = text;
                 b.UseVisualStyleBackColor = false;
             }
-            StyleBtn(this.btnAddUser,    "➕ إضافة مستخدم",  System.Drawing.Color.FromArgb(76,175,80),  0);
-            StyleBtn(this.btnEditUser,   "✏️ تعديل",         System.Drawing.Color.FromArgb(33,150,243), 1);
-            StyleBtn(this.btnDeleteUser, "🗑️ حذف",          System.Drawing.Color.FromArgb(220,53,69),  2);
+            StyleBtn(this.btnAddUser,    "➕ إضافة مستخدم",  System.Drawing.Color.FromArgb(79, 57, 246),  0);
+            StyleBtn(this.btnEditUser,   "✏️ تعديل",         System.Drawing.Color.FromArgb(43, 127, 255), 1);
+            StyleBtn(this.btnDeleteUser, "🗑️ حذف",          System.Drawing.Color.FromArgb(231, 0, 11),  2);
 
             this.lblCount.Dock = System.Windows.Forms.DockStyle.Right;
             this.lblCount.Font = new System.Drawing.Font("Segoe UI", 11F);
@@ -178,7 +178,7 @@ namespace gym_mangment_system
             this.cmbFRole.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.cmbFRole.Size = new System.Drawing.Size(435, 28); this.cmbFRole.TabIndex = 8;
 
-            this.btnFormSave.BackColor = System.Drawing.Color.FromArgb(76,175,80); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnFormSave.BackColor = System.Drawing.Color.FromArgb(0, 166, 62); this.btnFormSave.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnFormSave.FlatAppearance.BorderSize = 0; this.btnFormSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFormSave.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold); this.btnFormSave.ForeColor = System.Drawing.Color.White;
             this.btnFormSave.Location = new System.Drawing.Point(245, 320); this.btnFormSave.Name = "btnFormSave";

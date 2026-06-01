@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -36,6 +37,7 @@ namespace gym_mangment_system
             _activeNavButton = btnNavHome;
             HighlightNavButton(btnNavHome);
             BuildDashboardQuickPanel();
+            BuildWelcomeBanner();
             RefreshDashboardHomeData();
             AddSignOutButton();
             StyleSignOutButton();
@@ -93,6 +95,7 @@ namespace gym_mangment_system
             BackColor = t.FormBackground;
             sidebar.BackColor = t.Sidebar;
             topBar.BackColor = t.TopBar;
+            lblLogo.ForeColor = t.TextPrimary;
             lblDashTitle.ForeColor = t.TextPrimary;
             btnNotifications.BackColor = t.TopBar;
             btnNotifications.ForeColor = t.TextPrimary;
@@ -144,15 +147,24 @@ namespace gym_mangment_system
         // ── branding ──────────────────────────────────────
         private void ApplyBrandImages()
         {
-            float dashOp = ThemeManager.BrandingOpacity(isDashboard: true);
-            float homeOp = ThemeManager.IsLight ? 0.28f : 0.60f;
-            Image bg = ImageAssets.TryLoadToughBackground("dashboard", dashOp);
-            if (bg != null)
+            if (ThemeManager.IsLight)
             {
-                this.BackgroundImage = bg;
-                this.BackgroundImageLayout = ImageLayout.Stretch;
-                pnlDashboardHome.BackgroundImage = ImageAssets.TryLoadToughBackground("dashboard-home", homeOp);
-                pnlDashboardHome.BackgroundImageLayout = ImageLayout.Stretch;
+                // Figma uses a clean light surface — no photographic backdrop.
+                this.BackgroundImage = null;
+                pnlDashboardHome.BackgroundImage = null;
+            }
+            else
+            {
+                float dashOp = ThemeManager.BrandingOpacity(isDashboard: true);
+                float homeOp = 0.60f;
+                Image bg = ImageAssets.TryLoadToughBackground("dashboard", dashOp);
+                if (bg != null)
+                {
+                    this.BackgroundImage = bg;
+                    this.BackgroundImageLayout = ImageLayout.Stretch;
+                    pnlDashboardHome.BackgroundImage = ImageAssets.TryLoadToughBackground("dashboard-home", homeOp);
+                    pnlDashboardHome.BackgroundImageLayout = ImageLayout.Stretch;
+                }
             }
 
             Image logo = ImageAssets.TryLoad(ImageAssets.LogoHeartDumbbell);
@@ -178,56 +190,68 @@ namespace gym_mangment_system
 
             var statSpecs = new (string Icon, string Title, string Value, Color Accent)[]
             {
-                ("👥", "إجمالي الأعضاء",         GymDataStore.Data.Members.Count.ToString("N0"),                    Color.FromArgb(33,  150, 243)),
-                ("✅", "اشتراك مسجّل",           activeSubs.ToString("N0"),                                         Color.FromArgb(76,  175,  80)),
-                ("⚠️", "تنتهي خلال 21 يوماً", GymDataStore.MembersExpiringWithinDays(21).ToString("N0"),        Color.FromArgb(255, 152,   0)),
-                ("💰", "إيرادات الشهر (تقدير)", monthTotal.ToString("N0") + " $",                                  Color.FromArgb(76,  175,  80)),
-                ("🛒", "مبيعات المتجر اليوم",   GymDataStore.StoreSalesToday().ToString("N0") + " $",               Color.FromArgb(156,  39, 176)),
-                ("🏋️", "المدربون",              GymDataStore.Data.Trainers.Count.ToString("N0"),                   Color.FromArgb(33,  150, 243)),
+                ("👥", "إجمالي الأعضاء",         GymDataStore.Data.Members.Count.ToString("N0"),                    Color.FromArgb(43, 127, 255)),
+                ("✅", "اشتراك مسجّل",           activeSubs.ToString("N0"),                                         Color.FromArgb(0, 166, 62)),
+                ("⚠️", "تنتهي خلال 21 يوماً", GymDataStore.MembersExpiringWithinDays(21).ToString("N0"),        Color.FromArgb(255, 105, 0)),
+                ("💰", "إيرادات الشهر (تقدير)", monthTotal.ToString("N0") + " $",                                  Color.FromArgb(0, 166, 62)),
+                ("🛒", "مبيعات المتجر اليوم",   GymDataStore.StoreSalesToday().ToString("N0") + " $",               Color.FromArgb(173, 70, 255)),
+                ("🏋️", "المدربون",              GymDataStore.Data.Trainers.Count.ToString("N0"),                   Color.FromArgb(43, 127, 255)),
             };
 
-            int cardW = 240, cardH = 130;
+            int cardW = 250, cardH = 116;
             foreach (var (icon, title, value, accent) in statSpecs)
             {
                 Panel card = new Panel
                 {
                     Size      = new Size(cardW, cardH),
                     BackColor = t.Card,
-                    Margin    = new Padding(12),
+                    Margin    = new Padding(10),
                     Cursor    = Cursors.Hand
                 };
+                StyleAsRoundedCard(card, t.BorderSubtle, 14);
 
-                Panel strip = new Panel { Size = new Size(5, cardH), BackColor = accent, Dock = DockStyle.Left };
-
+                // Colored rounded icon badge (Figma stat-card style); RTL => left side.
+                int badgeSz = 48;
+                Panel badge = new Panel
+                {
+                    Size      = new Size(badgeSz, badgeSz),
+                    BackColor = accent,
+                    Location  = new Point(18, (cardH - badgeSz) / 2)
+                };
+                badge.Region = new Region(RoundedRect(new Rectangle(0, 0, badgeSz, badgeSz), 12));
                 Label lblIcon = new Label
                 {
                     Text      = icon,
-                    Font      = new Font("Segoe UI Emoji", 24F),
-                    Size      = new Size(60, 60),
-                    Location  = new Point(cardW - 65, (cardH - 60) / 2),
+                    Font      = new Font("Segoe UI Emoji", 18F),
+                    Dock      = DockStyle.Fill,
+                    ForeColor = Color.White,
                     TextAlign = ContentAlignment.MiddleCenter,
+                    BackColor = Color.Transparent
+                };
+                badge.Controls.Add(lblIcon);
+
+                int txtLeft  = badge.Right + 12;
+                int txtWidth = cardW - txtLeft - 18;
+
+                Label lblTitle = new Label
+                {
+                    Text      = title,
+                    Font      = new Font("Segoe UI", 9.5F),
+                    ForeColor = t.TextMuted,
+                    Size      = new Size(txtWidth, 22),
+                    Location  = new Point(txtLeft, 30),
+                    TextAlign = ContentAlignment.MiddleRight,
                     BackColor = Color.Transparent
                 };
 
                 Label lblVal = new Label
                 {
                     Text      = value,
-                    Font      = new Font("Segoe UI", 22F, FontStyle.Bold),
-                    ForeColor = accent,
-                    Size      = new Size(cardW - 80, 55),
-                    Location  = new Point(10, 30),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BackColor = Color.Transparent
-                };
-
-                Label lblTitle = new Label
-                {
-                    Text      = title,
-                    Font      = new Font("Segoe UI", 10F),
-                    ForeColor = t.TextMuted,
-                    Size      = new Size(cardW - 80, 24),
-                    Location  = new Point(10, 86),
-                    TextAlign = ContentAlignment.MiddleLeft,
+                    Font      = new Font("Segoe UI", 20F, FontStyle.Bold),
+                    ForeColor = t.TextPrimary,
+                    Size      = new Size(txtWidth, 40),
+                    Location  = new Point(txtLeft, 52),
+                    TextAlign = ContentAlignment.MiddleRight,
                     BackColor = Color.Transparent
                 };
 
@@ -235,16 +259,15 @@ namespace gym_mangment_system
                 Color normal = t.Card;
                 card.MouseEnter += (s, e) => card.BackColor = hover;
                 card.MouseLeave += (s, e) => card.BackColor = normal;
-                foreach (Control c in new Control[] { lblIcon, lblVal, lblTitle })
+                foreach (Control c in new Control[] { lblTitle, lblVal })
                 {
                     c.MouseEnter += (s, e) => card.BackColor = hover;
                     c.MouseLeave += (s, e) => card.BackColor = normal;
                 }
 
-                card.Controls.Add(strip);
-                card.Controls.Add(lblIcon);
-                card.Controls.Add(lblVal);
+                card.Controls.Add(badge);
                 card.Controls.Add(lblTitle);
+                card.Controls.Add(lblVal);
                 flowStatCards.Controls.Add(card);
             }
 
@@ -448,7 +471,7 @@ namespace gym_mangment_system
             _commercialLabel = new Label
             {
                 AutoSize  = true,
-                ForeColor = Color.FromArgb(255, 193, 7),
+                ForeColor = Color.FromArgb(240, 177, 0),
                 Font      = new Font("Tahoma", 10F, FontStyle.Bold),
                 Text      = CommercialText,
                 BackColor = Color.Transparent,
@@ -529,7 +552,7 @@ namespace gym_mangment_system
             Color normalBg = t.SidebarNav;
             Color activeBg = t.SidebarNavActive;
             Color normalFg = t.TextMuted;
-            Color activeFg = t.TextPrimary;
+            Color activeFg = ThemeManager.IsLight ? FigmaPalette.Primary : t.TextPrimary;
 
             foreach (Control c in sidebar.Controls)
                 if (c is Button b && b != btn)
@@ -574,17 +597,17 @@ namespace gym_mangment_system
         {
             flowNotifications.Controls.Clear();
             foreach (var p in GymDataStore.Data.StoreProducts.Where(x => x.StockQty <= 5).Take(3))
-                AddNotifCard("⚠️", "مخزون منخفض", p.Name + " — المتبقي " + p.StockQty, Color.FromArgb(255, 152, 0));
+                AddNotifCard("⚠️", "مخزون منخفض", p.Name + " — المتبقي " + p.StockQty, Color.FromArgb(255, 105, 0));
 
             int soon = GymDataStore.MembersExpiringWithinDays(14);
             if (soon > 0)
-                AddNotifCard("🔴", "اشتراكات قريبة الانتهاء", soon + " عضو خلال أسبوعين", Color.FromArgb(220, 53, 69));
+                AddNotifCard("🔴", "اشتراكات قريبة الانتهاء", soon + " عضو خلال أسبوعين", Color.FromArgb(231, 0, 11));
 
             foreach (var s in GymDataStore.Data.StoreSales.OrderByDescending(x => x.SoldAt).Take(3))
-                AddNotifCard("💰", "بيع متجر", (s.Summary ?? "").Trim(), Color.FromArgb(76, 175, 80));
+                AddNotifCard("💰", "بيع متجر", (s.Summary ?? "").Trim(), Color.FromArgb(0, 166, 62));
 
             if (flowNotifications.Controls.Count == 0)
-                AddNotifCard("✅", "لا تنبيهات", "كل شيء يبدو جيداً", Color.FromArgb(76, 175, 80));
+                AddNotifCard("✅", "لا تنبيهات", "كل شيء يبدو جيداً", Color.FromArgb(0, 166, 62));
         }
 
         private void AddNotifCard(string icon, string title, string body, Color accent)
@@ -648,6 +671,94 @@ namespace gym_mangment_system
                 if (cat == UnicodeCategory.OtherSymbol || cat == UnicodeCategory.Surrogate) return true;
             }
             return false;
+        }
+
+        // ── Figma purple gradient welcome banner ───────────
+        private Panel _welcomeBanner;
+        private void BuildWelcomeBanner()
+        {
+            if (_welcomeBanner != null) return;
+            _welcomeBanner = new Panel
+            {
+                Dock      = DockStyle.Top,
+                Height    = 104,
+                Padding   = new Padding(28, 20, 28, 0),
+                BackColor = Color.Transparent
+            };
+            _welcomeBanner.Paint += (s, e) =>
+            {
+                var r = _welcomeBanner.ClientRectangle;
+                if (r.Width <= 1 || r.Height <= 1) return;
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                using (var path = RoundedRect(new Rectangle(0, 0, r.Width - 1, r.Height - 1), 16))
+                using (var brush = new LinearGradientBrush(
+                    new Rectangle(0, 0, r.Width, r.Height),
+                    FigmaPalette.GradientStart, FigmaPalette.GradientEnd, LinearGradientMode.Horizontal))
+                {
+                    e.Graphics.FillPath(brush, path);
+                }
+            };
+
+            var sub = new Label
+            {
+                Text      = "نظام إدارة متكامل لصالتك الرياضية — الأعضاء، الاشتراكات، المتجر، المدربون وخطط التغذية.",
+                Dock      = DockStyle.Top,
+                Height    = 26,
+                ForeColor = Color.FromArgb(225, 226, 255),
+                Font      = new Font("Segoe UI", 10F),
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
+            };
+            var title = new Label
+            {
+                Text      = "مرحباً بك في Glory Gym",
+                Dock      = DockStyle.Top,
+                Height    = 38,
+                ForeColor = Color.White,
+                Font      = new Font("Segoe UI", 16F, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
+            };
+
+            _welcomeBanner.Controls.Add(sub);
+            _welcomeBanner.Controls.Add(title);
+            pnlDashboardHome.Controls.Add(_welcomeBanner);
+            _welcomeBanner.BringToFront();
+        }
+
+        // ── rounded card helpers (Figma card look) ─────────
+        internal static GraphicsPath RoundedRect(Rectangle r, int radius)
+        {
+            int d = radius * 2;
+            if (d > r.Width)  d = r.Width;
+            if (d > r.Height) d = r.Height;
+            var path = new GraphicsPath();
+            if (d <= 0) { path.AddRectangle(r); path.CloseFigure(); return path; }
+            path.AddArc(r.X, r.Y, d, d, 180, 90);
+            path.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+            path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
+            path.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
+        internal static void StyleAsRoundedCard(Panel card, Color border, int radius)
+        {
+            void Apply()
+            {
+                if (card.Width <= 1 || card.Height <= 1) return;
+                using (var p = RoundedRect(new Rectangle(0, 0, card.Width - 1, card.Height - 1), radius))
+                    card.Region = new Region(p);
+            }
+            Apply();
+            card.SizeChanged += (s, e) => Apply();
+            card.Paint += (s, e) =>
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                using (var p = RoundedRect(new Rectangle(0, 0, card.Width - 1, card.Height - 1), radius))
+                using (var pen = new Pen(border))
+                    e.Graphics.DrawPath(pen, p);
+            };
         }
 
         private void DashboardForm_Load(object sender, EventArgs e) { }
