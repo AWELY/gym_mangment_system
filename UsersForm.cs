@@ -3,6 +3,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 
 namespace gym_mangment_system
 {
@@ -39,7 +40,7 @@ namespace gym_mangment_system
                 BackColor     = ThemeManager.Current.ContentHost
             };
             Controls.Add(_cardHost);
-            _cardHost.SendToBack();
+            _cardHost.BringToFront();
         }
 
         private void BuildUserCards()
@@ -56,14 +57,13 @@ namespace gym_mangment_system
             _cardHost.ResumeLayout();
         }
 
-        private Panel BuildUserCard(UserDirectoryEntry u, UiColorScheme s)
+        private Guna2Panel BuildUserCard(UserDirectoryEntry u, UiColorScheme s)
         {
             int w = 330, h = 196, pad = 18, innerW = w - pad * 2;
             bool isAdmin = u.Username.Equals("admin", StringComparison.OrdinalIgnoreCase);
             string roleText = u.Role == AppSession.UserRole.Admin ? "مدير" : "موظف استقبال";
 
-            Panel card = new Panel { Size = new Size(w, h), Margin = new Padding(10), BackColor = s.Card };
-            DashboardForm.StyleAsRoundedCard(card, s.BorderSubtle, 14);
+            Guna2Panel card = GunaUi.Card(w, h, s.Card, s.BorderSubtle);
 
             string title = string.IsNullOrWhiteSpace(u.FullName) ? u.Username : u.FullName;
             Label name = new Label { Text = title, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
@@ -72,12 +72,12 @@ namespace gym_mangment_system
             Label pass = new Label { Text = "كلمة المرور: " + u.Password, Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 96), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
             int btnW = (innerW - 10) / 2, btnY = 148, btnH = 34;
-            Button del = TrainersForm.MakeCardButton("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
-            Button edit = TrainersForm.MakeCardButton("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
+            Guna2Button del = GunaUi.Button("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
+            Guna2Button edit = GunaUi.Button("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
             if (isAdmin)
             {
                 del.Enabled = false;
-                del.BackColor = s.SecondaryButton;
+                del.FillColor = s.SecondaryButton;
                 del.ForeColor = s.TextMuted;
             }
             int id = u.Id;

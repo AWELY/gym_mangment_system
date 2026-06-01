@@ -446,7 +446,7 @@ namespace gym_mangment_system
             btnNavReports.Click  += (s, e) => ShowEmbeddedPage(new ReportsForm(),       btnNavReports,  "📊  المالية");
             btnNavTrainers.Click += (s, e) => ShowEmbeddedPage(new TrainersForm(),      btnNavTrainers, "🏋️  إدارة المدربين");
             btnNavUsers.Click    += (s, e) => ShowEmbeddedPage(new UsersForm(),         btnNavUsers,    "👤  إدارة المستخدمين");
-            btnNotifications.Click += (s, e) => ToggleNotifications();
+            btnNotifications.Click += (s, e) => ShowEmbeddedPage(new NotificationsForm(), null, "🔔  الإشعارات");
         }
 
         // ── Role-based nav visibility ───────────────────────────────
@@ -558,8 +558,11 @@ namespace gym_mangment_system
                 if (c is Button b && b != btn)
                 { b.BackColor = normalBg; b.ForeColor = normalFg; }
 
-            btn.BackColor  = activeBg;
-            btn.ForeColor  = activeFg;
+            if (btn != null)
+            {
+                btn.BackColor  = activeBg;
+                btn.ForeColor  = activeFg;
+            }
             _activeNavButton = btn;
         }
 

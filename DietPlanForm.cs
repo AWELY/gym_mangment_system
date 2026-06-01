@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 
 namespace gym_mangment_system
 {
@@ -22,6 +23,14 @@ namespace gym_mangment_system
         private string _currentMemberName  = "";
         private string _currentMemberPhone = "";
 
+        // Figma card layout
+        private FlowLayoutPanel _cardHost;
+        private Panel _root;
+        private Panel _logPanel;
+        private Guna2Button _btnAddPlan;
+        private Guna2Button _btnCancelPlan;
+        private string _editingPlanName = null;
+
         public DietPlanForm()
         {
             InitializeComponent();
@@ -30,6 +39,7 @@ namespace gym_mangment_system
             RefreshPlanCombo();
             SetupPhoneAutoComplete();
             WireEvents();
+            BuildDietLayout();
             ApplyTheme(ThemeManager.Current);
         }
 
@@ -39,23 +49,9 @@ namespace gym_mangment_system
             ForeColor = s.TextPrimary;
             lblTitle.ForeColor = s.TextPrimary;
 
-            pnlLeft.BackColor = s.Panel;
-            lblSearchPhone.ForeColor = s.TextMuted;
-            txtSearchPhone.BackColor = s.InputBackground;
-            txtSearchPhone.ForeColor = s.InputForeground;
-
-            pnlMemberInfo.BackColor = s.PanelElevated;
-            lblFoundName.ForeColor = s.TextPrimary;
-            lblFoundPhone.ForeColor = s.TextMuted;
-
-            lblSectionHistory.ForeColor = s.TextMuted;
-            listHistory.BackColor = s.ListBackground;
-            listHistory.ForeColor = s.ListForeground;
-
-            pnlRight.BackColor = s.Panel;
-            lblRightTitle.ForeColor = s.TextPrimary;
-
-            pnlCreatePlan.BackColor = s.PanelElevated;
+            // overlay editor card
+            pnlCreatePlan.BackColor = s.Card;
+            lblCreateTitle.ForeColor = s.TextPrimary;
             lblPlanName.ForeColor = s.TextMuted;
             lblPlanPdf.ForeColor = s.TextMuted;
             txtPlanName.BackColor = s.InputBackground;
@@ -63,11 +59,155 @@ namespace gym_mangment_system
             txtPlanPdf.BackColor = s.InputBackground;
             txtPlanPdf.ForeColor = s.InputForeground;
 
-            lblSelectPlan.ForeColor = s.TextMuted;
-            cmbSelectPlan.BackColor = s.InputBackground;
-            cmbSelectPlan.ForeColor = s.InputForeground;
-            txtSelectedPlanPdf.BackColor = s.PanelElevated;
-            txtSelectedPlanPdf.ForeColor = Color.FromArgb(43, 127, 255);
+            // log section
+            lblSectionHistory.ForeColor = s.TextMuted;
+            listHistory.BackColor = s.ListBackground;
+            listHistory.ForeColor = s.ListForeground;
+
+            if (_root != null)     _root.BackColor = s.ContentHost;
+            if (_logPanel != null) _logPanel.BackColor = s.ContentHost;
+            if (_btnCancelPlan != null)
+            {
+                _btnCancelPlan.FillColor = s.SecondaryButton;
+                _btnCancelPlan.ForeColor = ThemeManager.IsLight ? s.TextPrimary : Color.White;
+            }
+            if (_cardHost != null)
+            {
+                _cardHost.BackColor = s.ContentHost;
+                BuildPlanCards();
+            }
+        }
+
+        // ── Figma layout: toolbar + plan cards + send log ──
+        private void BuildDietLayout()
+        {
+            pnlLeft.Visible  = false;
+            pnlRight.Visible = false;
+
+            pnlLeft.Controls.Remove(listHistory);
+            pnlLeft.Controls.Remove(lblSectionHistory);
+            pnlRight.Controls.Remove(pnlCreatePlan);
+
+            // overlay editor
+            Controls.Add(pnlCreatePlan);
+            pnlCreatePlan.Dock        = DockStyle.None;
+            pnlCreatePlan.BorderStyle = BorderStyle.None;
+            pnlCreatePlan.Size        = new Size(400, 250);
+            pnlCreatePlan.Visible     = false;
+            btnSavePlan.Size     = new Size(178, 38);
+            btnSavePlan.Location = new Point(210, 200);
+            btnSavePlan.Text     = "💾 حفظ";
+            _btnCancelPlan = GunaUi.Button("إلغاء", ThemeManager.Current.SecondaryButton, new Point(16, 200), new Size(178, 38));
+            _btnCancelPlan.Click += (_, __) => pnlCreatePlan.Visible = false;
+            pnlCreatePlan.Controls.Add(_btnCancelPlan);
+
+            _root = new Panel { Dock = DockStyle.Fill };
+            var tlp = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3 };
+            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 56));
+            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 210));
+
+            var toolbar = new Panel { Dock = DockStyle.Fill };
+            _btnAddPlan = GunaUi.ToolbarButton("➕ إضافة خطة", FigmaPalette.Primary, new Point(18, 9));
+            _btnAddPlan.Click += (_, __) => ShowPlanOverlay(null);
+            toolbar.Controls.Add(_btnAddPlan);
+
+            _cardHost = new FlowLayoutPanel
+            {
+                Dock          = DockStyle.Fill,
+                AutoScroll    = true,
+                FlowDirection = FlowDirection.RightToLeft,
+                WrapContents  = true,
+                Padding       = new Padding(14)
+            };
+
+            _logPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(16, 4, 16, 12) };
+            listHistory.Dock = DockStyle.Fill;
+            listHistory.BorderStyle = BorderStyle.None;
+            lblSectionHistory.Dock = DockStyle.Top;
+            lblSectionHistory.Height = 28;
+            lblSectionHistory.AutoSize = false;
+            lblSectionHistory.Text = "📋  سجل الإرسال";
+            lblSectionHistory.TextAlign = ContentAlignment.MiddleRight;
+            _logPanel.Controls.Add(listHistory);
+            _logPanel.Controls.Add(lblSectionHistory);
+
+            tlp.Controls.Add(toolbar, 0, 0);
+            tlp.Controls.Add(_cardHost, 0, 1);
+            tlp.Controls.Add(_logPanel, 0, 2);
+            _root.Controls.Add(tlp);
+
+            Controls.Add(_root);
+            _root.BringToFront();
+        }
+
+        private void BuildPlanCards()
+        {
+            if (_cardHost == null) return;
+            UiColorScheme s = ThemeManager.Current;
+            _cardHost.SuspendLayout();
+            foreach (Control c in _cardHost.Controls) c.Dispose();
+            _cardHost.Controls.Clear();
+            foreach (var p in _feedingPlans)
+                _cardHost.Controls.Add(BuildPlanCard(p, s));
+            _cardHost.ResumeLayout();
+        }
+
+        private Guna2Panel BuildPlanCard(FeedingPlan p, UiColorScheme s)
+        {
+            int w = 330, h = 188, pad = 18, innerW = w - pad * 2;
+            Guna2Panel card = GunaUi.Card(w, h, s.Card, s.BorderSubtle);
+
+            Label name = new Label { Text = p.Name, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            string pdfText = string.IsNullOrWhiteSpace(p.PdfPath) ? "—" : "📄 " + System.IO.Path.GetFileName(p.PdfPath);
+            Label pdf = new Label { Text = pdfText, Font = new Font("Segoe UI", 9.5F), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 48), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+
+            Guna2Button send = GunaUi.Button("📱  إرسال", FigmaPalette.GreenBtn, new Point(pad, 84), new Size(innerW, 36));
+            int btnW = (innerW - 10) / 2;
+            Guna2Button del = GunaUi.Button("🗑  حذف", FigmaPalette.Red, new Point(pad, 130), new Size(btnW, 34));
+            Guna2Button edit = GunaUi.Button("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, 130), new Size(btnW, 34));
+
+            string nm = p.Name, path = p.PdfPath;
+            send.Click += async (_, __) => await SendPlanAsync(new FeedingPlan { Name = nm, PdfPath = path });
+            edit.Click += (_, __) => ShowPlanOverlay(nm);
+            del.Click  += (_, __) => DeletePlan(nm);
+
+            card.Controls.Add(name); card.Controls.Add(pdf);
+            card.Controls.Add(send); card.Controls.Add(del); card.Controls.Add(edit);
+            return card;
+        }
+
+        private void ShowPlanOverlay(string editName)
+        {
+            _editingPlanName = editName;
+            if (editName == null)
+            {
+                lblCreateTitle.Text = "➕  إنشاء خطة جديدة";
+                txtPlanName.Text = "";
+                txtPlanPdf.Text  = "";
+            }
+            else
+            {
+                var p = _feedingPlans.FirstOrDefault(x => x.Name == editName);
+                lblCreateTitle.Text = "✏️  تعديل الخطة";
+                txtPlanName.Text = p?.Name ?? "";
+                txtPlanPdf.Text  = p?.PdfPath ?? "";
+            }
+            pnlCreatePlan.Location = new Point((ClientSize.Width - pnlCreatePlan.Width) / 2, (ClientSize.Height - pnlCreatePlan.Height) / 2);
+            pnlCreatePlan.Visible = true;
+            pnlCreatePlan.BringToFront();
+            txtPlanName.Focus();
+        }
+
+        private void DeletePlan(string name)
+        {
+            if (MessageBox.Show("حذف خطة التغذية: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                return;
+            GymDataStore.Data.FeedingPlans.RemoveAll(x => x.Name == name);
+            GymDataStore.Save();
+            _feedingPlans.RemoveAll(x => x.Name == name);
+            RefreshPlanCombo();
+            BuildPlanCards();
         }
 
         private void SetupPhoneAutoComplete()
@@ -110,45 +250,8 @@ namespace gym_mangment_system
 
         private void WireEvents()
         {
-            btnSearchPhone.Click              += BtnSearchPhone_Click;
-            txtSearchPhone.KeyDown            += (s, e) => { if (e.KeyCode == Keys.Enter) BtnSearchPhone_Click(s, e); };
-            btnBrowsePlanPdf.Click            += BtnBrowsePlanPdf_Click;
-            btnSavePlan.Click                 += BtnSavePlan_Click;
-            cmbSelectPlan.SelectedIndexChanged += CmbSelectPlan_Changed;
-            btnSendPlan.Click                 += async (s, e) => await BtnSendPlan_ClickAsync(s, e);
-        }
-
-        private void BtnSearchPhone_Click(object sender, EventArgs e)
-        {
-            string phone = txtSearchPhone.Text.Trim();
-            if (string.IsNullOrEmpty(phone))
-            {
-                MessageBox.Show("الرجاء إدخال رقم الهاتف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var found = GymDataStore.Data.Members.FirstOrDefault(m =>
-                !string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phone));
-
-            if (found == null)
-            {
-                lblFoundName.Text  = "❌  لم يُعثر على عضو بهذا الرقم";
-                lblFoundName.ForeColor = Color.FromArgb(231, 0, 11);
-                lblFoundPhone.Text = "";
-                lblFoundPlan.Text  = "";
-                _currentMemberName  = "";
-                _currentMemberPhone = "";
-            }
-            else
-            {
-                _currentMemberName  = found.FullName;
-                _currentMemberPhone = found.Phone;
-
-                lblFoundName.Text  = "👤  " + found.FullName;
-                lblFoundName.ForeColor = Color.White;
-                lblFoundPhone.Text = "📞  " + found.Phone;
-                lblFoundPlan.Text  = "📋  " + found.PlanName;
-            }
+            btnBrowsePlanPdf.Click += BtnBrowsePlanPdf_Click;
+            btnSavePlan.Click      += BtnSavePlan_Click;
         }
 
         private void BtnBrowsePlanPdf_Click(object sender, EventArgs e)
@@ -172,54 +275,56 @@ namespace gym_mangment_system
                 MessageBox.Show("الرجاء إدخال اسم الخطة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (string.IsNullOrEmpty(pdf))
-            {
-                MessageBox.Show("الرجاء اختيار ملف PDF للخطة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
-            if (_feedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ||
-                GymDataStore.Data.FeedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            bool nameTakenByOther =
+                GymDataStore.Data.FeedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && p.Name != _editingPlanName);
+            if (nameTakenByOther)
             {
                 MessageBox.Show("توجد خطة بهذا الاسم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            GymDataStore.Data.FeedingPlans.Add(new FeedingPlanRecord { Name = name, PdfPath = pdf });
-            GymDataStore.Save();
-
-            var newPlan = new FeedingPlan { Name = name, PdfPath = pdf };
-            _feedingPlans.Add(newPlan);
-            RefreshPlanCombo();
-            cmbSelectPlan.SelectedItem = newPlan;
-
-            txtPlanName.Text = "";
-            txtPlanPdf.Text  = "";
-
-            MessageBox.Show("تم حفظ الخطة: " + name, "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void CmbSelectPlan_Changed(object sender, EventArgs e)
-        {
-            if (cmbSelectPlan.SelectedItem is FeedingPlan plan)
-                txtSelectedPlanPdf.Text = plan.PdfPath;
+            if (_editingPlanName == null)
+            {
+                GymDataStore.Data.FeedingPlans.Add(new FeedingPlanRecord { Name = name, PdfPath = pdf });
+                _feedingPlans.Add(new FeedingPlan { Name = name, PdfPath = pdf });
+            }
             else
-                txtSelectedPlanPdf.Text = "";
+            {
+                var rec = GymDataStore.Data.FeedingPlans.FirstOrDefault(p => p.Name == _editingPlanName);
+                if (rec != null) { rec.Name = name; rec.PdfPath = pdf; }
+                var local = _feedingPlans.FirstOrDefault(p => p.Name == _editingPlanName);
+                if (local != null) { local.Name = name; local.PdfPath = pdf; }
+            }
+
+            GymDataStore.Save();
+            RefreshPlanCombo();
+            BuildPlanCards();
+            pnlCreatePlan.Visible = false;
         }
 
-        private async Task BtnSendPlan_ClickAsync(object sender, EventArgs e)
+        private async Task SendPlanAsync(FeedingPlan plan)
         {
-            if (string.IsNullOrEmpty(_currentMemberName))
+            string phone = Microsoft.VisualBasic.Interaction.InputBox(
+                "أدخل رقم هاتف العضو لإرسال خطة: " + plan.Name, "إرسال الخطة", "");
+            if (string.IsNullOrWhiteSpace(phone)) return;
+
+            var found = GymDataStore.Data.Members.FirstOrDefault(m =>
+                !string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phone.Trim()));
+            if (found == null)
             {
-                MessageBox.Show("الرجاء البحث عن عضو أولاً برقم الهاتف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("لم يُعثر على عضو بهذا الرقم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (!(cmbSelectPlan.SelectedItem is FeedingPlan plan))
-            {
-                MessageBox.Show("الرجاء اختيار خطة تغذية", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            _currentMemberName  = found.FullName;
+            _currentMemberPhone = found.Phone;
+            await SendCoreAsync(plan);
+        }
+
+        private async Task SendCoreAsync(FeedingPlan plan)
+        {
+            if (string.IsNullOrEmpty(_currentMemberName) || plan == null) return;
 
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
             string logEntry  = $"[{timestamp}]  {_currentMemberName} ({_currentMemberPhone})  ←  {plan.Name}";
@@ -243,12 +348,9 @@ namespace gym_mangment_system
             bool sentAsDocument = !string.IsNullOrWhiteSpace(plan.PdfPath) && File.Exists(plan.PdfPath.Trim());
             QonvoSendResult result;
 
-            string prevBtnText = btnSendPlan.Text;
             try
             {
-                btnSendPlan.Enabled = false;
-                btnSendPlan.Text    = "جاري الإرسال…";
-                Cursor              = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
 
                 using (var client = new QonvoWhatsAppClient())
                 {
@@ -281,9 +383,7 @@ namespace gym_mangment_system
             }
             finally
             {
-                btnSendPlan.Enabled = true;
-                btnSendPlan.Text    = prevBtnText;
-                Cursor              = Cursors.Default;
+                Cursor = Cursors.Default;
             }
 
             if (result.Ok)

@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 
 namespace gym_mangment_system
 {
@@ -11,7 +12,7 @@ namespace gym_mangment_system
         private DataTable _dt;
         private int _editingId = -1;
         private FlowLayoutPanel _cardHost;
-        private Button _btnAddPlan;
+        private Guna2Button _btnAddPlan;
         private Label _lblEditorTitle;
 
         public SubscriptionsForm()
@@ -49,21 +50,9 @@ namespace gym_mangment_system
                 BackColor     = ThemeManager.Current.ContentHost
             };
             Controls.Add(_cardHost);
-            _cardHost.SendToBack();
+            _cardHost.BringToFront();
 
-            _btnAddPlan = new Button
-            {
-                Text      = "➕ إضافة خطة",
-                BackColor = FigmaPalette.Primary,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Font      = new Font("Segoe UI", 11F, FontStyle.Bold),
-                Size      = new Size(160, 38),
-                Location  = new Point(30, 26),
-                Cursor    = Cursors.Hand,
-                UseVisualStyleBackColor = false
-            };
-            _btnAddPlan.FlatAppearance.BorderSize = 0;
+            _btnAddPlan = GunaUi.ToolbarButton("➕ إضافة خطة", FigmaPalette.Primary, new Point(30, 26));
             _btnAddPlan.Click += (_, __) => ShowEditorOverlay(isNew: true);
             Controls.Add(_btnAddPlan);
             _btnAddPlan.BringToFront();
@@ -135,19 +124,18 @@ namespace gym_mangment_system
             _cardHost.ResumeLayout();
         }
 
-        private Panel BuildPlanCard(SubscriptionPlan plan, UiColorScheme s)
+        private Guna2Panel BuildPlanCard(SubscriptionPlan plan, UiColorScheme s)
         {
             int w = 320, h = 180, pad = 18, innerW = w - pad * 2;
-            Panel card = new Panel { Size = new Size(w, h), Margin = new Padding(10), BackColor = s.Card };
-            DashboardForm.StyleAsRoundedCard(card, s.BorderSubtle, 14);
+            Guna2Panel card = GunaUi.Card(w, h, s.Card, s.BorderSubtle);
 
             Label name = new Label { Text = plan.Name, Font = new Font("Segoe UI", 14F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 30), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label price = new Label { Text = plan.Price.ToString("0") + " ريال", Font = new Font("Segoe UI", 17F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 50), Size = new Size(innerW, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label dur = new Label { Text = "المدة: " + BuildDurationLabel(plan.DurationValue, plan.DurationUnit), Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 86), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
             int btnW = (innerW - 10) / 2, btnY = 126, btnH = 36;
-            Button del = TrainersForm.MakeCardButton("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
-            Button edit = TrainersForm.MakeCardButton("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
+            Guna2Button del = GunaUi.Button("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
+            Guna2Button edit = GunaUi.Button("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
             int id = plan.Id;
             string nm = plan.Name;
             del.Click += (_, __) => DeletePlan(id, nm);

@@ -3,6 +3,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 
 namespace gym_mangment_system
 {
@@ -51,7 +52,7 @@ namespace gym_mangment_system
                 BackColor     = ThemeManager.Current.ContentHost
             };
             Controls.Add(_cardHost);
-            _cardHost.SendToBack();
+            _cardHost.BringToFront();
 
             _lblSubtitle = new Label
             {
@@ -80,11 +81,10 @@ namespace gym_mangment_system
             _cardHost.ResumeLayout();
         }
 
-        private Panel BuildTrainerCard(TrainerRecord t, UiColorScheme s)
+        private Guna2Panel BuildTrainerCard(TrainerRecord t, UiColorScheme s)
         {
             int w = 330, h = 200, pad = 18, innerW = w - pad * 2;
-            Panel card = new Panel { Size = new Size(w, h), Margin = new Padding(10), BackColor = s.Card };
-            DashboardForm.StyleAsRoundedCard(card, s.BorderSubtle, 14);
+            Guna2Panel card = GunaUi.Card(w, h, s.Card, s.BorderSubtle);
 
             Label name = new Label { Text = t.Name, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label phone = new Label { Text = (t.Phone ?? "") + "  📞", Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 46), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
@@ -93,8 +93,8 @@ namespace gym_mangment_system
             Label join = new Label { Text = "تاريخ الانضمام: " + (t.JoinDate ?? ""), Font = new Font("Segoe UI", 9.5F), ForeColor = s.TextMuted, Location = new Point(pad, 126), Size = new Size(innerW, 20), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
             int btnW = (innerW - 10) / 2, btnY = 154, btnH = 34;
-            Button del = MakeCardButton("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
-            Button edit = MakeCardButton("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
+            Guna2Button del = GunaUi.Button("🗑  حذف", FigmaPalette.Red, new Point(pad, btnY), new Size(btnW, btnH));
+            Guna2Button edit = GunaUi.Button("✎  تعديل", FigmaPalette.BlueBtn, new Point(pad + btnW + 10, btnY), new Size(btnW, btnH));
             int id = t.Id;
             del.Click += (_, __) => DeleteTrainer(id, t.Name);
             edit.Click += (_, __) => LoadTrainerIntoForm(id);
@@ -102,18 +102,6 @@ namespace gym_mangment_system
             card.Controls.Add(name); card.Controls.Add(phone); card.Controls.Add(spec);
             card.Controls.Add(salary); card.Controls.Add(join); card.Controls.Add(del); card.Controls.Add(edit);
             return card;
-        }
-
-        internal static Button MakeCardButton(string text, Color back, Point loc, Size size)
-        {
-            var b = new Button
-            {
-                Text = text, BackColor = back, ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Location = loc, Size = size, Cursor = Cursors.Hand, UseVisualStyleBackColor = false
-            };
-            b.FlatAppearance.BorderSize = 0;
-            return b;
         }
 
         private void DeleteTrainer(int id, string name)
