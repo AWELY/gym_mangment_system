@@ -48,7 +48,7 @@ namespace gym_mangment_system
         /// purple→pink gradient to match the Figma design. The <paramref name="fill"/>
         /// argument is kept for call-site compatibility but the brand gradient is used.
         /// </summary>
-        internal static Guna2Button ToolbarButton(string text, Color fill, Point location)
+        internal static Guna2GradientButton ToolbarButton(string text, Color fill, Point location)
         {
             return new Guna2GradientButton
             {
@@ -64,20 +64,13 @@ namespace gym_mangment_system
             };
         }
 
-        /// <summary>Turn an existing Guna2 button into the brand purple→pink gradient style.</summary>
-        internal static void ApplyBrandGradient(Guna2Button btn)
+        /// <summary>Apply the brand purple→pink gradient to a gradient button.</summary>
+        internal static void ApplyBrandGradient(Guna2GradientButton btn)
         {
             if (btn == null) return;
-            if (btn is Guna2GradientButton gb)
-            {
-                gb.FillColor  = FigmaPalette.GradientStart;
-                gb.FillColor2 = FigmaPalette.GradientEnd;
-            }
-            else
-            {
-                btn.FillColor = FigmaPalette.Primary;
-            }
-            btn.ForeColor = Color.White;
+            btn.FillColor  = FigmaPalette.GradientStart;
+            btn.FillColor2 = FigmaPalette.GradientEnd;
+            btn.ForeColor  = Color.White;
             if (btn.BorderRadius < 10) btn.BorderRadius = 12;
         }
     }

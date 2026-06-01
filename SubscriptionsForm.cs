@@ -12,7 +12,7 @@ namespace gym_mangment_system
         private DataTable _dt;
         private int _editingId = -1;
         private FlowLayoutPanel _cardHost;
-        private Guna2Button _btnAddPlan;
+        private Guna2GradientButton _btnAddPlan;
         private Label _lblEditorTitle;
         private Panel _rootPanel;
 

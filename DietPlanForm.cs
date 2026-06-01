@@ -26,7 +26,7 @@ namespace gym_mangment_system
         // Figma card layout
         private FlowLayoutPanel _cardHost;
         private Panel _root;
-        private Guna2Button _btnAddPlan;
+        private Guna2GradientButton _btnAddPlan;
         private Guna2Button _btnCancelPlan;
         private string _editingPlanName = null;
 
