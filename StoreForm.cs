@@ -336,7 +336,7 @@ namespace gym_mangment_system
                 Panel row = new Panel { Size = new Size(320, 55), BackColor = s.Panel, Margin = new Padding(2, 3, 2, 3) };
 
                 Label lblN = new Label { Text = item.Name, Font = new Font("Segoe UI", 11F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(165, 5), Size = new Size(150, 22), TextAlign = ContentAlignment.MiddleRight };
-                Label lblD = new Label { Text = item.Qty + " × " + item.Price.ToString("0.00") + " ريال = " + line.ToString("0.00") + " ريال", Font = new Font("Segoe UI", 9F), ForeColor = Color.FromArgb(0, 166, 62), Location = new Point(100, 30), Size = new Size(215, 18), TextAlign = ContentAlignment.MiddleRight };
+                Label lblD = new Label { Text = item.Qty + " × " + item.Price.ToString("0.00") + " د.ل = " + line.ToString("0.00") + " د.ل", Font = new Font("Segoe UI", 9F), ForeColor = Color.FromArgb(0, 166, 62), Location = new Point(100, 30), Size = new Size(215, 18), TextAlign = ContentAlignment.MiddleRight };
 
                 Button btnRm = new Button { Text = "✕", Font = new Font("Segoe UI", 10F, FontStyle.Bold), ForeColor = Color.FromArgb(231, 0, 11), BackColor = s.Panel, FlatStyle = FlatStyle.Flat, Size = new Size(30, 30), Location = new Point(8, 12), Cursor = Cursors.Hand, Tag = item };
                 btnRm.FlatAppearance.BorderSize = 0;

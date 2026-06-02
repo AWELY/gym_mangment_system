@@ -300,7 +300,7 @@ namespace gym_mangment_system
 
         private static string FormatMoney(decimal value)
         {
-            return value.ToString("N0") + " ريال";
+            return value.ToString("N0") + " د.ل";
         }
     }
 }
