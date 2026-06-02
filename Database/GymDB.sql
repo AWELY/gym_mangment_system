@@ -127,11 +127,11 @@ BEGIN
     CREATE TABLE dbo.StoreSaleItems
     (
         SaleId      INT           NOT NULL,
-        LineNo      INT           NOT NULL,
+        [LineNo]    INT           NOT NULL,
         ProductName NVARCHAR(200) NULL,
         Price       DECIMAL(18,2) NOT NULL CONSTRAINT DF_SaleItems_Price DEFAULT(0),
         Qty         INT           NOT NULL CONSTRAINT DF_SaleItems_Qty   DEFAULT(0),
-        CONSTRAINT PK_StoreSaleItems PRIMARY KEY (SaleId, LineNo),
+        CONSTRAINT PK_StoreSaleItems PRIMARY KEY (SaleId, [LineNo]),
         CONSTRAINT FK_SaleItems_Sale FOREIGN KEY (SaleId)
             REFERENCES dbo.StoreSales (SaleId) ON DELETE CASCADE
     );
@@ -522,9 +522,9 @@ CREATE PROCEDURE dbo.usp_StoreSaleItems_SelectAll
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT SaleId, LineNo, ProductName, Price, Qty
+    SELECT SaleId, [LineNo], ProductName, Price, Qty
     FROM   dbo.StoreSaleItems
-    ORDER BY SaleId, LineNo;
+    ORDER BY SaleId, [LineNo];
 END
 GO
 
@@ -535,7 +535,7 @@ CREATE PROCEDURE dbo.usp_StoreSaleItems_Insert
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.StoreSaleItems (SaleId, LineNo, ProductName, Price, Qty)
+    INSERT INTO dbo.StoreSaleItems (SaleId, [LineNo], ProductName, Price, Qty)
     VALUES (@SaleId, @LineNo, @ProductName, @Price, @Qty);
 END
 GO
