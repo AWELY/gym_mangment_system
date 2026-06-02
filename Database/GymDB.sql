@@ -72,11 +72,32 @@ BEGIN
         FullName     NVARCHAR(150) NULL,
         Phone        NVARCHAR(40)  NULL,
         Gender       NVARCHAR(20)  NULL,
-        PlanName     NVARCHAR(150) NULL,
+        PlanId       INT           NULL,                 -- FK -> SubscriptionPlans(PlanId)
+        PlanName     NVARCHAR(150) NULL,                 -- cached plan label for display
         PriceText    NVARCHAR(60)  NULL,
         DurationText NVARCHAR(60)  NULL,
-        JoinDate     DATE          NULL
+        JoinDate     DATE          NULL,
+        CONSTRAINT FK_Members_Plan FOREIGN KEY (PlanId)
+            REFERENCES dbo.SubscriptionPlans (PlanId) ON DELETE SET NULL
     );
+END
+GO
+
+/* Upgrade existing databases: add the Members.PlanId column + FK if missing. */
+IF COL_LENGTH(N'dbo.Members', N'PlanId') IS NULL
+    ALTER TABLE dbo.Members ADD PlanId INT NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Members_Plan')
+BEGIN
+    -- Backfill PlanId from the matching plan name before enforcing the FK.
+    UPDATE m
+    SET    m.PlanId = p.PlanId
+    FROM   dbo.Members m
+    JOIN   dbo.SubscriptionPlans p ON p.[Name] = m.PlanName
+    WHERE  m.PlanId IS NULL;
+
+    ALTER TABLE dbo.Members WITH CHECK ADD CONSTRAINT FK_Members_Plan
+        FOREIGN KEY (PlanId) REFERENCES dbo.SubscriptionPlans (PlanId) ON DELETE SET NULL;
 END
 GO
 
@@ -128,13 +149,34 @@ BEGIN
     (
         SaleId      INT           NOT NULL,
         [LineNo]    INT           NOT NULL,
-        ProductName NVARCHAR(200) NULL,
+        ProductId   INT           NULL,                 -- FK -> StoreProducts(ProductId)
+        ProductName NVARCHAR(200) NULL,                 -- cached product label for receipt history
         Price       DECIMAL(18,2) NOT NULL CONSTRAINT DF_SaleItems_Price DEFAULT(0),
         Qty         INT           NOT NULL CONSTRAINT DF_SaleItems_Qty   DEFAULT(0),
         CONSTRAINT PK_StoreSaleItems PRIMARY KEY (SaleId, [LineNo]),
         CONSTRAINT FK_SaleItems_Sale FOREIGN KEY (SaleId)
-            REFERENCES dbo.StoreSales (SaleId) ON DELETE CASCADE
+            REFERENCES dbo.StoreSales (SaleId) ON DELETE CASCADE,
+        CONSTRAINT FK_SaleItems_Product FOREIGN KEY (ProductId)
+            REFERENCES dbo.StoreProducts (ProductId) ON DELETE SET NULL
     );
+END
+GO
+
+/* Upgrade existing databases: add the StoreSaleItems.ProductId column + FK if missing. */
+IF COL_LENGTH(N'dbo.StoreSaleItems', N'ProductId') IS NULL
+    ALTER TABLE dbo.StoreSaleItems ADD ProductId INT NULL;
+GO
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_SaleItems_Product')
+BEGIN
+    -- Backfill ProductId from the matching product name before enforcing the FK.
+    UPDATE i
+    SET    i.ProductId = p.ProductId
+    FROM   dbo.StoreSaleItems i
+    JOIN   dbo.StoreProducts p ON p.[Name] = i.ProductName
+    WHERE  i.ProductId IS NULL;
+
+    ALTER TABLE dbo.StoreSaleItems WITH CHECK ADD CONSTRAINT FK_SaleItems_Product
+        FOREIGN KEY (ProductId) REFERENCES dbo.StoreProducts (ProductId) ON DELETE SET NULL;
 END
 GO
 
@@ -191,7 +233,7 @@ AS
             p.DurationValue,
             p.DurationUnit
     FROM    dbo.Members m
-    LEFT JOIN dbo.SubscriptionPlans p ON p.[Name] = m.PlanName;
+    LEFT JOIN dbo.SubscriptionPlans p ON p.PlanId = m.PlanId;
 GO
 
 IF OBJECT_ID(N'dbo.vw_MonthlyStoreRevenue', N'V') IS NOT NULL DROP VIEW dbo.vw_MonthlyStoreRevenue;
@@ -344,7 +386,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SELECT MemberId, FullName, Phone, Gender, PlanName, PriceText, DurationText,
-           CONVERT(VARCHAR(10), JoinDate, 23) AS JoinDate
+           CONVERT(VARCHAR(10), JoinDate, 23) AS JoinDate, PlanId
     FROM   dbo.Members
     ORDER BY MemberId;
 END
@@ -354,12 +396,13 @@ IF OBJECT_ID(N'dbo.usp_Members_Insert', N'P') IS NOT NULL DROP PROCEDURE dbo.usp
 GO
 CREATE PROCEDURE dbo.usp_Members_Insert
     @MemberId INT, @FullName NVARCHAR(150), @Phone NVARCHAR(40), @Gender NVARCHAR(20),
-    @PlanName NVARCHAR(150), @PriceText NVARCHAR(60), @DurationText NVARCHAR(60), @JoinDate DATE
+    @PlanName NVARCHAR(150), @PriceText NVARCHAR(60), @DurationText NVARCHAR(60), @JoinDate DATE,
+    @PlanId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Members (MemberId, FullName, Phone, Gender, PlanName, PriceText, DurationText, JoinDate)
-    VALUES (@MemberId, @FullName, @Phone, @Gender, @PlanName, @PriceText, @DurationText, @JoinDate);
+    INSERT INTO dbo.Members (MemberId, FullName, Phone, Gender, PlanId, PlanName, PriceText, DurationText, JoinDate)
+    VALUES (@MemberId, @FullName, @Phone, @Gender, @PlanId, @PlanName, @PriceText, @DurationText, @JoinDate);
 END
 GO
 
@@ -367,12 +410,13 @@ IF OBJECT_ID(N'dbo.usp_Members_Update', N'P') IS NOT NULL DROP PROCEDURE dbo.usp
 GO
 CREATE PROCEDURE dbo.usp_Members_Update
     @MemberId INT, @FullName NVARCHAR(150), @Phone NVARCHAR(40), @Gender NVARCHAR(20),
-    @PlanName NVARCHAR(150), @PriceText NVARCHAR(60), @DurationText NVARCHAR(60), @JoinDate DATE
+    @PlanName NVARCHAR(150), @PriceText NVARCHAR(60), @DurationText NVARCHAR(60), @JoinDate DATE,
+    @PlanId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE dbo.Members
-    SET FullName = @FullName, Phone = @Phone, Gender = @Gender, PlanName = @PlanName,
+    SET FullName = @FullName, Phone = @Phone, Gender = @Gender, PlanId = @PlanId, PlanName = @PlanName,
         PriceText = @PriceText, DurationText = @DurationText, JoinDate = @JoinDate
     WHERE MemberId = @MemberId;
 END
@@ -522,7 +566,7 @@ CREATE PROCEDURE dbo.usp_StoreSaleItems_SelectAll
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT SaleId, [LineNo], ProductName, Price, Qty
+    SELECT SaleId, [LineNo], ProductName, Price, Qty, ProductId
     FROM   dbo.StoreSaleItems
     ORDER BY SaleId, [LineNo];
 END
@@ -531,12 +575,13 @@ GO
 IF OBJECT_ID(N'dbo.usp_StoreSaleItems_Insert', N'P') IS NOT NULL DROP PROCEDURE dbo.usp_StoreSaleItems_Insert;
 GO
 CREATE PROCEDURE dbo.usp_StoreSaleItems_Insert
-    @SaleId INT, @LineNo INT, @ProductName NVARCHAR(200), @Price DECIMAL(18,2), @Qty INT
+    @SaleId INT, @LineNo INT, @ProductName NVARCHAR(200), @Price DECIMAL(18,2), @Qty INT,
+    @ProductId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.StoreSaleItems (SaleId, [LineNo], ProductName, Price, Qty)
-    VALUES (@SaleId, @LineNo, @ProductName, @Price, @Qty);
+    INSERT INTO dbo.StoreSaleItems (SaleId, [LineNo], ProductId, ProductName, Price, Qty)
+    VALUES (@SaleId, @LineNo, @ProductId, @ProductName, @Price, @Qty);
 END
 GO
 
@@ -620,13 +665,15 @@ CREATE PROCEDURE dbo.usp_ClearAllData
 AS
 BEGIN
     SET NOCOUNT ON;
+    -- Delete referencing (child) rows before the tables they point at, so the
+    -- foreign keys (Members -> SubscriptionPlans, StoreSaleItems -> StoreProducts/StoreSales) hold.
     DELETE FROM dbo.StoreSaleItems;
     DELETE FROM dbo.StoreSales;
     DELETE FROM dbo.SubscriptionPlanFeatures;
-    DELETE FROM dbo.SubscriptionPlans;
     DELETE FROM dbo.Members;
-    DELETE FROM dbo.Trainers;
+    DELETE FROM dbo.SubscriptionPlans;
     DELETE FROM dbo.StoreProducts;
+    DELETE FROM dbo.Trainers;
     DELETE FROM dbo.FeedingPlans;
     DELETE FROM dbo.DietSendHistory;
     DELETE FROM dbo.Users;
@@ -695,17 +742,17 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Members)
 BEGIN
-    INSERT INTO dbo.Members (MemberId, FullName, Phone, Gender, PlanName, PriceText, DurationText, JoinDate) VALUES
-        (1,  N'أحمد محمد',    N'0501234567', N'ذكر',  N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-01-15'),
-        (2,  N'سارة علي',     N'0559876543', N'أنثى', N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-06-20'),
-        (3,  N'خالد إبراهيم', N'0561112233', N'ذكر',  N'Annual Plan', N'300 ريال', N'1 سنة', '2025-11-01'),
-        (4,  N'نورة حسن',     N'0547778899', N'أنثى', N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-02-10'),
-        (5,  N'عمر فاروق',    N'0533334455', N'ذكر',  N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-09-05'),
-        (6,  N'ليلى أحمد',    N'0522225566', N'أنثى', N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-03-01'),
-        (7,  N'يوسف كمال',    N'0511116677', N'ذكر',  N'Annual Plan', N'300 ريال', N'1 سنة', '2025-08-15'),
-        (8,  N'فاطمة سعيد',   N'0588889900', N'أنثى', N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-04-01'),
-        (9,  N'محمود عادل',   N'0577771122', N'ذكر',  N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-12-20'),
-        (10, N'هند محمود',    N'0566662233', N'أنثى', N'Annual Plan', N'300 ريال', N'1 سنة', '2026-01-05');
+    INSERT INTO dbo.Members (MemberId, FullName, Phone, Gender, PlanId, PlanName, PriceText, DurationText, JoinDate) VALUES
+        (1,  N'أحمد محمد',    N'0501234567', N'ذكر',  1, N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-01-15'),
+        (2,  N'سارة علي',     N'0559876543', N'أنثى', 2, N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-06-20'),
+        (3,  N'خالد إبراهيم', N'0561112233', N'ذكر',  3, N'Annual Plan', N'300 ريال', N'1 سنة', '2025-11-01'),
+        (4,  N'نورة حسن',     N'0547778899', N'أنثى', 1, N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-02-10'),
+        (5,  N'عمر فاروق',    N'0533334455', N'ذكر',  2, N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-09-05'),
+        (6,  N'ليلى أحمد',    N'0522225566', N'أنثى', 1, N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-03-01'),
+        (7,  N'يوسف كمال',    N'0511116677', N'ذكر',  3, N'Annual Plan', N'300 ريال', N'1 سنة', '2025-08-15'),
+        (8,  N'فاطمة سعيد',   N'0588889900', N'أنثى', 1, N'Basic Plan',  N'30 ريال',  N'1 شهر', '2026-04-01'),
+        (9,  N'محمود عادل',   N'0577771122', N'ذكر',  2, N'Pro Plan',    N'50 ريال',  N'3 شهر', '2025-12-20'),
+        (10, N'هند محمود',    N'0566662233', N'أنثى', 3, N'Annual Plan', N'300 ريال', N'1 سنة', '2026-01-05');
 END
 GO
 

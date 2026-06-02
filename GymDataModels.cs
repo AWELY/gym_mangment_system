@@ -9,6 +9,10 @@ namespace gym_mangment_system
         public string FullName { get; set; }
         public string Phone { get; set; }
         public string Gender { get; set; }
+
+        /// <summary>FK to SubscriptionPlans.PlanId (null when no/unknown plan).</summary>
+        public int? PlanId { get; set; }
+
         public string PlanName { get; set; }
         public string PriceText { get; set; }
         public string DurationText { get; set; }
@@ -39,6 +43,9 @@ namespace gym_mangment_system
 
     public sealed class StoreSaleItemRecord
     {
+        /// <summary>FK to StoreProducts.ProductId (null when the product was removed).</summary>
+        public int? ProductId { get; set; }
+
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public int Qty { get; set; }

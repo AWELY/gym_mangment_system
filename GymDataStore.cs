@@ -121,7 +121,8 @@ namespace gym_mangment_system
                             PlanName = AsString(r, 4),
                             PriceText = AsString(r, 5),
                             DurationText = AsString(r, 6),
-                            JoinDate = AsString(r, 7)
+                            JoinDate = AsString(r, 7),
+                            PlanId = AsNullableInt(r, 8)
                         });
 
                 using (var cmd = Db.Proc("dbo.usp_Trainers_SelectAll", conn))
@@ -177,7 +178,8 @@ namespace gym_mangment_system
                             {
                                 ProductName = AsString(r, 2),
                                 Price = r.GetDecimal(3),
-                                Qty = r.GetInt32(4)
+                                Qty = r.GetInt32(4),
+                                ProductId = AsNullableInt(r, 5)
                             });
                     }
 
@@ -253,6 +255,7 @@ namespace gym_mangment_system
                         cmd.AddParam("@PriceText", m.PriceText);
                         cmd.AddParam("@DurationText", m.DurationText);
                         cmd.AddParam("@JoinDate", ToDateParam(m.JoinDate));
+                        cmd.AddParam("@PlanId", ResolvePlanId(s, m.PlanId));
                         cmd.ExecuteNonQuery();
                     }
 
@@ -304,6 +307,7 @@ namespace gym_mangment_system
                             cmd.AddParam("@ProductName", items[i].ProductName);
                             cmd.AddParam("@Price", items[i].Price);
                             cmd.AddParam("@Qty", items[i].Qty);
+                            cmd.AddParam("@ProductId", ResolveProductId(s, items[i].ProductId));
                             cmd.ExecuteNonQuery();
                         }
                 }
@@ -334,6 +338,27 @@ namespace gym_mangment_system
         // ── helpers ────────────────────────────────────────
         private static string AsString(SqlDataReader r, int ordinal)
             => r.IsDBNull(ordinal) ? null : r.GetValue(ordinal).ToString();
+
+        private static int? AsNullableInt(SqlDataReader r, int ordinal)
+            => r.IsDBNull(ordinal) ? (int?)null : r.GetInt32(ordinal);
+
+        /// <summary>Returns the plan id only when it still exists in the snapshot, else DBNull (keeps the FK valid).</summary>
+        private static object ResolvePlanId(GymDataSnapshot s, int? planId)
+        {
+            if (!planId.HasValue) return DBNull.Value;
+            foreach (var p in s.SubscriptionPlans)
+                if (p.Id == planId.Value) return planId.Value;
+            return DBNull.Value;
+        }
+
+        /// <summary>Returns the product id only when it still exists in the snapshot, else DBNull (keeps the FK valid).</summary>
+        private static object ResolveProductId(GymDataSnapshot s, int? productId)
+        {
+            if (!productId.HasValue) return DBNull.Value;
+            foreach (var p in s.StoreProducts)
+                if (p.Id == productId.Value) return productId.Value;
+            return DBNull.Value;
+        }
 
         /// <summary>Converts an app date string ("yyyy-MM-dd") to a DATE param value (DBNull when blank/invalid).</summary>
         private static object ToDateParam(string value)

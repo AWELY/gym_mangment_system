@@ -448,7 +448,16 @@ namespace gym_mangment_system
                 Summary = sb.ToString().Trim()
             };
             foreach (var item in _cart)
-                sale.Items.Add(new StoreSaleItemRecord { ProductName = item.Name, Price = item.Price, Qty = item.Qty });
+            {
+                var prod = FindProductByName(item.Name);
+                sale.Items.Add(new StoreSaleItemRecord
+                {
+                    ProductId   = prod?.Id,
+                    ProductName = item.Name,
+                    Price       = item.Price,
+                    Qty         = item.Qty
+                });
+            }
             GymDataStore.Data.StoreSales.Add(sale);
             GymDataStore.Save();
 

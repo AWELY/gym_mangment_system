@@ -418,6 +418,11 @@ namespace gym_mangment_system
             string duration   = txtFPlanMonths.Text;
             string gender     = cmbFGender.SelectedItem?.ToString() ?? "ذكر";
 
+            // Resolve the real FK (PlanId) from the chosen plan name.
+            int? planId = null;
+            foreach (var p in SubscriptionPlanCatalog.GetPlans())
+                if (p.Name == planName) { planId = p.Id; break; }
+
             if (_isEditing && _editingMemberId > 0)
             {
                 MemberRecord mem = null;
@@ -428,6 +433,7 @@ namespace gym_mangment_system
                     mem.FullName   = txtFName.Text.Trim();
                     mem.Phone      = txtFPhone.Text.Trim();
                     mem.Gender     = gender;
+                    mem.PlanId     = planId;
                     mem.PlanName   = planName;
                     mem.PriceText  = price;
                     mem.DurationText = duration;
@@ -443,6 +449,7 @@ namespace gym_mangment_system
                     FullName      = txtFName.Text.Trim(),
                     Phone         = txtFPhone.Text.Trim(),
                     Gender        = gender,
+                    PlanId        = planId,
                     PlanName      = planName,
                     PriceText     = price,
                     DurationText  = duration,
