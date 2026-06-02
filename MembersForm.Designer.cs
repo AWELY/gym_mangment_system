@@ -14,6 +14,7 @@
         private Guna.UI2.WinForms.Guna2Button btnEdit;
         private Guna.UI2.WinForms.Guna2Button btnWhatsApp;
         private Guna.UI2.WinForms.Guna2Button btnDelete;
+        private Guna.UI2.WinForms.Guna2Button btnPrint;
         private System.Windows.Forms.Label lblMemberCount;
 
         // ── Add/Edit inline panel ──
@@ -53,6 +54,7 @@
             this.btnDelete      = new Guna.UI2.WinForms.Guna2Button();
             this.btnWhatsApp    = new Guna.UI2.WinForms.Guna2Button();
             this.btnEdit        = new Guna.UI2.WinForms.Guna2Button();
+            this.btnPrint       = new Guna.UI2.WinForms.Guna2Button();
 
             this.pnlForm        = new Guna.UI2.WinForms.Guna2Panel();
             this.btnFormCancel  = new Guna.UI2.WinForms.Guna2Button();
@@ -167,6 +169,7 @@
 
             // pnlActions
             this.pnlActions.Controls.Add(this.lblMemberCount);
+            this.pnlActions.Controls.Add(this.btnPrint);
             this.pnlActions.Controls.Add(this.btnDelete);
             this.pnlActions.Controls.Add(this.btnWhatsApp);
             this.pnlActions.Controls.Add(this.btnEdit);
@@ -210,6 +213,18 @@
             this.btnDelete.Size       = new System.Drawing.Size(160, 39);
             this.btnDelete.TabIndex   = 3;
             this.btnDelete.Text       = "🗑️  حذف العضو";
+
+            this.btnPrint.FillColor  = System.Drawing.Color.FromArgb(124, 58, 237);
+            this.btnPrint.Cursor     = System.Windows.Forms.Cursors.Hand;
+            this.btnPrint.Dock       = System.Windows.Forms.DockStyle.Left;
+            this.btnPrint.BorderRadius = 8;
+            this.btnPrint.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.btnPrint.ForeColor  = System.Drawing.Color.White;
+            this.btnPrint.Margin     = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.btnPrint.Name       = "btnPrint";
+            this.btnPrint.Size       = new System.Drawing.Size(170, 39);
+            this.btnPrint.TabIndex   = 6;
+            this.btnPrint.Text       = "🖨️ طباعة الأعضاء";
 
             this.lblMemberCount.Dock      = System.Windows.Forms.DockStyle.Right;
             this.lblMemberCount.Font      = new System.Drawing.Font("Segoe UI", 11F);

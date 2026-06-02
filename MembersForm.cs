@@ -241,6 +241,7 @@ namespace gym_mangment_system
             btnEdit.Click        += BtnEdit_Click;
             btnWhatsApp.Click    += BtnWhatsApp_Click;
             btnDelete.Click      += BtnDelete_Click;
+            btnPrint.Click       += BtnPrint_Click;
             btnFormSave.Click    += BtnFormSave_Click;
             btnFormCancel.Click  += BtnFormCancel_Click;
             txtSearch.TextChanged += TxtSearch_TextChanged;
@@ -377,6 +378,30 @@ namespace gym_mangment_system
 
             string msg = $"مرحباً {name}،\n\nنراسلك من Glory Gym.";
             WhatsAppWeb.OpenChat(phone, msg);
+        }
+
+        // ═══════════════════════════════════════════
+        //  PRINT (Crystal Report: GymMembers.rpt)
+        // ═══════════════════════════════════════════
+        private void BtnPrint_Click(object sender, EventArgs e)
+        {
+            if (_dt.DefaultView.Count == 0)
+            {
+                MessageBox.Show("لا يوجد أعضاء للطباعة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                using (var report = new MembersReportForm())
+                    report.ShowDialog(this);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "تعذر فتح تقرير الأعضاء.\n\nتفاصيل الخطأ:\n" + ex.Message,
+                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         // ═══════════════════════════════════════════

@@ -37,6 +37,7 @@
     <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="CrystalDecisions.ReportSource, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="CrystalDecisions.Shared, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="ReaLTaiizor, Version=3.8.1.8, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ReaLTaiizor.3.8.1.8\lib\net48\ReaLTaiizor.dll</HintPath>
     </Reference>
@@ -147,6 +148,9 @@
     </Compile>
     <Compile Include="MembersForm.Designer.cs">
       <DependentUpon>MembersForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MembersReportForm.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
