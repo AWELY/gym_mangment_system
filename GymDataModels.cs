@@ -37,11 +37,21 @@ namespace gym_mangment_system
         public string PhotoBase64 { get; set; }
     }
 
+    public sealed class StoreSaleItemRecord
+    {
+        public string ProductName { get; set; }
+        public decimal Price { get; set; }
+        public int Qty { get; set; }
+    }
+
     public sealed class StoreSaleRecord
     {
         public string SoldAt { get; set; }
         public decimal Total { get; set; }
         public string Summary { get; set; }
+
+        /// <summary>Normalized line items (one entry per cart line) for this sale.</summary>
+        public List<StoreSaleItemRecord> Items { get; set; } = new List<StoreSaleItemRecord>();
     }
 
     public sealed class FeedingPlanRecord

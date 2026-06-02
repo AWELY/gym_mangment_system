@@ -25,5 +25,23 @@ namespace gym_mangment_system.Properties
             get => (bool)(this["UseLightTheme"]);
             set => this["UseLightTheme"] = value;
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SqlConnectionString
+        {
+            get => (string)(this["SqlConnectionString"]);
+            set => this["SqlConnectionString"] = value;
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BackupFolder
+        {
+            get => (string)(this["BackupFolder"]);
+            set => this["BackupFolder"] = value;
+        }
     }
 }

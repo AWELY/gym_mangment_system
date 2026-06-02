@@ -16,6 +16,7 @@
         private System.Windows.Forms.Button btnNavDiet;
         private System.Windows.Forms.Button btnNavReports;
         private System.Windows.Forms.Button btnNavNotifications;
+        private System.Windows.Forms.Button btnNavSettings;
 
         private System.Windows.Forms.Panel pnlSidebarFooter;
         private System.Windows.Forms.Panel pnlSidebarSeparator;
@@ -39,6 +40,7 @@
             this.pnlSidebarFooter    = new System.Windows.Forms.Panel();
             this.pnlSidebarSeparator = new System.Windows.Forms.Panel();
             this.btnThemeToggle      = new System.Windows.Forms.Button();
+            this.btnNavSettings      = new System.Windows.Forms.Button();
             this.btnNavNotifications = new System.Windows.Forms.Button();
             this.btnNavReports       = new System.Windows.Forms.Button();
             this.btnNavDiet          = new System.Windows.Forms.Button();
@@ -62,6 +64,7 @@
             this.sidebar.BackColor = System.Drawing.Color.White;
             // Add footer (bottom) first, then nav from bottom-most to top, then brand last (topmost).
             this.sidebar.Controls.Add(this.pnlSidebarFooter);
+            this.sidebar.Controls.Add(this.btnNavSettings);
             this.sidebar.Controls.Add(this.btnNavNotifications);
             this.sidebar.Controls.Add(this.btnNavReports);
             this.sidebar.Controls.Add(this.btnNavDiet);
@@ -94,6 +97,7 @@
             SetupNavBtn(this.btnNavDiet,          "🍎   خطط التغذية",     6);
             SetupNavBtn(this.btnNavReports,       "💲   التقارير المالية", 7);
             SetupNavBtn(this.btnNavNotifications,  "🔔   الإشعارات",       8);
+            SetupNavBtn(this.btnNavSettings,      "⚙️   الإعدادات",       9);
 
             // ── sidebar footer (theme toggle + logout, added at runtime) ──
             this.pnlSidebarFooter.BackColor = System.Drawing.Color.White;

@@ -109,8 +109,12 @@
     <Compile Include="IThemeAware.cs" />
     <Compile Include="ThemeManager.cs" />
     <Compile Include="AppSession.cs" />
+    <Compile Include="Database\Db.cs" />
     <Compile Include="GymDataModels.cs" />
     <Compile Include="GymDataStore.cs" />
+    <Compile Include="SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UserDirectory.cs" />
     <Compile Include="WhatsAppWeb.cs" />
     <Compile Include="QonvoWhatsApp.cs" />
@@ -158,6 +162,7 @@
       <DependentUpon>StoreForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Database\GymDB.sql" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

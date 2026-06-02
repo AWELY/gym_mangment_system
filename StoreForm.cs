@@ -424,12 +424,15 @@ namespace gym_mangment_system
             foreach (var item in _cart)
                 sb.Append(item.Name).Append("×").Append(item.Qty).Append("؛ ");
 
-            GymDataStore.Data.StoreSales.Add(new StoreSaleRecord
+            var sale = new StoreSaleRecord
             {
                 SoldAt  = DateTime.Now.ToString("o"),
                 Total   = total,
                 Summary = sb.ToString().Trim()
-            });
+            };
+            foreach (var item in _cart)
+                sale.Items.Add(new StoreSaleItemRecord { ProductName = item.Name, Price = item.Price, Qty = item.Qty });
+            GymDataStore.Data.StoreSales.Add(sale);
             GymDataStore.Save();
 
             MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " ريال\nعدد المنتجات: " + _cart.Count,

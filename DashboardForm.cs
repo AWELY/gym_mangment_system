@@ -36,6 +36,22 @@ namespace gym_mangment_system
 
             this.FormClosing += (s, e) =>
             {
+                // Only prompt on a real application exit (not when signing out).
+                if (!RequestSignOut)
+                {
+                    var answer = MessageBox.Show(
+                        "هل تريد أخذ نسخة احتياطية لقاعدة البيانات قبل الخروج؟",
+                        "إغلاق النظام", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                    if (answer == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    if (answer == DialogResult.Yes)
+                        SettingsForm.BackupInteractive(this);
+                }
+
                 ThemeManager.ThemeChanged -= OnGlobalThemeChanged;
                 GymDataStore.Save();
             };
@@ -197,6 +213,7 @@ namespace gym_mangment_system
             btnNavDiet.Click          += (s, e) => ShowEmbeddedPage(new DietPlanForm(),      btnNavDiet,          "خطط التغذية");
             btnNavReports.Click       += (s, e) => ShowEmbeddedPage(new ReportsForm(),       btnNavReports,       "التقارير المالية");
             btnNavNotifications.Click += (s, e) => ShowEmbeddedPage(new NotificationsForm(), btnNavNotifications, "الإشعارات");
+            btnNavSettings.Click      += (s, e) => ShowEmbeddedPage(new SettingsForm(),      btnNavSettings,      "الإعدادات");
         }
 
         private void ApplyRoleVisibility()
@@ -209,6 +226,7 @@ namespace gym_mangment_system
                 btnNavTrainers.Visible      = false;
                 btnNavUsers.Visible         = false;
                 btnNavNotifications.Visible = false;
+                btnNavSettings.Visible      = false;
                 ShowEmbeddedPage(new MembersForm(), btnNavMembers, "إدارة الأعضاء");
             }
         }

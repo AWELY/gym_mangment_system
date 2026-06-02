@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace gym_mangment_system
 {
     /// <summary>
-    /// Single source of truth: in-memory lists only (session / runtime; no file persistence).
+    /// Single source of truth. The in-memory snapshot is loaded from MSSQL on
+    /// <see cref="Initialize"/> and persisted back on every <see cref="Save"/>.
+    /// Forms keep reading/mutating the snapshot exactly as before.
     /// </summary>
     public static class GymDataStore
     {
@@ -16,93 +21,323 @@ namespace gym_mangment_system
             get
             {
                 if (_data == null)
-                    _data = SeedDefaults();
+                    Initialize();
                 return _data;
             }
         }
 
         public static void Initialize()
         {
-            if (_data == null)
-                _data = SeedDefaults();
+            if (_data != null)
+                return;
+
+            try
+            {
+                _data = LoadFromDatabase();
+            }
+            catch (Exception ex)
+            {
+                _data = GymDataSnapshot.CreateEmpty();
+                MessageBox.Show(
+                    "تعذر الاتصال بقاعدة البيانات. سيتم تشغيل النظام بدون بيانات.\n\n" +
+                    "تأكد من تشغيل SQL Server وتنفيذ سكربت قاعدة البيانات (GymDB.sql)،\n" +
+                    "ويمكنك تعديل سلسلة الاتصال من صفحة الإعدادات.\n\n" +
+                    "تفاصيل الخطأ:\n" + ex.Message,
+                    "خطأ في قاعدة البيانات", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
-        /// <summary>No-op: data is not written to disk. Kept for call sites that used to persist.</summary>
-        public static void Save() { }
+        /// <summary>Persists the whole in-memory snapshot to MSSQL in one transaction.</summary>
+        public static void Save()
+        {
+            if (_data == null)
+                return;
 
-        private static GymDataSnapshot SeedDefaults()
+            try
+            {
+                PersistToDatabase(_data);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "تعذر حفظ البيانات في قاعدة البيانات.\n\nتفاصيل الخطأ:\n" + ex.Message,
+                    "خطأ في الحفظ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ── load ───────────────────────────────────────────
+        private static GymDataSnapshot LoadFromDatabase()
         {
             var s = GymDataSnapshot.CreateEmpty();
 
-            s.SubscriptionPlans.AddRange(new[]
+            using (var conn = Db.GetOpenConnection())
             {
-                new SubscriptionPlan { Id = 1, Name = "Basic Plan", Price = 30.00m, DurationValue = 1, DurationUnit = "شهر",
-                    Features = new List<string> { "دخول غير محدود", "خزانة خاصة" } },
-                new SubscriptionPlan { Id = 2, Name = "Pro Plan", Price = 50.00m, DurationValue = 3, DurationUnit = "شهر",
-                    Features = new List<string> { "دخول غير محدود", "حصص جماعية", "خزانة خاصة", "خصم على المتجر" } },
-                new SubscriptionPlan { Id = 3, Name = "Annual Plan", Price = 300.00m, DurationValue = 1, DurationUnit = "سنة",
-                    Features = new List<string> { "دخول غير محدود", "حصص جماعية", "مدرب شخصي", "غرفة ساونا", "خزانة خاصة", "خصم على المتجر", "خطة تغذية" } }
-            });
+                using (var cmd = Db.Proc("dbo.usp_Users_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.Users.Add(new UserDirectoryEntry
+                        {
+                            Id = r.GetInt32(0),
+                            FullName = AsString(r, 1),
+                            Username = AsString(r, 2),
+                            Password = AsString(r, 3),
+                            Role = (AppSession.UserRole)r.GetInt32(4)
+                        });
 
-            s.Users.Add(new UserDirectoryEntry { Id = 1, FullName = "المدير العام", Username = "admin", Password = "admin", Role = AppSession.UserRole.Admin });
-            s.Users.Add(new UserDirectoryEntry { Id = 2, FullName = "مستلم النظام", Username = "reception", Password = "1234", Role = AppSession.UserRole.Receptionist });
+                using (var cmd = Db.Proc("dbo.usp_SubscriptionPlans_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.SubscriptionPlans.Add(new SubscriptionPlan
+                        {
+                            Id = r.GetInt32(0),
+                            Name = AsString(r, 1),
+                            Price = r.GetDecimal(2),
+                            DurationValue = r.GetInt32(3),
+                            DurationUnit = AsString(r, 4),
+                            Features = new List<string>()
+                        });
 
-            s.Members.AddRange(new[]
-            {
-                new MemberRecord { Id = 1, FullName = "أحمد محمد", Phone = "0501234567", Gender = "ذكر", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-01-15" },
-                new MemberRecord { Id = 2, FullName = "سارة علي", Phone = "0559876543", Gender = "أنثى", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-06-20" },
-                new MemberRecord { Id = 3, FullName = "خالد إبراهيم", Phone = "0561112233", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2025-11-01" },
-                new MemberRecord { Id = 4, FullName = "نورة حسن", Phone = "0547778899", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-02-10" },
-                new MemberRecord { Id = 5, FullName = "عمر فاروق", Phone = "0533334455", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-09-05" },
-                new MemberRecord { Id = 6, FullName = "ليلى أحمد", Phone = "0522225566", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-03-01" },
-                new MemberRecord { Id = 7, FullName = "يوسف كمال", Phone = "0511116677", Gender = "ذكر", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2025-08-15" },
-                new MemberRecord { Id = 8, FullName = "فاطمة سعيد", Phone = "0588889900", Gender = "أنثى", PlanName = "Basic Plan", PriceText = "30 ريال", DurationText = "1 شهر", JoinDate = "2026-04-01" },
-                new MemberRecord { Id = 9, FullName = "محمود عادل", Phone = "0577771122", Gender = "ذكر", PlanName = "Pro Plan", PriceText = "50 ريال", DurationText = "3 شهر", JoinDate = "2025-12-20" },
-                new MemberRecord { Id = 10, FullName = "هند محمود", Phone = "0566662233", Gender = "أنثى", PlanName = "Annual Plan", PriceText = "300 ريال", DurationText = "1 سنة", JoinDate = "2026-01-05" }
-            });
+                using (var cmd = Db.Proc("dbo.usp_PlanFeatures_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                    {
+                        int planId = r.GetInt32(0);
+                        var plan = s.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
+                        if (plan != null)
+                            plan.Features.Add(AsString(r, 2));
+                    }
 
-            s.Trainers.AddRange(new[]
-            {
-                new TrainerRecord { Id = 1, Name = "محمد السالم", Phone = "0501111222", Specialty = "رفع أثقال", Salary = 2500m, JoinDate = "2023-01-10" },
-                new TrainerRecord { Id = 2, Name = "أنس العتيبي", Phone = "0522223333", Specialty = "كروس فيت", Salary = 2200m, JoinDate = "2023-03-15" },
-                new TrainerRecord { Id = 3, Name = "ريم الزهراني", Phone = "0533334444", Specialty = "يوغا ولياقة", Salary = 2000m, JoinDate = "2023-06-01" },
-                new TrainerRecord { Id = 4, Name = "فيصل الحربي", Phone = "0544445555", Specialty = "ملاكمة", Salary = 2800m, JoinDate = "2022-11-20" },
-                new TrainerRecord { Id = 5, Name = "نورا الشمري", Phone = "0555556666", Specialty = "تمارين نسائية", Salary = 1900m, JoinDate = "2024-01-05" }
-            });
+                using (var cmd = Db.Proc("dbo.usp_Members_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.Members.Add(new MemberRecord
+                        {
+                            Id = r.GetInt32(0),
+                            FullName = AsString(r, 1),
+                            Phone = AsString(r, 2),
+                            Gender = AsString(r, 3),
+                            PlanName = AsString(r, 4),
+                            PriceText = AsString(r, 5),
+                            DurationText = AsString(r, 6),
+                            JoinDate = AsString(r, 7)
+                        });
 
-            int pid = 1;
-            void AddP(string name, decimal price, string cat, string emoji, int stock, string expiryIso)
-            {
-                s.StoreProducts.Add(new StoreProductRecord
-                {
-                    Id = pid++, Name = name, Price = price, Category = cat, Emoji = emoji,
-                    StockQty = stock, Expiry = expiryIso, PhotoBase64 = null
-                });
+                using (var cmd = Db.Proc("dbo.usp_Trainers_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.Trainers.Add(new TrainerRecord
+                        {
+                            Id = r.GetInt32(0),
+                            Name = AsString(r, 1),
+                            Phone = AsString(r, 2),
+                            Specialty = AsString(r, 3),
+                            Salary = r.GetDecimal(4),
+                            JoinDate = AsString(r, 5)
+                        });
+
+                using (var cmd = Db.Proc("dbo.usp_StoreProducts_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.StoreProducts.Add(new StoreProductRecord
+                        {
+                            Id = r.GetInt32(0),
+                            Name = AsString(r, 1),
+                            Price = r.GetDecimal(2),
+                            Category = AsString(r, 3),
+                            Emoji = AsString(r, 4),
+                            StockQty = r.GetInt32(5),
+                            Expiry = AsString(r, 6),
+                            PhotoBase64 = AsString(r, 7)
+                        });
+
+                var salesById = new Dictionary<int, StoreSaleRecord>();
+                using (var cmd = Db.Proc("dbo.usp_StoreSales_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                    {
+                        var sale = new StoreSaleRecord
+                        {
+                            SoldAt = AsString(r, 1),
+                            Total = r.GetDecimal(2),
+                            Summary = AsString(r, 3),
+                            Items = new List<StoreSaleItemRecord>()
+                        };
+                        salesById[r.GetInt32(0)] = sale;
+                        s.StoreSales.Add(sale);
+                    }
+
+                using (var cmd = Db.Proc("dbo.usp_StoreSaleItems_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                    {
+                        if (salesById.TryGetValue(r.GetInt32(0), out var sale))
+                            sale.Items.Add(new StoreSaleItemRecord
+                            {
+                                ProductName = AsString(r, 2),
+                                Price = r.GetDecimal(3),
+                                Qty = r.GetInt32(4)
+                            });
+                    }
+
+                using (var cmd = Db.Proc("dbo.usp_FeedingPlans_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.FeedingPlans.Add(new FeedingPlanRecord
+                        {
+                            Name = AsString(r, 1),
+                            PdfPath = AsString(r, 2)
+                        });
+
+                using (var cmd = Db.Proc("dbo.usp_DietSendHistory_SelectAll", conn))
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        s.DietSendHistory.Add(AsString(r, 1));
             }
 
-            AddP("واي بروتين", 50m, "بروتين", "💪", 20, DateTime.Now.AddMonths(8).ToString("yyyy-MM-dd"));
-            AddP("كرياتين مونو", 25m, "كرياتين", "⚡", 15, DateTime.Now.AddMonths(12).ToString("yyyy-MM-dd"));
-            AddP("BCAA أحماض", 30m, "بروتين", "🧬", 10, DateTime.Now.AddMonths(6).ToString("yyyy-MM-dd"));
-            AddP("فيتامين D3", 12m, "فيتامينات", "☀️", 30, DateTime.Now.AddMonths(18).ToString("yyyy-MM-dd"));
-            AddP("أوميغا 3", 18m, "فيتامينات", "🐟", 25, DateTime.Now.AddMonths(10).ToString("yyyy-MM-dd"));
-            AddP("مشروب طاقة", 5m, "مشروبات طاقة", "🥤", 50, DateTime.Now.AddMonths(4).ToString("yyyy-MM-dd"));
-            AddP("حزام رفع أثقال", 35m, "معدات", "🏋️", 8, DateTime.Now.AddYears(3).ToString("yyyy-MM-dd"));
-            AddP("قفازات تمرين", 15m, "معدات", "🧤", 12, DateTime.Now.AddYears(3).ToString("yyyy-MM-dd"));
-            AddP("شيكر بروتين", 8m, "معدات", "🥤", 18, DateTime.Now.AddYears(2).ToString("yyyy-MM-dd"));
-            AddP("بروتين بار", 3.5m, "بروتين", "🍫", 40, DateTime.Now.AddMonths(3).ToString("yyyy-MM-dd"));
-            AddP("جلوتامين", 22m, "بروتين", "💊", 14, DateTime.Now.AddMonths(9).ToString("yyyy-MM-dd"));
-            AddP("ZMA مكمل", 16m, "فيتامينات", "💤", 11, DateTime.Now.AddMonths(15).ToString("yyyy-MM-dd"));
-
-            s.FeedingPlans.AddRange(new[]
-            {
-                new FeedingPlanRecord { Name = "خطة التنشيف", PdfPath = @"C:\Plans\cutting_plan.pdf" },
-                new FeedingPlanRecord { Name = "خطة التضخم", PdfPath = @"C:\Plans\bulking_plan.pdf" },
-                new FeedingPlanRecord { Name = "خطة الحفاظ", PdfPath = @"C:\Plans\maintenance_plan.pdf" },
-                new FeedingPlanRecord { Name = "خطة نباتية", PdfPath = @"C:\Plans\vegan_plan.pdf" },
-                new FeedingPlanRecord { Name = "خطة كيتو", PdfPath = @"C:\Plans\keto_plan.pdf" }
-            });
-
             return s;
+        }
+
+        // ── persist ────────────────────────────────────────
+        private static void PersistToDatabase(GymDataSnapshot s)
+        {
+            using (var conn = Db.GetOpenConnection())
+            using (var tx = conn.BeginTransaction())
+            {
+                using (var clear = Db.Proc("dbo.usp_ClearAllData", conn, tx))
+                    clear.ExecuteNonQuery();
+
+                foreach (var u in s.Users)
+                    using (var cmd = Db.Proc("dbo.usp_Users_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@UserId", u.Id);
+                        cmd.AddParam("@FullName", u.FullName);
+                        cmd.AddParam("@Username", u.Username);
+                        cmd.AddParam("@Password", u.Password);
+                        cmd.AddParam("@Role", (int)u.Role);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                foreach (var p in s.SubscriptionPlans)
+                {
+                    using (var cmd = Db.Proc("dbo.usp_SubscriptionPlans_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@PlanId", p.Id);
+                        cmd.AddParam("@Name", p.Name);
+                        cmd.AddParam("@Price", p.Price);
+                        cmd.AddParam("@DurationValue", p.DurationValue);
+                        cmd.AddParam("@DurationUnit", p.DurationUnit);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    var features = p.Features ?? new List<string>();
+                    for (int i = 0; i < features.Count; i++)
+                        using (var cmd = Db.Proc("dbo.usp_PlanFeatures_Insert", conn, tx))
+                        {
+                            cmd.AddParam("@PlanId", p.Id);
+                            cmd.AddParam("@FeatureNo", i + 1);
+                            cmd.AddParam("@Feature", features[i]);
+                            cmd.ExecuteNonQuery();
+                        }
+                }
+
+                foreach (var m in s.Members)
+                    using (var cmd = Db.Proc("dbo.usp_Members_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@MemberId", m.Id);
+                        cmd.AddParam("@FullName", m.FullName);
+                        cmd.AddParam("@Phone", m.Phone);
+                        cmd.AddParam("@Gender", m.Gender);
+                        cmd.AddParam("@PlanName", m.PlanName);
+                        cmd.AddParam("@PriceText", m.PriceText);
+                        cmd.AddParam("@DurationText", m.DurationText);
+                        cmd.AddParam("@JoinDate", ToDateParam(m.JoinDate));
+                        cmd.ExecuteNonQuery();
+                    }
+
+                foreach (var t in s.Trainers)
+                    using (var cmd = Db.Proc("dbo.usp_Trainers_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@TrainerId", t.Id);
+                        cmd.AddParam("@Name", t.Name);
+                        cmd.AddParam("@Phone", t.Phone);
+                        cmd.AddParam("@Specialty", t.Specialty);
+                        cmd.AddParam("@Salary", t.Salary);
+                        cmd.AddParam("@JoinDate", ToDateParam(t.JoinDate));
+                        cmd.ExecuteNonQuery();
+                    }
+
+                foreach (var p in s.StoreProducts)
+                    using (var cmd = Db.Proc("dbo.usp_StoreProducts_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@ProductId", p.Id);
+                        cmd.AddParam("@Name", p.Name);
+                        cmd.AddParam("@Price", p.Price);
+                        cmd.AddParam("@Category", p.Category);
+                        cmd.AddParam("@Emoji", p.Emoji);
+                        cmd.AddParam("@StockQty", p.StockQty);
+                        cmd.AddParam("@Expiry", ToDateParam(p.Expiry));
+                        cmd.AddParam("@PhotoBase64", p.PhotoBase64);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                int saleId = 0;
+                foreach (var sale in s.StoreSales)
+                {
+                    saleId++;
+                    using (var cmd = Db.Proc("dbo.usp_StoreSales_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@SaleId", saleId);
+                        cmd.AddParam("@SoldAt", sale.SoldAt);
+                        cmd.AddParam("@Total", sale.Total);
+                        cmd.AddParam("@Summary", sale.Summary);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    var items = sale.Items ?? new List<StoreSaleItemRecord>();
+                    for (int i = 0; i < items.Count; i++)
+                        using (var cmd = Db.Proc("dbo.usp_StoreSaleItems_Insert", conn, tx))
+                        {
+                            cmd.AddParam("@SaleId", saleId);
+                            cmd.AddParam("@LineNo", i + 1);
+                            cmd.AddParam("@ProductName", items[i].ProductName);
+                            cmd.AddParam("@Price", items[i].Price);
+                            cmd.AddParam("@Qty", items[i].Qty);
+                            cmd.ExecuteNonQuery();
+                        }
+                }
+
+                int feedingId = 0;
+                foreach (var f in s.FeedingPlans)
+                    using (var cmd = Db.Proc("dbo.usp_FeedingPlans_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@FeedingPlanId", ++feedingId);
+                        cmd.AddParam("@Name", f.Name);
+                        cmd.AddParam("@PdfPath", f.PdfPath);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                int historyId = 0;
+                foreach (var entry in s.DietSendHistory)
+                    using (var cmd = Db.Proc("dbo.usp_DietSendHistory_Insert", conn, tx))
+                    {
+                        cmd.AddParam("@HistoryId", ++historyId);
+                        cmd.AddParam("@Entry", entry);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                tx.Commit();
+            }
+        }
+
+        // ── helpers ────────────────────────────────────────
+        private static string AsString(SqlDataReader r, int ordinal)
+            => r.IsDBNull(ordinal) ? null : r.GetValue(ordinal).ToString();
+
+        /// <summary>Converts an app date string ("yyyy-MM-dd") to a DATE param value (DBNull when blank/invalid).</summary>
+        private static object ToDateParam(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return DBNull.Value;
+            return DateTime.TryParse(value, out var dt) ? (object)dt.Date : DBNull.Value;
         }
 
         public static int NextMemberId() => Data.Members.Count == 0 ? 1 : Data.Members.Max(m => m.Id) + 1;
