@@ -108,8 +108,8 @@
             this.flowProducts.Padding    = new System.Windows.Forms.Padding(5);
             this.flowProducts.TabIndex   = 2;
 
-            this.btnAddNewItem.FillColor = System.Drawing.Color.FromArgb(152, 16, 250);
-            this.btnAddNewItem.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
+            this.btnAddNewItem.FillColor = System.Drawing.Color.FromArgb(15, 118, 110);
+            this.btnAddNewItem.FillColor2 = System.Drawing.Color.FromArgb(13, 148, 136);
             this.btnAddNewItem.Cursor    = System.Windows.Forms.Cursors.Hand;
             this.btnAddNewItem.Dock      = System.Windows.Forms.DockStyle.Bottom;
             this.btnAddNewItem.BorderRadius = 12;

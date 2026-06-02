@@ -11,20 +11,20 @@ namespace gym_mangment_system
     /// </summary>
     public static class FigmaPalette
     {
-        // Brand / primary — purple→pink gradient (Glory Gym redesign).
+        // Brand / primary — clean professional teal. Calm, near-solid gradient (not flashy).
         // Buttons, active nav pill, logo, prices, banner.
-        public static readonly Color Primary      = Color.FromArgb(0x98, 0x10, 0xFA); // purple-600
-        public static readonly Color PrimaryHover = Color.FromArgb(0x82, 0x0A, 0xD8); // purple-700
-        public static readonly Color PrimarySoft  = Color.FromArgb(0xF3, 0xE8, 0xFF); // purple-50 (soft borders / active nav tint)
+        public static readonly Color Primary      = Color.FromArgb(0x0D, 0x94, 0x88); // teal-600
+        public static readonly Color PrimaryHover = Color.FromArgb(0x0F, 0x76, 0x6E); // teal-700
+        public static readonly Color PrimarySoft  = Color.FromArgb(0xCC, 0xFB, 0xF1); // teal-100 (soft borders / active nav tint)
 
-        // Brand gradient (purple → pink) used by the active nav pill, primary buttons and banner.
-        public static readonly Color GradientStart = Color.FromArgb(0x98, 0x10, 0xFA); // purple-600
-        public static readonly Color GradientEnd   = Color.FromArgb(0xE6, 0x00, 0x76); // pink-600
-        public static readonly Color Pink          = Color.FromArgb(0xE6, 0x00, 0x76); // pink-600
+        // Brand gradient (subtle teal-700 → teal-600) — keeps a hint of depth without the "fancy" look.
+        public static readonly Color GradientStart = Color.FromArgb(0x0F, 0x76, 0x6E); // teal-700
+        public static readonly Color GradientEnd   = Color.FromArgb(0x0D, 0x94, 0x88); // teal-600
+        public static readonly Color Pink          = Color.FromArgb(0x0E, 0x74, 0x90); // cyan-700 (secondary accent)
 
-        // Logo icon square gradient (purple-500 → pink-500)
-        public static readonly Color LogoStart = Color.FromArgb(0xAD, 0x46, 0xFF); // purple-500
-        public static readonly Color LogoEnd   = Color.FromArgb(0xF6, 0x33, 0x9A); // pink-500
+        // Logo icon square gradient (teal-500 → teal-600)
+        public static readonly Color LogoStart = Color.FromArgb(0x14, 0xB8, 0xA6); // teal-500
+        public static readonly Color LogoEnd   = Color.FromArgb(0x0D, 0x94, 0x88); // teal-600
 
         // Accent colors
         public static readonly Color Blue     = Color.FromArgb(0x2B, 0x7F, 0xFF); // blue-500  (stat: members)
@@ -32,7 +32,7 @@ namespace gym_mangment_system
         public static readonly Color Green    = Color.FromArgb(0x00, 0xC9, 0x51); // green-500 (value text)
         public static readonly Color GreenBtn = Color.FromArgb(0x00, 0xA6, 0x3E); // green-600 (checkout / add-to-cart / price)
         public static readonly Color Orange   = Color.FromArgb(0xFF, 0x69, 0x00); // orange-500
-        public static readonly Color Purple   = Color.FromArgb(0xAD, 0x46, 0xFF); // purple-500 (cart / sales)
+        public static readonly Color Purple   = Color.FromArgb(0x08, 0x91, 0xB2); // cyan-600 (cart / sales accent)
         public static readonly Color Red      = Color.FromArgb(0xE7, 0x00, 0x0B); // red-600   (delete)
         public static readonly Color Amber    = Color.FromArgb(0xF0, 0xB1, 0x00); // amber     (ticker banner)
 
@@ -53,8 +53,8 @@ namespace gym_mangment_system
         public static readonly Color Gray900 = Color.FromArgb(0x11, 0x18, 0x27);
         public static readonly Color White   = Color.White;
 
-        /// <summary>Soft purple→pink table header band (matches Figma thead tint).</summary>
-        public static readonly Color TableHeaderTint = Color.FromArgb(0xFA, 0xF1, 0xFC);
+        /// <summary>Soft teal table header band tint.</summary>
+        public static readonly Color TableHeaderTint = Color.FromArgb(0xEC, 0xFE, 0xFF);
 
         /// <summary>Brand purple→pink gradient brush (horizontal). Caller owns/disposes it.</summary>
         public static System.Drawing.Drawing2D.LinearGradientBrush BrandBrush(Rectangle r)
@@ -159,7 +159,7 @@ namespace gym_mangment_system
             formBackground: Color.FromArgb(10, 10, 10),
             sidebar: Color.FromArgb(19, 19, 22),
             sidebarNav: Color.FromArgb(19, 19, 22),
-            sidebarNavActive: Color.FromArgb(38, 30, 48),
+            sidebarNavActive: Color.FromArgb(16, 40, 42),
             topBar: Color.FromArgb(19, 19, 22),
             statusBar: Color.FromArgb(10, 10, 10),
             contentHost: Color.FromArgb(10, 10, 10),
@@ -173,7 +173,7 @@ namespace gym_mangment_system
             notifCard: Color.FromArgb(32, 32, 40),
             notifCardHover: Color.FromArgb(44, 44, 54),
             quickPanel: Color.FromArgb(19, 19, 24),
-            tableHeaderBand: Color.FromArgb(45, 35, 58),
+            tableHeaderBand: Color.FromArgb(17, 46, 48),
             inputBackground: Color.FromArgb(32, 32, 40),
             inputForeground: Color.White,
             listBackground: Color.FromArgb(26, 26, 34),
@@ -182,7 +182,7 @@ namespace gym_mangment_system
             gridRow: Color.FromArgb(18, 18, 24),
             gridRowAlt: Color.FromArgb(24, 24, 30),
             gridHeader: Color.FromArgb(28, 28, 36),
-            gridSelection: Color.FromArgb(45, 35, 58),
+            gridSelection: Color.FromArgb(17, 46, 48),
             gridSelectionFore: Color.White,
             gridLines: Color.FromArgb(38, 38, 38),
             secondaryButton: Color.FromArgb(45, 45, 55),

@@ -50,21 +50,21 @@ namespace gym_mangment_system
             Invalidate();
         }
 
-        // ── purple gradient backdrop (matches Figma login) ──
+        // ── deep teal/slate gradient backdrop (clean, professional) ──
         private void Form1_PaintBackground(object sender, PaintEventArgs e)
         {
             var r = ClientRectangle;
             if (r.Width <= 0 || r.Height <= 0) return;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using (var brush = new LinearGradientBrush(r, Color.FromArgb(0x24, 0x0B, 0x3E), Color.FromArgb(0x6B, 0x1F, 0x9C), LinearGradientMode.ForwardDiagonal))
+            using (var brush = new LinearGradientBrush(r, Color.FromArgb(0x0B, 0x1F, 0x1E), Color.FromArgb(0x0F, 0x76, 0x6E), LinearGradientMode.ForwardDiagonal))
             {
                 brush.InterpolationColors = new ColorBlend(3)
                 {
                     Colors = new[]
                     {
-                        Color.FromArgb(0x1E, 0x09, 0x33),
-                        Color.FromArgb(0x47, 0x16, 0x7A),
-                        Color.FromArgb(0x7A, 0x1F, 0x9E)
+                        Color.FromArgb(0x0B, 0x1F, 0x1E),
+                        Color.FromArgb(0x0E, 0x3B, 0x38),
+                        Color.FromArgb(0x0F, 0x76, 0x6E)
                     },
                     Positions = new[] { 0f, 0.55f, 1f }
                 };

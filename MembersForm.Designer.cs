@@ -118,8 +118,8 @@
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddMember.FillColor  = System.Drawing.Color.FromArgb(152, 16, 250);
-            this.btnAddMember.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
+            this.btnAddMember.FillColor  = System.Drawing.Color.FromArgb(15, 118, 110);
+            this.btnAddMember.FillColor2 = System.Drawing.Color.FromArgb(13, 148, 136);
             this.btnAddMember.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnAddMember.BorderRadius = 12;
             this.btnAddMember.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);

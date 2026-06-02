@@ -509,7 +509,7 @@ namespace gym_mangment_system
                     titleR, Color.White, TextFormatFlags.Right | TextFormatFlags.RightToLeft);
                 var subR = new Rectangle(24, 60, r.Width - 48, 28);
                 TextRenderer.DrawText(e.Graphics, "يمكنك إدارة الأعضاء، الاشتراكات، المتجر، المدربين، وخطط التغذية بكل سهولة من مكان واحد.",
-                    new Font("Segoe UI", 11F), subR, Color.FromArgb(0xF3, 0xE8, 0xFF),
+                    new Font("Segoe UI", 11F), subR, Color.FromArgb(0xE6, 0xFF, 0xFA),
                     TextFormatFlags.Right | TextFormatFlags.RightToLeft);
             };
             return banner;

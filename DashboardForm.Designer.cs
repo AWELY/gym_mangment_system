@@ -185,7 +185,7 @@
             btn.Cursor    = System.Windows.Forms.Cursors.Hand;
             btn.Dock      = System.Windows.Forms.DockStyle.Top;
             btn.FlatAppearance.BorderSize = 0;
-            btn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(0xF3, 0xE8, 0xFF);
+            btn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(0xF0, 0xFD, 0xFA);
             btn.FlatStyle  = System.Windows.Forms.FlatStyle.Flat;
             btn.Font       = new System.Drawing.Font("Segoe UI", 11.5F);
             btn.ForeColor  = System.Drawing.Color.FromArgb(0x37, 0x41, 0x51);

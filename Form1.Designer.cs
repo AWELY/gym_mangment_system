@@ -99,7 +99,7 @@
             // lblSubtitle
             this.lblSubtitle.Text = "نظام إدارة الصالة الرياضية";
             this.lblSubtitle.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(0xD6, 0xC7, 0xF0);
+            this.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(0xBF, 0xD6, 0xD2);
             this.lblSubtitle.Size = new System.Drawing.Size(500, 26);
             this.lblSubtitle.Location = new System.Drawing.Point(250, 206);
             this.lblSubtitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -107,8 +107,8 @@
             this.lblSubtitle.Anchor = System.Windows.Forms.AnchorStyles.Top;
 
             // card
-            this.card.FillColor = System.Drawing.Color.FromArgb(0x3A, 0x2A, 0x57);
-            this.card.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.card.FillColor = System.Drawing.Color.FromArgb(0x12, 0x3A, 0x37);
+            this.card.BorderColor = System.Drawing.Color.FromArgb(0x2E, 0x6B, 0x64);
             this.card.BorderThickness = 1;
             this.card.BorderRadius = 20;
             this.card.Size = new System.Drawing.Size(440, 360);
@@ -128,14 +128,14 @@
             // lblUser
             this.lblUser.Text = "اسم المستخدم";
             this.lblUser.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblUser.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblUser.ForeColor = System.Drawing.Color.FromArgb(0xBF, 0xD6, 0xD2);
             this.lblUser.Size = new System.Drawing.Size(376, 22);
             this.lblUser.Location = new System.Drawing.Point(32, 22);
             this.lblUser.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblUser.BackColor = System.Drawing.Color.Transparent;
 
             // pnlUser
-            this.pnlUser.BackColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.pnlUser.BackColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
             this.pnlUser.Size = new System.Drawing.Size(376, 46);
             this.pnlUser.Location = new System.Drawing.Point(32, 48);
             this.pnlUser.Controls.Add(this.txtUser);
@@ -146,31 +146,31 @@
             this.lblUserIcon.Dock = System.Windows.Forms.DockStyle.Left;
             this.lblUserIcon.Width = 40;
             this.lblUserIcon.Font = new System.Drawing.Font("Segoe UI Emoji", 12F);
-            this.lblUserIcon.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblUserIcon.ForeColor = System.Drawing.Color.FromArgb(0xBF, 0xD6, 0xD2);
             this.lblUserIcon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblUserIcon.BackColor = System.Drawing.Color.Transparent;
 
             // txtUser
             this.txtUser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtUser.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.txtUser.FillColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
             this.txtUser.ForeColor = System.Drawing.Color.White;
             this.txtUser.BorderRadius = 10;
-            this.txtUser.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.txtUser.BorderColor = System.Drawing.Color.FromArgb(0x2E, 0x6B, 0x64);
             this.txtUser.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.txtUser.PlaceholderText = "admin أو reception";
-            this.txtUser.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
+            this.txtUser.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x94, 0xA3, 0xB8);
 
             // lblPass
             this.lblPass.Text = "كلمة المرور";
             this.lblPass.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPass.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblPass.ForeColor = System.Drawing.Color.FromArgb(0xBF, 0xD6, 0xD2);
             this.lblPass.Size = new System.Drawing.Size(376, 22);
             this.lblPass.Location = new System.Drawing.Point(32, 104);
             this.lblPass.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblPass.BackColor = System.Drawing.Color.Transparent;
 
             // pnlPass
-            this.pnlPass.BackColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.pnlPass.BackColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
             this.pnlPass.Size = new System.Drawing.Size(376, 46);
             this.pnlPass.Location = new System.Drawing.Point(32, 130);
             this.pnlPass.Controls.Add(this.txtPass);
@@ -181,25 +181,25 @@
             this.lblPassIcon.Dock = System.Windows.Forms.DockStyle.Left;
             this.lblPassIcon.Width = 40;
             this.lblPassIcon.Font = new System.Drawing.Font("Segoe UI Emoji", 12F);
-            this.lblPassIcon.ForeColor = System.Drawing.Color.FromArgb(0xCB, 0xBC, 0xE6);
+            this.lblPassIcon.ForeColor = System.Drawing.Color.FromArgb(0xBF, 0xD6, 0xD2);
             this.lblPassIcon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblPassIcon.BackColor = System.Drawing.Color.Transparent;
 
             // txtPass
             this.txtPass.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPass.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
+            this.txtPass.FillColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
             this.txtPass.ForeColor = System.Drawing.Color.White;
             this.txtPass.BorderRadius = 10;
-            this.txtPass.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.txtPass.BorderColor = System.Drawing.Color.FromArgb(0x2E, 0x6B, 0x64);
             this.txtPass.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.txtPass.PasswordChar = '•';
             this.txtPass.PlaceholderText = "••••••••";
-            this.txtPass.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
+            this.txtPass.PlaceholderForeColor = System.Drawing.Color.FromArgb(0x94, 0xA3, 0xB8);
 
             // btnLogin
             this.btnLogin.Text = "تسجيل الدخول";
-            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(0x98, 0x10, 0xFA);
-            this.btnLogin.FillColor2 = System.Drawing.Color.FromArgb(0xE6, 0x00, 0x76);
+            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(0x0F, 0x76, 0x6E);
+            this.btnLogin.FillColor2 = System.Drawing.Color.FromArgb(0x0D, 0x94, 0x88);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
             this.btnLogin.BorderRadius = 12;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
@@ -211,15 +211,15 @@
             // lblDefaults
             this.lblDefaults.Text = "الحسابات الافتراضية";
             this.lblDefaults.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblDefaults.ForeColor = System.Drawing.Color.FromArgb(0x9C, 0x8C, 0xBC);
+            this.lblDefaults.ForeColor = System.Drawing.Color.FromArgb(0x94, 0xA3, 0xB8);
             this.lblDefaults.Size = new System.Drawing.Size(376, 22);
             this.lblDefaults.Location = new System.Drawing.Point(32, 250);
             this.lblDefaults.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblDefaults.BackColor = System.Drawing.Color.Transparent;
 
             // chipAdmin
-            this.chipAdmin.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
-            this.chipAdmin.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.chipAdmin.FillColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
+            this.chipAdmin.BorderColor = System.Drawing.Color.FromArgb(0x2E, 0x6B, 0x64);
             this.chipAdmin.BorderThickness = 1;
             this.chipAdmin.BorderRadius = 12;
             this.chipAdmin.Size = new System.Drawing.Size(182, 60);
@@ -238,14 +238,14 @@
 
             this.lblChipAdminCreds.Text = "admin / admin";
             this.lblChipAdminCreds.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblChipAdminCreds.ForeColor = System.Drawing.Color.FromArgb(0xC4, 0xB5, 0xE0);
+            this.lblChipAdminCreds.ForeColor = System.Drawing.Color.FromArgb(0xA9, 0xC7, 0xC3);
             this.lblChipAdminCreds.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblChipAdminCreds.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.lblChipAdminCreds.BackColor = System.Drawing.Color.Transparent;
 
             // chipReception
-            this.chipReception.FillColor = System.Drawing.Color.FromArgb(0x4A, 0x39, 0x68);
-            this.chipReception.BorderColor = System.Drawing.Color.FromArgb(0x6B, 0x52, 0x8F);
+            this.chipReception.FillColor = System.Drawing.Color.FromArgb(0x16, 0x40, 0x3B);
+            this.chipReception.BorderColor = System.Drawing.Color.FromArgb(0x2E, 0x6B, 0x64);
             this.chipReception.BorderThickness = 1;
             this.chipReception.BorderRadius = 12;
             this.chipReception.Size = new System.Drawing.Size(182, 60);
@@ -264,14 +264,14 @@
 
             this.lblChipRecCreds.Text = "reception / 1234";
             this.lblChipRecCreds.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblChipRecCreds.ForeColor = System.Drawing.Color.FromArgb(0xC4, 0xB5, 0xE0);
+            this.lblChipRecCreds.ForeColor = System.Drawing.Color.FromArgb(0xA9, 0xC7, 0xC3);
             this.lblChipRecCreds.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblChipRecCreds.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.lblChipRecCreds.BackColor = System.Drawing.Color.Transparent;
 
             // Form1
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(0x2A, 0x0D, 0x45);
+            this.BackColor = System.Drawing.Color.FromArgb(0x0B, 0x1F, 0x1E);
             this.ClientSize = new System.Drawing.Size(1000, 700);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

@@ -112,8 +112,8 @@
             this.txtSearch.Size        = new System.Drawing.Size(320, 29);
             this.txtSearch.TabIndex    = 1;
 
-            this.btnAddTrainer.FillColor  = System.Drawing.Color.FromArgb(152, 16, 250);
-            this.btnAddTrainer.FillColor2 = System.Drawing.Color.FromArgb(230, 0, 118);
+            this.btnAddTrainer.FillColor  = System.Drawing.Color.FromArgb(15, 118, 110);
+            this.btnAddTrainer.FillColor2 = System.Drawing.Color.FromArgb(13, 148, 136);
             this.btnAddTrainer.Cursor     = System.Windows.Forms.Cursors.Hand;
             this.btnAddTrainer.BorderRadius = 12;
             this.btnAddTrainer.Font       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
