@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
@@ -179,7 +179,9 @@ namespace gym_mangment_system
             }
             else
             {
-                var p = _feedingPlans.FirstOrDefault(x => x.Name == editName);
+                FeedingPlan p = null;
+                foreach (var fp in _feedingPlans)
+                    if (fp.Name == editName) { p = fp; break; }
                 lblCreateTitle.Text = "✏️  تعديل الخطة";
                 txtPlanName.Text = p?.Name ?? "";
                 txtPlanPdf.Text  = p?.PdfPath ?? "";
@@ -225,8 +227,9 @@ namespace gym_mangment_system
         private void ReloadHistoryFromStore()
         {
             listHistory.Items.Clear();
-            foreach (var line in Enumerable.Reverse(GymDataStore.Data.DietSendHistory))
-                listHistory.Items.Add(line);
+            var hist = GymDataStore.Data.DietSendHistory;
+            for (int i = hist.Count - 1; i >= 0; i--)
+                listHistory.Items.Add(hist[i]);
         }
 
         private void RefreshPlanCombo()
@@ -267,8 +270,13 @@ namespace gym_mangment_system
                 return;
             }
 
-            bool nameTakenByOther =
-                GymDataStore.Data.FeedingPlans.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && p.Name != _editingPlanName);
+            bool nameTakenByOther = false;
+            foreach (var p in GymDataStore.Data.FeedingPlans)
+                if (p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && p.Name != _editingPlanName)
+                {
+                    nameTakenByOther = true;
+                    break;
+                }
             if (nameTakenByOther)
             {
                 MessageBox.Show("توجد خطة بهذا الاسم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -282,9 +290,13 @@ namespace gym_mangment_system
             }
             else
             {
-                var rec = GymDataStore.Data.FeedingPlans.FirstOrDefault(p => p.Name == _editingPlanName);
+                FeedingPlanRecord rec = null;
+                foreach (var p in GymDataStore.Data.FeedingPlans)
+                    if (p.Name == _editingPlanName) { rec = p; break; }
                 if (rec != null) { rec.Name = name; rec.PdfPath = pdf; }
-                var local = _feedingPlans.FirstOrDefault(p => p.Name == _editingPlanName);
+                FeedingPlan local = null;
+                foreach (var p in _feedingPlans)
+                    if (p.Name == _editingPlanName) { local = p; break; }
                 if (local != null) { local.Name = name; local.PdfPath = pdf; }
             }
 
@@ -300,8 +312,10 @@ namespace gym_mangment_system
                 "أدخل رقم هاتف العضو لإرسال خطة: " + plan.Name, "إرسال الخطة", "");
             if (string.IsNullOrWhiteSpace(phone)) return;
 
-            var found = GymDataStore.Data.Members.FirstOrDefault(m =>
-                !string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phone.Trim()));
+            string phoneTrim = phone.Trim();
+            MemberRecord found = null;
+            foreach (var m in GymDataStore.Data.Members)
+                if (!string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phoneTrim)) { found = m; break; }
             if (found == null)
             {
                 MessageBox.Show("لم يُعثر على عضو بهذا الرقم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -328,7 +342,12 @@ namespace gym_mangment_system
             string recipient = QonvoPhone.ToE164(_currentMemberPhone, defaultCc);
             string senderPhone = QonvoWhatsAppClient.ReadSetting("QonvoSenderWhatsAppPhone", "").Trim();
             if (!string.IsNullOrEmpty(senderPhone) && !senderPhone.StartsWith("+", StringComparison.Ordinal))
-                senderPhone = "+" + new string(senderPhone.Where(char.IsDigit).ToArray());
+            {
+                var digits = new StringBuilder();
+                foreach (char c in senderPhone)
+                    if (char.IsDigit(c)) digits.Append(c);
+                senderPhone = "+" + digits.ToString();
+            }
 
             string msgForMember =
                 $"مرحباً {_currentMemberName}،\n\nخطة التغذية: {plan.Name}\n\nمع تحيات فريق Glory Gym";

@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -222,7 +222,9 @@ namespace gym_mangment_system
         private void RebindMembersFromStore()
         {
             _dt.Rows.Clear();
-            foreach (var m in GymDataStore.Data.Members.OrderBy(x => x.Id))
+            var sorted = new List<MemberRecord>(GymDataStore.Data.Members);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var m in sorted)
             {
                 _dt.Rows.Add(m.Id, m.FullName, m.Phone, m.Gender, m.PlanName, m.PriceText, m.DurationText, m.JoinDate);
             }
@@ -257,8 +259,9 @@ namespace gym_mangment_system
                 return;
             }
 
-            SubscriptionPlan plan = SubscriptionPlanCatalog.GetPlans()
-                .FirstOrDefault(p => p.Name == selectedName);
+            SubscriptionPlan plan = null;
+            foreach (var p in SubscriptionPlanCatalog.GetPlans())
+                if (p.Name == selectedName) { plan = p; break; }
 
             if (plan != null)
             {
@@ -417,7 +420,9 @@ namespace gym_mangment_system
 
             if (_isEditing && _editingMemberId > 0)
             {
-                var mem = GymDataStore.Data.Members.FirstOrDefault(x => x.Id == _editingMemberId);
+                MemberRecord mem = null;
+                foreach (var x in GymDataStore.Data.Members)
+                    if (x.Id == _editingMemberId) { mem = x; break; }
                 if (mem != null)
                 {
                     mem.FullName   = txtFName.Text.Trim();

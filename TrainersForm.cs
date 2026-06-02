@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
 
@@ -84,7 +84,9 @@ namespace gym_mangment_system
             foreach (Control c in _cardHost.Controls) c.Dispose();
             _cardHost.Controls.Clear();
 
-            foreach (var t in GymDataStore.Data.Trainers.OrderBy(x => x.Id))
+            var sorted = new List<TrainerRecord>(GymDataStore.Data.Trainers);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var t in sorted)
                 _cardHost.Controls.Add(BuildTrainerCard(t, s));
 
             _cardHost.ResumeLayout();
@@ -124,7 +126,9 @@ namespace gym_mangment_system
 
         private void LoadTrainerIntoForm(int id)
         {
-            var tr = GymDataStore.Data.Trainers.FirstOrDefault(x => x.Id == id);
+            TrainerRecord tr = null;
+            foreach (var x in GymDataStore.Data.Trainers)
+                if (x.Id == id) { tr = x; break; }
             if (tr == null) return;
             _isEditing = true;
             _editingTrainerId = id;
@@ -189,7 +193,9 @@ namespace gym_mangment_system
         private void RebindTrainersFromStore()
         {
             _dt.Rows.Clear();
-            foreach (var t in GymDataStore.Data.Trainers.OrderBy(x => x.Id))
+            var sorted = new List<TrainerRecord>(GymDataStore.Data.Trainers);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var t in sorted)
                 _dt.Rows.Add(t.Id, t.Name, t.Phone, t.Specialty, t.Salary, t.JoinDate);
             _dt.AcceptChanges();
             BuildTrainerCards();
@@ -258,7 +264,9 @@ namespace gym_mangment_system
 
             if (_isEditing && _editingTrainerId > 0)
             {
-                var tr = GymDataStore.Data.Trainers.FirstOrDefault(x => x.Id == _editingTrainerId);
+                TrainerRecord tr = null;
+                foreach (var x in GymDataStore.Data.Trainers)
+                    if (x.Id == _editingTrainerId) { tr = x; break; }
                 if (tr != null)
                 {
                     tr.Name      = txtFName.Text.Trim();
@@ -304,7 +312,9 @@ namespace gym_mangment_system
 
         private void UpdateCount()
         {
-            decimal totalSalaries = GymDataStore.Data.Trainers.Sum(x => x.Salary);
+            decimal totalSalaries = 0;
+            foreach (var x in GymDataStore.Data.Trainers)
+                totalSalaries += x.Salary;
             string txt = "إجمالي الرواتب الشهرية: " + totalSalaries.ToString("0") + " ريال";
             lblCount.Text = txt;
             if (_lblSubtitle != null) _lblSubtitle.Text = txt;

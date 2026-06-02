@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
 
@@ -46,15 +45,24 @@ namespace gym_mangment_system
         private static List<NotifItem> BuildItems()
         {
             var items = new List<NotifItem>();
-            foreach (var p in GymDataStore.Data.StoreProducts.Where(x => x.StockQty <= 5))
+            foreach (var p in GymDataStore.Data.StoreProducts)
+            {
+                if (p.StockQty > 5) continue;
                 items.Add(new NotifItem { Icon = "⚠️", Title = "مخزون منخفض", Body = p.Name + " — المتبقي " + p.StockQty, Accent = FigmaPalette.Orange });
+            }
 
             int soon = GymDataStore.MembersExpiringWithinDays(14);
             if (soon > 0)
                 items.Add(new NotifItem { Icon = "🔴", Title = "اشتراكات قريبة الانتهاء", Body = soon + " عضو خلال أسبوعين", Accent = FigmaPalette.Red });
 
-            foreach (var s in GymDataStore.Data.StoreSales.OrderByDescending(x => x.SoldAt).Take(5))
+            var sales = new List<StoreSaleRecord>(GymDataStore.Data.StoreSales);
+            sales.Sort((a, b) => string.CompareOrdinal(b.SoldAt, a.SoldAt));
+            int take = Math.Min(5, sales.Count);
+            for (int i = 0; i < take; i++)
+            {
+                var s = sales[i];
                 items.Add(new NotifItem { Icon = "💰", Title = "بيع متجر", Body = (s.Summary ?? "").Trim(), Accent = FigmaPalette.GreenBtn });
+            }
 
             return items;
         }
@@ -154,7 +162,9 @@ namespace gym_mangment_system
             _counters.BackColor = s.ContentHost;
             _body.BackColor = s.ContentHost;
 
-            int lowStock = GymDataStore.Data.StoreProducts.Count(x => x.StockQty <= 5);
+            int lowStock = 0;
+            foreach (var x in GymDataStore.Data.StoreProducts)
+                if (x.StockQty <= 5) lowStock++;
             int expiring = GymDataStore.MembersExpiringWithinDays(14);
             int positive = GymDataStore.Data.StoreSales.Count;
 

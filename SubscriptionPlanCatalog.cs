@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace gym_mangment_system
 {
@@ -45,7 +44,9 @@ namespace gym_mangment_system
         public static void Upsert(SubscriptionPlan plan)
         {
             var list = GymDataStore.Data.SubscriptionPlans;
-            var existing = list.FirstOrDefault(p => p.Id == plan.Id);
+            SubscriptionPlan existing = null;
+            foreach (var p in list)
+                if (p.Id == plan.Id) { existing = p; break; }
             if (existing != null)
             {
                 existing.Name = plan.Name;
@@ -64,7 +65,9 @@ namespace gym_mangment_system
         public static void Delete(int id)
         {
             var list = GymDataStore.Data.SubscriptionPlans;
-            var existing = list.FirstOrDefault(p => p.Id == id);
+            SubscriptionPlan existing = null;
+            foreach (var p in list)
+                if (p.Id == id) { existing = p; break; }
             if (existing != null)
                 list.Remove(existing);
             GymDataStore.Save();

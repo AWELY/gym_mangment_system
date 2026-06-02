@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
@@ -262,7 +261,9 @@ namespace gym_mangment_system
 
         private void EditPlan(int id)
         {
-            var plan = SubscriptionPlanCatalog.GetPlans().FirstOrDefault(p => p.Id == id);
+            SubscriptionPlan plan = null;
+            foreach (var p in SubscriptionPlanCatalog.GetPlans())
+                if (p.Id == id) { plan = p; break; }
             if (plan == null) return;
             _editingId = id;
             txtType.Text = plan.Name;
@@ -278,7 +279,9 @@ namespace gym_mangment_system
             if (MessageBox.Show("حذف نوع الاشتراك: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
             SubscriptionPlanCatalog.Delete(id);
-            DataRow row = _dt.AsEnumerable().FirstOrDefault(r => r.Field<int>("ID") == id);
+            DataRow row = null;
+            foreach (DataRow r in _dt.Rows)
+                if (r.RowState != DataRowState.Deleted && Convert.ToInt32(r["ID"]) == id) { row = r; break; }
             if (row != null) row.Delete();
             _dt.AcceptChanges();
             BuildPlanCards();
@@ -411,14 +414,22 @@ namespace gym_mangment_system
 
             if (_editingId == -1)
             {
-                int newId = _dt.Rows.Count > 0 ? _dt.AsEnumerable().Max(r => r.Field<int>("ID")) + 1 : 1;
+                int maxId = 0;
+                foreach (DataRow r in _dt.Rows)
+                {
+                    int rid = Convert.ToInt32(r["ID"]);
+                    if (rid > maxId) maxId = rid;
+                }
+                int newId = maxId + 1;
                 _dt.Rows.Add(newId, type, durationLabel, price, displayName);
                 SubscriptionPlanCatalog.Upsert(new SubscriptionPlan { Id = newId, Name = type, Price = price, DurationValue = durationValue, DurationUnit = durationUnit, Features = features });
                 MessageBox.Show("تمت إضافة نوع الاشتراك.", "نجاح", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                DataRow row = _dt.AsEnumerable().FirstOrDefault(r => r.Field<int>("ID") == _editingId);
+                DataRow row = null;
+                foreach (DataRow r in _dt.Rows)
+                    if (r.RowState != DataRowState.Deleted && Convert.ToInt32(r["ID"]) == _editingId) { row = r; break; }
                 if (row != null)
                 {
                     row["نوع الاشتراك"] = type;

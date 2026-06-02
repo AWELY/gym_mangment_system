@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -102,7 +102,9 @@ namespace gym_mangment_system
                     while (r.Read())
                     {
                         int planId = r.GetInt32(0);
-                        var plan = s.SubscriptionPlans.FirstOrDefault(p => p.Id == planId);
+                        SubscriptionPlan plan = null;
+                        foreach (var p in s.SubscriptionPlans)
+                            if (p.Id == planId) { plan = p; break; }
                         if (plan != null)
                             plan.Features.Add(AsString(r, 2));
                     }
@@ -340,15 +342,37 @@ namespace gym_mangment_system
             return DateTime.TryParse(value, out var dt) ? (object)dt.Date : DBNull.Value;
         }
 
-        public static int NextMemberId() => Data.Members.Count == 0 ? 1 : Data.Members.Max(m => m.Id) + 1;
-        public static int NextTrainerId() => Data.Trainers.Count == 0 ? 1 : Data.Trainers.Max(m => m.Id) + 1;
-        public static int NextProductId() => Data.StoreProducts.Count == 0 ? 1 : Data.StoreProducts.Max(m => m.Id) + 1;
+        public static int NextMemberId()
+        {
+            int max = 0;
+            foreach (var m in Data.Members)
+                if (m.Id > max) max = m.Id;
+            return max + 1;
+        }
+
+        public static int NextTrainerId()
+        {
+            int max = 0;
+            foreach (var t in Data.Trainers)
+                if (t.Id > max) max = t.Id;
+            return max + 1;
+        }
+
+        public static int NextProductId()
+        {
+            int max = 0;
+            foreach (var p in Data.StoreProducts)
+                if (p.Id > max) max = p.Id;
+            return max + 1;
+        }
 
         public static decimal ParsePriceFromMemberDisplay(string priceText)
         {
             if (string.IsNullOrWhiteSpace(priceText)) return 0;
-            string d = new string(priceText.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
-            d = d.Replace(',', '.');
+            var sb = new StringBuilder();
+            foreach (char c in priceText)
+                if (char.IsDigit(c) || c == '.' || c == ',') sb.Append(c);
+            string d = sb.ToString().Replace(',', '.');
             return decimal.TryParse(d, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : 0;
         }
 
@@ -385,7 +409,9 @@ namespace gym_mangment_system
             int n = 0;
             foreach (var m in Data.Members)
             {
-                var plan = Data.SubscriptionPlans.FirstOrDefault(p => p.Name == m.PlanName);
+                SubscriptionPlan plan = null;
+                foreach (var p in Data.SubscriptionPlans)
+                    if (p.Name == m.PlanName) { plan = p; break; }
                 if (plan == null) continue;
                 if (!DateTime.TryParse(m.JoinDate, out var start)) continue;
                 DateTime end;
@@ -406,25 +432,31 @@ namespace gym_mangment_system
         public static decimal StoreRevenueThisMonth()
         {
             int mo = DateTime.Now.Month, y = DateTime.Now.Year;
-            return Data.StoreSales
-                .Where(s => DateTime.TryParse(s.SoldAt, out var d) && d.Year == y && d.Month == mo)
-                .Sum(s => s.Total);
+            decimal total = 0;
+            foreach (var s in Data.StoreSales)
+                if (DateTime.TryParse(s.SoldAt, out var d) && d.Year == y && d.Month == mo)
+                    total += s.Total;
+            return total;
         }
 
         public static decimal SubscriptionCashInThisMonth()
         {
             int mo = DateTime.Now.Month, y = DateTime.Now.Year;
-            return Data.Members
-                .Where(m => DateTime.TryParse(m.JoinDate, out var jd) && jd.Year == y && jd.Month == mo)
-                .Sum(m => ParsePriceFromMemberDisplay(m.PriceText));
+            decimal total = 0;
+            foreach (var m in Data.Members)
+                if (DateTime.TryParse(m.JoinDate, out var jd) && jd.Year == y && jd.Month == mo)
+                    total += ParsePriceFromMemberDisplay(m.PriceText);
+            return total;
         }
 
         public static decimal StoreSalesToday()
         {
             var t = DateTime.Today;
-            return Data.StoreSales
-                .Where(s => DateTime.TryParse(s.SoldAt, out var d) && d.Date == t)
-                .Sum(s => s.Total);
+            decimal total = 0;
+            foreach (var s in Data.StoreSales)
+                if (DateTime.TryParse(s.SoldAt, out var d) && d.Date == t)
+                    total += s.Total;
+            return total;
         }
     }
 }

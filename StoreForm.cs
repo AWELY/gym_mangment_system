@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -59,8 +58,24 @@ namespace gym_mangment_system
             foreach (var p in _products)
                 p.Photo?.Dispose();
             _products.Clear();
-            foreach (var r in GymDataStore.Data.StoreProducts.OrderBy(x => x.Id))
+            var sorted = new List<StoreProductRecord>(GymDataStore.Data.StoreProducts);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var r in sorted)
                 _products.Add(ProductFromRecord(r));
+        }
+
+        private Product FindProductByName(string name)
+        {
+            foreach (var p in _products)
+                if (p.Name == name) return p;
+            return null;
+        }
+
+        private static StoreProductRecord FindRecordByName(string name)
+        {
+            foreach (var r in GymDataStore.Data.StoreProducts)
+                if (r.Name == name) return r;
+            return null;
         }
 
         private static Product ProductFromRecord(StoreProductRecord r)
@@ -119,7 +134,9 @@ namespace gym_mangment_system
         private void PersistAllProducts()
         {
             GymDataStore.Data.StoreProducts.Clear();
-            foreach (var p in _products.OrderBy(x => x.Id))
+            var sorted = new List<Product>(_products);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var p in sorted)
                 GymDataStore.Data.StoreProducts.Add(ToRecord(p));
             GymDataStore.Save();
         }
@@ -331,7 +348,7 @@ namespace gym_mangment_system
                 btnP.Click += (sender, e) =>
                 {
                     var ci = (CartItem)((Button)sender).Tag;
-                    var pr = _products.FirstOrDefault(p => p.Name == ci.Name);
+                    var pr = FindProductByName(ci.Name);
                     int avail = pr?.StockQty ?? 0;
                     if (ci.Qty >= avail)
                     {
@@ -395,7 +412,7 @@ namespace gym_mangment_system
             var stockErrors = new List<string>();
             foreach (var line in _cart)
             {
-                var pr = _products.FirstOrDefault(p => p.Name == line.Name);
+                var pr = FindProductByName(line.Name);
                 int avail = pr?.StockQty ?? 0;
                 if (line.Qty > avail)
                     stockErrors.Add(line.Name + ": المطلوب " + line.Qty + "، المتوفر " + avail);
@@ -410,10 +427,10 @@ namespace gym_mangment_system
 
             foreach (var line in _cart)
             {
-                var rec = GymDataStore.Data.StoreProducts.FirstOrDefault(x => x.Name == line.Name);
+                var rec = FindRecordByName(line.Name);
                 if (rec != null)
                     rec.StockQty = Math.Max(0, rec.StockQty - line.Qty);
-                var pr = _products.FirstOrDefault(x => x.Name == line.Name);
+                var pr = FindProductByName(line.Name);
                 if (pr != null)
                     pr.StockQty = Math.Max(0, pr.StockQty - line.Qty);
             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -672,7 +672,10 @@ namespace gym_mangment_system
             else if (root is ButtonBase bb) bb.UseCompatibleTextRendering = hasArabic && !hasEmoji;
             else if (root is DataGridView dgv)
             {
-                string sample = string.Concat(dgv.Columns.Cast<DataGridViewColumn>().Select(col => col.HeaderText ?? ""));
+                var sampleSb = new StringBuilder();
+                foreach (DataGridViewColumn col in dgv.Columns)
+                    sampleSb.Append(col.HeaderText ?? "");
+                string sample = sampleSb.ToString();
                 dgv.DefaultCellStyle.Font              = CreateArabicFriendlyFont(dgv.DefaultCellStyle.Font ?? dgv.Font, sample);
                 dgv.ColumnHeadersDefaultCellStyle.Font = CreateArabicFriendlyFont(dgv.ColumnHeadersDefaultCellStyle.Font ?? dgv.Font, sample);
             }

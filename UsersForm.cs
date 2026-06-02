@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
 
@@ -60,7 +60,9 @@ namespace gym_mangment_system
             foreach (Control c in _cardHost.Controls) c.Dispose();
             _cardHost.Controls.Clear();
 
-            foreach (var u in GymDataStore.Data.Users.OrderBy(x => x.Id))
+            var sorted = new List<UserDirectoryEntry>(GymDataStore.Data.Users);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var u in sorted)
                 _cardHost.Controls.Add(BuildUserCard(u, s));
 
             _cardHost.ResumeLayout();
@@ -118,7 +120,9 @@ namespace gym_mangment_system
 
         private void LoadUserIntoForm(int id)
         {
-            var u = GymDataStore.Data.Users.FirstOrDefault(x => x.Id == id);
+            UserDirectoryEntry u = null;
+            foreach (var x in GymDataStore.Data.Users)
+                if (x.Id == id) { u = x; break; }
             if (u == null) return;
             _isEditing = true;
             var rowIdx = -1;

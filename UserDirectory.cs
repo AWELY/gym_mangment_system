@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 
 namespace gym_mangment_system
 {
@@ -62,7 +61,9 @@ namespace gym_mangment_system
         public static void FillDataTable(DataTable dt)
         {
             dt.Rows.Clear();
-            foreach (var a in Accounts.OrderBy(x => x.Id))
+            var sorted = new List<UserDirectoryEntry>(Accounts);
+            sorted.Sort((a, b) => a.Id.CompareTo(b.Id));
+            foreach (var a in sorted)
             {
                 dt.Rows.Add(a.Id, a.FullName, a.Username, UserDirectoryEntry.RoleToDisplay(a.Role));
             }
@@ -70,14 +71,20 @@ namespace gym_mangment_system
 
         public static bool UsernameExists(string username, int? exceptId)
         {
-            return Accounts.Any(a =>
-                a.Username.Equals(username.Trim(), StringComparison.OrdinalIgnoreCase)
-                && (!exceptId.HasValue || a.Id != exceptId.Value));
+            string u = username.Trim();
+            foreach (var a in Accounts)
+                if (a.Username.Equals(u, StringComparison.OrdinalIgnoreCase)
+                    && (!exceptId.HasValue || a.Id != exceptId.Value))
+                    return true;
+            return false;
         }
 
         public static void Add(string fullName, string username, string password, AppSession.UserRole role)
         {
-            int id = Accounts.Count == 0 ? 1 : Accounts.Max(x => x.Id) + 1;
+            int max = 0;
+            foreach (var x in Accounts)
+                if (x.Id > max) max = x.Id;
+            int id = max + 1;
             Accounts.Add(new UserDirectoryEntry
             {
                 Id = id,
@@ -91,7 +98,9 @@ namespace gym_mangment_system
 
         public static void Update(int id, string fullName, string username, string passwordOrNullKeep, AppSession.UserRole role)
         {
-            var a = Accounts.FirstOrDefault(x => x.Id == id);
+            UserDirectoryEntry a = null;
+            foreach (var x in Accounts)
+                if (x.Id == id) { a = x; break; }
             if (a == null) return;
             if (a.Username.Equals("admin", StringComparison.OrdinalIgnoreCase) && role != AppSession.UserRole.Admin)
                 role = AppSession.UserRole.Admin;
@@ -106,7 +115,9 @@ namespace gym_mangment_system
 
         public static bool Remove(int id)
         {
-            var a = Accounts.FirstOrDefault(x => x.Id == id);
+            UserDirectoryEntry a = null;
+            foreach (var x in Accounts)
+                if (x.Id == id) { a = x; break; }
             if (a == null) return false;
             if (a.Username.Equals("admin", StringComparison.OrdinalIgnoreCase)) return false;
             bool ok = Accounts.Remove(a);

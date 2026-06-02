@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
 
@@ -49,7 +48,9 @@ namespace gym_mangment_system
 
             _monthlySubscriptions = GymDataStore.SubscriptionCashInThisMonth();
             _monthlyStore = GymDataStore.StoreRevenueThisMonth();
-            _monthlySalaries = GymDataStore.Data.Trainers.Sum(t => t.Salary);
+            _monthlySalaries = 0;
+            foreach (var t in GymDataStore.Data.Trainers)
+                _monthlySalaries += t.Salary;
             _monthlyGross = _monthlySubscriptions + _monthlyStore;
             _monthlyNet = _monthlyGross - _monthlySalaries;
 
@@ -227,11 +228,21 @@ namespace gym_mangment_system
 
             decimal[] dSubs = GymDataStore.SubscriptionTotalsByMonthCurrentYear();
             decimal[] dStore = GymDataStore.StoreTotalsByMonthCurrentYear();
-            float[] gross = dSubs.Zip(dStore, (a, b) => (float)(a + b)).ToArray();
-            float salary = (float)GymDataStore.Data.Trainers.Sum(t => t.Salary);
-            float[] net = gross.Select(x => x - salary).ToArray();
+            int monthCount = Math.Min(dSubs.Length, dStore.Length);
+            float[] gross = new float[monthCount];
+            for (int i = 0; i < monthCount; i++)
+                gross[i] = (float)(dSubs[i] + dStore[i]);
+            decimal salaryTotal = 0;
+            foreach (var t in GymDataStore.Data.Trainers)
+                salaryTotal += t.Salary;
+            float salary = (float)salaryTotal;
+            float[] net = new float[gross.Length];
+            for (int i = 0; i < gross.Length; i++)
+                net[i] = gross[i] - salary;
             string[] months = { "ين", "فب", "مار", "أبر", "ماي", "يون", "يول", "أغس", "سبت", "أكت", "نوف", "ديس" };
-            float maxGross = gross.Length > 0 ? gross.Max() : 0f;
+            float maxGross = 0f;
+            for (int i = 0; i < gross.Length; i++)
+                if (gross[i] > maxGross) maxGross = gross[i];
             float maxVal = Math.Max(500f, Math.Max(maxGross, salary) * 1.20f);
             int barW = Math.Max(8, chartW / 34);
 

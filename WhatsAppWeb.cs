@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace gym_mangment_system
@@ -16,7 +16,10 @@ namespace gym_mangment_system
         public static string NormalizePhoneForWaMe(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw)) return "";
-            string d = new string(raw.Where(char.IsDigit).ToArray());
+            var sb = new StringBuilder();
+            foreach (char c in raw)
+                if (char.IsDigit(c)) sb.Append(c);
+            string d = sb.ToString();
             if (d.Length == 0) return "";
 
             if (d.StartsWith("966", StringComparison.Ordinal)) return d;
