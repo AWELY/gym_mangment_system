@@ -129,7 +129,7 @@
     </Compile>
     <Compile Include="UserDirectory.cs" />
     <Compile Include="WhatsAppWeb.cs" />
-    <Compile Include="QonvoWhatsApp.cs" />
+    <Compile Include="WaslWhatsApp.cs" />
     <Compile Include="SubscriptionPlanCatalog.cs" />
     <Compile Include="TrainersForm.cs">
       <SubType>Form</SubType>

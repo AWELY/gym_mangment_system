@@ -338,31 +338,24 @@ namespace gym_mangment_system
             GymDataStore.Save();
             listHistory.Items.Insert(0, logEntry);
 
-            string defaultCc = QonvoWhatsAppClient.ReadSetting("QonvoDefaultCountryCode", "218");
-            string recipient = QonvoPhone.ToE164(_currentMemberPhone, defaultCc);
-            string senderPhone = QonvoWhatsAppClient.ReadSetting("QonvoSenderWhatsAppPhone", "").Trim();
-            if (!string.IsNullOrEmpty(senderPhone) && !senderPhone.StartsWith("+", StringComparison.Ordinal))
-            {
-                var digits = new StringBuilder();
-                foreach (char c in senderPhone)
-                    if (char.IsDigit(c)) digits.Append(c);
-                senderPhone = "+" + digits.ToString();
-            }
+            string defaultCc = WaslWhatsAppClient.ReadSetting("WaslDefaultCountryCode", "218");
+            string recipient = WaslPhone.ToDigits(_currentMemberPhone, defaultCc);
+            string senderPhone = WaslPhone.ToDigits(WaslWhatsAppClient.ReadSetting("WaslSenderPhone", ""), defaultCc);
 
             string msgForMember =
                 $"مرحباً {_currentMemberName}،\n\nخطة التغذية: {plan.Name}\n\nمع تحيات فريق Glory Gym";
 
-            string baseUrl = QonvoWhatsAppClient.ReadSetting("QonvoBaseUrl", "https://backup.qonvo.ly/api");
-            string token   = QonvoWhatsAppClient.ReadSetting("QonvoApiToken", "");
+            string baseUrl = WaslWhatsAppClient.ReadSetting("WaslBaseUrl", "https://wasl.itsyosefali.cloud/api/v1");
+            string token   = WaslWhatsAppClient.ReadSetting("WaslApiToken", "");
 
             bool sentAsDocument = !string.IsNullOrWhiteSpace(plan.PdfPath) && File.Exists(plan.PdfPath.Trim());
-            QonvoSendResult result;
+            WaslSendResult result;
 
             try
             {
                 Cursor = Cursors.WaitCursor;
 
-                using (var client = new QonvoWhatsAppClient())
+                using (var client = new WaslWhatsAppClient())
                 {
                     if (sentAsDocument)
                     {
@@ -400,8 +393,8 @@ namespace gym_mangment_system
             {
                 MessageBox.Show(
                     sentAsDocument
-                        ? "تم جدولة إرسال خطة التغذية (ملف PDF) عبر واتساب (Qonvo)."
-                        : "تم جدولة إرسال الرسالة عبر واتساب (Qonvo).",
+                        ? "تم جدولة إرسال خطة التغذية (ملف PDF) عبر واتساب (WASL)."
+                        : "تم جدولة إرسال الرسالة عبر واتساب (WASL).",
                     "واتساب",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
