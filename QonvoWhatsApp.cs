@@ -223,7 +223,9 @@ namespace gym_mangment_system
                     {
                         byte[] raw = File.ReadAllBytes(pathCopy);
                         string b64 = Convert.ToBase64String(raw);
-                        string dataUriPrefix = "data:application/pdf;base64,";
+                        // Qonvo validates the document data URI against octet-stream,
+                        // regardless of the real file type (sent via media_mimetype below).
+                        string dataUriPrefix = "data:application/octet-stream;base64,";
                         string mediaBase64  = dataUriPrefix + b64;
                         var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
                         var payload = new Dictionary<string, object>
