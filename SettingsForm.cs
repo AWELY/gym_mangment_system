@@ -214,9 +214,47 @@ namespace gym_mangment_system
             }
             catch (Exception ex)
             {
+                // The most common cause is that the SQL Server *service account*
+                // (not the Windows user) cannot write to the chosen folder, e.g. the
+                // Desktop -> "Operating system error 5 (Access is denied.)". Offer to
+                // save into SQL Server's own default backup directory instead, which
+                // the service account can always write to.
+                string defaultDir = null;
+                try { defaultDir = Db.GetDefaultBackupDirectory(); } catch { /* ignore */ }
+
+                if (!string.IsNullOrWhiteSpace(defaultDir) &&
+                    !string.Equals(defaultDir.TrimEnd('\\'), (folder ?? "").TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
+                {
+                    var retry = MessageBox.Show(owner,
+                        "تعذر إنشاء النسخة الاحتياطية في المجلد المحدد، غالباً لأن حساب خدمة " +
+                        "SQL Server لا يملك صلاحية الكتابة عليه (مثل سطح المكتب).\n\n" +
+                        "هل تريد حفظ النسخة في مجلد SQL Server الافتراضي؟\n\n" + defaultDir,
+                        "نسخ احتياطي", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                    if (retry == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            string file2 = Db.BackupTo(defaultDir);
+                            Settings.Default.BackupFolder = defaultDir;
+                            Settings.Default.Save();
+                            MessageBox.Show(owner,
+                                "تم إنشاء النسخة الاحتياطية بنجاح ✅\n\n" + file2,
+                                "نسخ احتياطي", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return true;
+                        }
+                        catch (Exception ex2)
+                        {
+                            ex = ex2;
+                        }
+                    }
+                }
+
                 MessageBox.Show(owner,
                     "تعذر إنشاء النسخة الاحتياطية:\n\n" + ex.Message +
-                    "\n\nملاحظة: يجب أن يملك حساب خدمة SQL Server صلاحية الكتابة على المجلد المحدد.",
+                    "\n\nملاحظة: يجب أن يملك حساب خدمة SQL Server صلاحية الكتابة على المجلد المحدد." +
+                    "\nاختر مجلداً مثل C:\\GymBackups وامنح حساب الخدمة صلاحية الكتابة عليه، " +
+                    "أو استخدم مجلد SQL Server الافتراضي.",
                     "نسخ احتياطي", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }

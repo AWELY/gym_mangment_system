@@ -74,6 +74,31 @@ namespace gym_mangment_system
         }
 
         /// <summary>
+        /// Returns SQL Server's own default backup directory (read from the instance
+        /// registry). The SQL Server service account always has write access to this
+        /// folder, so it is a safe fallback when a user-chosen folder (e.g. the
+        /// Desktop) is denied. Returns null if it cannot be determined.
+        /// </summary>
+        public static string GetDefaultBackupDirectory()
+        {
+            using (var conn = GetOpenConnection())
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText =
+                    "DECLARE @dir NVARCHAR(512); " +
+                    "EXEC master.dbo.xp_instance_regread " +
+                    "N'HKEY_LOCAL_MACHINE', " +
+                    "N'Software\\Microsoft\\MSSQLServer\\MSSQLServer', " +
+                    "N'BackupDirectory', @dir OUTPUT; " +
+                    "SELECT @dir;";
+                object result = cmd.ExecuteScalar();
+                return result == null || result == DBNull.Value
+                    ? null
+                    : result.ToString();
+            }
+        }
+
+        /// <summary>
         /// Runs a full database backup into <paramref name="folder"/> via usp_BackupDatabase.
         /// The SQL Server service account must have write permission to that folder.
         /// Returns the full path of the created .bak file.
