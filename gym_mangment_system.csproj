@@ -117,6 +117,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GunaUi.cs" />
+    <Compile Include="GunaMessageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="NotificationsForm.cs">
       <SubType>Form</SubType>
     </Compile>
