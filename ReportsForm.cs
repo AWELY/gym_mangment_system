@@ -95,8 +95,26 @@ namespace gym_mangment_system
                         "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };
+
+            // Opens the SalesRevune.rpt Crystal report file directly (same as the
+            // members report opens GymMembers.rpt).
+            var btnSalesReport = new Guna2Button
+            {
+                Dock = DockStyle.Left,
+                Width = 175,
+                Text = "📄 تقرير إيرادات المبيعات",
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                ForeColor = Color.White,
+                FillColor = Green,
+                BorderRadius = 8,
+                Cursor = Cursors.Hand,
+                Margin = new Padding(15, 10, 15, 10)
+            };
+            btnSalesReport.Click += (_, __) => OpenReportFile("SalesRevune.rpt", "إيرادات المبيعات");
+
             titleBar.Controls.Add(title);
             titleBar.Controls.Add(btnPrint);
+            titleBar.Controls.Add(btnSalesReport);
 
             // ── KPI cards row ──
             var cards = new TableLayoutPanel
@@ -365,6 +383,34 @@ namespace gym_mangment_system
 
                 g.FillRectangle(netBrush, lx + 205, ly + 28, 14, 14);
                 g.DrawString("المتبقي", lFont, legBrush, lx + 225, ly + 25);
+            }
+        }
+
+        // Opens a Crystal report (.rpt) file with the system's default handler.
+        private void OpenReportFile(string fileName, string friendlyName)
+        {
+            string path = System.IO.Path.Combine(Application.StartupPath, fileName);
+
+            if (!System.IO.File.Exists(path))
+            {
+                GunaUi.Show(
+                    "لم يتم العثور على ملف التقرير:\n" + path,
+                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                GunaUi.Show(
+                    "تعذر فتح ملف التقرير (" + friendlyName + ").\n\nتفاصيل الخطأ:\n" + ex.Message,
+                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
