@@ -11,6 +11,7 @@ namespace gym_mangment_system
         public SplashForm()
         {
             InitializeComponent();
+            ImageAssets.ApplyAppIcon(this);
             ApplyBranding();
             _timer.Interval = 2000;
             _timer.Tick += Timer_Tick;

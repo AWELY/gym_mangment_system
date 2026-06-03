@@ -100,7 +100,7 @@ namespace gym_mangment_system
             Label name = new Label { Text = t.Name, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 28), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label phone = new Label { Text = (t.Phone ?? "") + "  📞", Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 46), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label spec = new Label { Text = "التخصص: " + (t.Specialty ?? ""), Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 72), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label salary = new Label { Text = "الراتب: " + t.Salary.ToString("0") + " ريال/شهر", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 98), Size = new Size(innerW, 26), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label salary = new Label { Text = "الراتب: " + t.Salary.ToString("0") + " د.ل/شهر", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 98), Size = new Size(innerW, 26), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label join = new Label { Text = "تاريخ الانضمام: " + (t.JoinDate ?? ""), Font = new Font("Segoe UI", 9.5F), ForeColor = s.TextMuted, Location = new Point(pad, 126), Size = new Size(innerW, 20), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
             int btnW = (innerW - 10) / 2, btnY = 154, btnH = 34;
@@ -315,7 +315,7 @@ namespace gym_mangment_system
             decimal totalSalaries = 0;
             foreach (var x in GymDataStore.Data.Trainers)
                 totalSalaries += x.Salary;
-            string txt = "إجمالي الرواتب الشهرية: " + totalSalaries.ToString("0") + " ريال";
+            string txt = "إجمالي الرواتب الشهرية: " + totalSalaries.ToString("0") + " د.ل";
             lblCount.Text = txt;
             if (_lblSubtitle != null) _lblSubtitle.Text = txt;
         }

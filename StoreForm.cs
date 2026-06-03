@@ -252,7 +252,7 @@ namespace gym_mangment_system
                 visual = new Label { Text = product.Emoji, Font = new Font("Segoe UI", 26F), Size = new Size(170, 48), Location = new Point(0, 6), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
             }
             Label name  = new Label { Text = product.Name,  Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = s.TextPrimary, Size = new Size(170, 20), Location = new Point(0, 56), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
-            Label price = new Label { Text = product.Price.ToString("0.00") + " ريال", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Size = new Size(170, 24), Location = new Point(0, 78), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
+            Label price = new Label { Text = product.Price.ToString("0.00") + " د.ل", Font = new Font("Segoe UI", 12F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Size = new Size(170, 24), Location = new Point(0, 78), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
 
             Color stockColor = lowStock ? Color.FromArgb(231, 0, 11) : Color.FromArgb(0, 166, 62);
             Label stock = new Label { Text = "كمية: " + product.StockQty, Font = new Font("Segoe UI", 8F), ForeColor = stockColor, Size = new Size(170, 18), Location = new Point(0, 104), TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.Transparent };
@@ -369,7 +369,7 @@ namespace gym_mangment_system
                 flowCartItems.Controls.Add(row);
             }
 
-            lblTotalValue.Text = total.ToString("0.00") + " ريال";
+            lblTotalValue.Text = total.ToString("0.00") + " د.ل";
             lblCartCount.Text  = totalItems + " عنصر في السلة";
         }
 
@@ -461,7 +461,7 @@ namespace gym_mangment_system
             GymDataStore.Data.StoreSales.Add(sale);
             GymDataStore.Save();
 
-            MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " ريال\nعدد المنتجات: " + _cart.Count,
+            MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " د.ل\nعدد المنتجات: " + _cart.Count,
                 "✅ فاتورة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             _cart.Clear();
             RefreshCart();

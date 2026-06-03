@@ -252,7 +252,7 @@ namespace gym_mangment_system
                 for (int i = 0; i <= 6; i++)
                 {
                     int y = padT + (chartH * i / 6);
-                    string val = ((int)(maxVal - maxVal * i / 6)).ToString("N0") + " ريال";
+                    string val = ((int)(maxVal - maxVal * i / 6)).ToString("N0") + " د.ل";
                     g.DrawString(val, axisFont, axisBrush, 2, y - 7);
                 }
             }

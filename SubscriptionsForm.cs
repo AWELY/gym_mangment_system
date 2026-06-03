@@ -227,7 +227,7 @@ namespace gym_mangment_system
             Guna2Panel card = GunaUi.Card(w, h, s.Card, s.BorderSubtle);
 
             Label name = new Label { Text = plan.Name, Font = new Font("Segoe UI", 14F, FontStyle.Bold), ForeColor = s.TextPrimary, Location = new Point(pad, 16), Size = new Size(innerW, 30), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
-            Label price = new Label { Text = plan.Price.ToString("0") + " ريال", Font = new Font("Segoe UI", 17F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 50), Size = new Size(innerW, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
+            Label price = new Label { Text = plan.Price.ToString("0") + " د.ل", Font = new Font("Segoe UI", 17F, FontStyle.Bold), ForeColor = FigmaPalette.Primary, Location = new Point(pad, 50), Size = new Size(innerW, 32), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
             Label dur = new Label { Text = "المدة: " + BuildDurationLabel(plan.DurationValue, plan.DurationUnit), Font = new Font("Segoe UI", 10F), ForeColor = s.TextMuted, Location = new Point(pad, 86), Size = new Size(innerW, 22), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.Transparent };
 
             card.Controls.Add(name); card.Controls.Add(price); card.Controls.Add(dur);
@@ -358,7 +358,7 @@ namespace gym_mangment_system
             lblTitle.Text = "📋 إعداد أنواع الاشتراك";
             lblType.Text = "اسم الخطة";
             lblDuration.Text = "المدة";
-            lblPrice.Text = "السعر (ريال)";
+            lblPrice.Text = "السعر (د.ل)";
             lblHint.Text = "أضف نوع الاشتراك (اسم + مدة + سعر). الأنواع هنا تظهر في صفحة الأعضاء.";
 
             cmbMember.Visible = false;
@@ -409,7 +409,7 @@ namespace gym_mangment_system
             string durationUnit = cmbDurationUnit.SelectedItem?.ToString() ?? "شهر";
             decimal price = numPrice.Value;
             string durationLabel = BuildDurationLabel(durationValue, durationUnit);
-            string displayName = type + " - " + price.ToString("0.##") + " ريال / " + durationLabel;
+            string displayName = type + " - " + price.ToString("0.##") + " د.ل / " + durationLabel;
             var features = CollectCheckedFeatures();
 
             if (_editingId == -1)

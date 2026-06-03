@@ -11,6 +11,7 @@ namespace gym_mangment_system
         public Form1()
         {
             InitializeComponent();
+            ImageAssets.ApplyAppIcon(this);
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
             ThemeManager.ThemeChanged += OnThemeManagerThemeChanged;
             this.FormClosed += (_, __) => ThemeManager.ThemeChanged -= OnThemeManagerThemeChanged;

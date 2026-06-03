@@ -11,6 +11,31 @@ namespace gym_mangment_system
         public static string BgGym = "bg_gym.jpg";
         public static string LogoHeartDumbbell = "logo_heart_dumbbell.jpg";
         public static string LogoHeartbeat = "logo_heartbeat.jpg";
+        public static string AppLogo = "glory_gym_logo.png";
+
+        private static Icon _appIcon;
+
+        /// <summary>The application/brand icon (extracted from the published EXE icon).</summary>
+        public static Icon AppIcon
+        {
+            get
+            {
+                if (_appIcon == null)
+                {
+                    try { _appIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); }
+                    catch { /* icon unavailable -> leave null */ }
+                }
+                return _appIcon;
+            }
+        }
+
+        /// <summary>Assigns the brand icon to a top-level window (title bar + taskbar).</summary>
+        public static void ApplyAppIcon(Form form)
+        {
+            Icon ic = AppIcon;
+            if (form != null && ic != null)
+                form.Icon = ic;
+        }
 
         public static Image TryLoad(string fileName)
         {

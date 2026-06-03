@@ -20,6 +20,7 @@ namespace gym_mangment_system
         public DashboardForm()
         {
             InitializeComponent();
+            ImageAssets.ApplyAppIcon(this);
             ThemeManager.ThemeChanged += OnGlobalThemeChanged;
             btnThemeToggle.Click += (_, __) => ThemeManager.Toggle();
 
@@ -410,10 +411,10 @@ namespace gym_mangment_system
                 GymDataStore.MembersExpiringWithinDays(21).ToString("N0"), FigmaPalette.Orange,
                 () => ShowEmbeddedPage(new SubscriptionsForm(), btnNavSubs, "خطط الاشتراكات")));
             flow.Controls.Add(BuildStatCard(t, "💲", "إيرادات الشهر",
-                monthRevenue.ToString("N0") + " ريال", FigmaPalette.Green,
+                monthRevenue.ToString("N0") + " د.ل", FigmaPalette.Green,
                 () => ShowEmbeddedPage(new ReportsForm(), btnNavReports, "التقارير المالية")));
             flow.Controls.Add(BuildStatCard(t, "🛒", "مبيعات اليوم",
-                GymDataStore.StoreSalesToday().ToString("N0") + " ريال", FigmaPalette.Purple,
+                GymDataStore.StoreSalesToday().ToString("N0") + " د.ل", FigmaPalette.Purple,
                 () => ShowEmbeddedPage(new StoreForm(), btnNavStore, "متجر المكملات")));
 
             return flow;
@@ -550,7 +551,7 @@ namespace gym_mangment_system
             // خطط الاشتراك
             var plansRows = new List<Tuple<string, string>>();
             foreach (var p in GymDataStore.Data.SubscriptionPlans)
-                plansRows.Add(Tuple.Create(p.Name, p.Price.ToString("0.##") + " ريال"));
+                plansRows.Add(Tuple.Create(p.Name, p.Price.ToString("0.##") + " د.ل"));
             row.Controls.Add(BuildInfoPanel(t, "خطط الاشتراك", "💲", FigmaPalette.Pink, plansRows), 0, 0);
 
             // إحصائيات سريعة
