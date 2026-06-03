@@ -335,7 +335,7 @@ namespace gym_mangment_system
         {
             if (gridMembers.SelectedRows.Count == 0)
             {
-                MessageBox.Show("الرجاء تحديد عضو للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء تحديد عضو للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -364,7 +364,7 @@ namespace gym_mangment_system
         {
             if (gridMembers.SelectedRows.Count == 0)
             {
-                MessageBox.Show("الرجاء تحديد عضو لفتح واتساب", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء تحديد عضو لفتح واتساب", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -372,7 +372,7 @@ namespace gym_mangment_system
             string phone = gridMembers.SelectedRows[0].Cells["الهاتف"].Value?.ToString() ?? "";
             if (string.IsNullOrWhiteSpace(phone))
             {
-                MessageBox.Show("لا يوجد رقم هاتف لهذا العضو", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("لا يوجد رقم هاتف لهذا العضو", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -387,7 +387,7 @@ namespace gym_mangment_system
         {
             if (_dt.DefaultView.Count == 0)
             {
-                MessageBox.Show("لا يوجد أعضاء للطباعة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("لا يوجد أعضاء للطباعة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -398,7 +398,7 @@ namespace gym_mangment_system
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                GunaUi.Show(
                     "تعذر فتح تقرير الأعضاء.\n\nتفاصيل الخطأ:\n" + ex.Message,
                     "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -411,19 +411,19 @@ namespace gym_mangment_system
         {
             if (gridMembers.SelectedRows.Count == 0)
             {
-                MessageBox.Show("الرجاء تحديد عضو للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء تحديد عضو للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             string name = gridMembers.SelectedRows[0].Cells["الاسم"].Value?.ToString() ?? "";
-            if (MessageBox.Show("هل أنت متأكد من حذف العضو: " + name + "؟", "⚠️ تأكيد الحذف",
+            if (GunaUi.Show("هل أنت متأكد من حذف العضو: " + name + "؟", "⚠️ تأكيد الحذف",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 int id = Convert.ToInt32(gridMembers.SelectedRows[0].Cells["ID"].Value);
                 GymDataStore.Data.Members.RemoveAll(x => x.Id == id);
                 GymDataStore.Save();
                 RebindMembersFromStore();
-                MessageBox.Show("تم حذف العضو بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تم حذف العضو بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -434,7 +434,7 @@ namespace gym_mangment_system
         {
             if (string.IsNullOrWhiteSpace(txtFName.Text))
             {
-                MessageBox.Show("الرجاء إدخال اسم العضو", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء إدخال اسم العضو", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -464,7 +464,7 @@ namespace gym_mangment_system
                     mem.DurationText = duration;
                 }
                 GymDataStore.Save();
-                MessageBox.Show("تم تحديث بيانات العضو بنجاح", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تم تحديث بيانات العضو بنجاح", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
@@ -481,7 +481,7 @@ namespace gym_mangment_system
                     JoinDate      = DateTime.Now.ToString("yyyy-MM-dd")
                 });
                 GymDataStore.Save();
-                MessageBox.Show("تمت إضافة العضو بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تمت إضافة العضو بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             HideForm();

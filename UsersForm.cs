@@ -106,10 +106,10 @@ namespace gym_mangment_system
         {
             if (username.Equals("admin", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("لا يمكن حذف حساب المدير الافتراضي", "محظور", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                GunaUi.Show("لا يمكن حذف حساب المدير الافتراضي", "محظور", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
-            if (MessageBox.Show("هل أنت متأكد من حذف المستخدم: " + username + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            if (GunaUi.Show("هل أنت متأكد من حذف المستخدم: " + username + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
             if (UserDirectory.Remove(id))
             {
@@ -190,7 +190,7 @@ namespace gym_mangment_system
 
         private void BtnEditUser_Click(object sender, EventArgs e)
         {
-            if (gridUsers.SelectedRows.Count == 0) { MessageBox.Show("الرجاء تحديد مستخدم للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (gridUsers.SelectedRows.Count == 0) { GunaUi.Show("الرجاء تحديد مستخدم للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
             _isEditing = true;
             var row = gridUsers.SelectedRows[0];
             _editingRowIndex   = row.Index;
@@ -208,14 +208,14 @@ namespace gym_mangment_system
 
         private void BtnDeleteUser_Click(object sender, EventArgs e)
         {
-            if (gridUsers.SelectedRows.Count == 0) { MessageBox.Show("الرجاء تحديد مستخدم للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (gridUsers.SelectedRows.Count == 0) { GunaUi.Show("الرجاء تحديد مستخدم للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
             string name = gridUsers.SelectedRows[0].Cells["اسم المستخدم"].Value?.ToString() ?? "";
             if (name.Equals("admin", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("لا يمكن حذف حساب المدير الافتراضي", "محظور", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                GunaUi.Show("لا يمكن حذف حساب المدير الافتراضي", "محظور", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
-            if (MessageBox.Show("هل أنت متأكد من حذف المستخدم: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (GunaUi.Show("هل أنت متأكد من حذف المستخدم: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 int id = Convert.ToInt32(gridUsers.SelectedRows[0].Cells["ID"].Value);
                 if (UserDirectory.Remove(id))
@@ -228,8 +228,8 @@ namespace gym_mangment_system
 
         private void BtnFormSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtFUsername.Text)) { MessageBox.Show("الرجاء إدخال اسم المستخدم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
-            if (cmbFRole.SelectedIndex < 0) { MessageBox.Show("الرجاء اختيار الصلاحية", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (string.IsNullOrWhiteSpace(txtFUsername.Text)) { GunaUi.Show("الرجاء إدخال اسم المستخدم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (cmbFRole.SelectedIndex < 0) { GunaUi.Show("الرجاء اختيار الصلاحية", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
             var role = UserDirectoryEntry.RoleFromDisplay(cmbFRole.SelectedItem?.ToString() ?? "");
             string u = txtFUsername.Text.Trim();
@@ -241,30 +241,30 @@ namespace gym_mangment_system
                 int id = Convert.ToInt32(drv["ID"]);
                 if (UserDirectory.UsernameExists(u, id))
                 {
-                    MessageBox.Show("اسم المستخدم مستخدم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    GunaUi.Show("اسم المستخدم مستخدم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 string pwdKeep = string.IsNullOrWhiteSpace(txtFPassword.Text) ? null : txtFPassword.Text;
                 UserDirectory.Update(id, txtFFullName.Text.Trim(), u, pwdKeep, role);
                 UserDirectory.FillDataTable(_dt);
-                MessageBox.Show("تم تحديث بيانات المستخدم", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تم تحديث بيانات المستخدم", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(txtFPassword.Text))
                 {
-                    MessageBox.Show("الرجاء إدخال كلمة مرور للمستخدم الجديد", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    GunaUi.Show("الرجاء إدخال كلمة مرور للمستخدم الجديد", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 if (UserDirectory.UsernameExists(u, null))
                 {
-                    MessageBox.Show("اسم المستخدم مستخدم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    GunaUi.Show("اسم المستخدم مستخدم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 UserDirectory.Add(txtFFullName.Text.Trim(), u, txtFPassword.Text, role);
                 UserDirectory.FillDataTable(_dt);
-                MessageBox.Show("تمت إضافة المستخدم بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تمت إضافة المستخدم بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             HideForm(); UpdateCount();
         }

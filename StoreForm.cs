@@ -291,7 +291,7 @@ namespace gym_mangment_system
         // ═══════════════════════════════════════════
         private static void ShowStockExceededWarning(string productName, int requestedQty, int availableQty)
         {
-            MessageBox.Show(
+            GunaUi.Show(
                 "الكمية المطلوبة أكبر من المتوفر في المخزون.\n\n" +
                 "المنتج: " + productName + "\n" +
                 "المطلوب: " + requestedQty + "\n" +
@@ -303,7 +303,7 @@ namespace gym_mangment_system
         {
             if (product.StockQty <= 0)
             {
-                MessageBox.Show("هذا المنتج غير متوفر في المخزون", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("هذا المنتج غير متوفر في المخزون", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             var existing = _cart.Find(c => c.Name == product.Name);
@@ -400,14 +400,14 @@ namespace gym_mangment_system
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("تعذر تحميل الصورة:\n" + ex.Message, "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GunaUi.Show("تعذر تحميل الصورة:\n" + ex.Message, "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
         private void BtnCheckout_Click(object sender, EventArgs e)
         {
-            if (_cart.Count == 0) { MessageBox.Show("السلة فارغة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (_cart.Count == 0) { GunaUi.Show("السلة فارغة!", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
             var stockErrors = new List<string>();
             foreach (var line in _cart)
@@ -419,7 +419,7 @@ namespace gym_mangment_system
             }
             if (stockErrors.Count > 0)
             {
-                MessageBox.Show(
+                GunaUi.Show(
                     "لا يمكن إتمام البيع بسبب نقص المخزون:\n\n" + string.Join("\n", stockErrors),
                     "تنبيه المخزون", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -461,7 +461,7 @@ namespace gym_mangment_system
             GymDataStore.Data.StoreSales.Add(sale);
             GymDataStore.Save();
 
-            MessageBox.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " د.ل\nعدد المنتجات: " + _cart.Count,
+            GunaUi.Show("تم إصدار الفاتورة بنجاح!\n\nالمجموع: " + total.ToString("0.00") + " د.ل\nعدد المنتجات: " + _cart.Count,
                 "✅ فاتورة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             _cart.Clear();
             RefreshCart();
@@ -488,7 +488,7 @@ namespace gym_mangment_system
         {
             if (string.IsNullOrWhiteSpace(txtNewName.Text))
             {
-                MessageBox.Show("الرجاء إدخال اسم المنتج", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء إدخال اسم المنتج", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -526,7 +526,7 @@ namespace gym_mangment_system
             picNewImage.Image?.Dispose();
             picNewImage.Image = null;
 
-            MessageBox.Show("تمت إضافة المنتج: " + p.Name + "\nالكمية: " + p.StockQty + " | ينتهي: " + p.Expiry.ToString("yyyy-MM-dd"),
+            GunaUi.Show("تمت إضافة المنتج: " + p.Name + "\nالكمية: " + p.StockQty + " | ينتهي: " + p.Expiry.ToString("yyyy-MM-dd"),
                 "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

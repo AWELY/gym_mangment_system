@@ -107,7 +107,7 @@ namespace gym_mangment_system
             }
             else
             {
-                MessageBox.Show(
+                GunaUi.Show(
                     "اسم المستخدم أو كلمة المرور غير صحيحة.\n\nمدير: admin / admin\nاستقبال: reception / 1234",
                     "خطأ في تسجيل الدخول", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;

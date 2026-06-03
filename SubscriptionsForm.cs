@@ -276,7 +276,7 @@ namespace gym_mangment_system
 
         private void DeletePlan(int id, string name)
         {
-            if (MessageBox.Show("حذف نوع الاشتراك: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            if (GunaUi.Show("حذف نوع الاشتراك: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
             SubscriptionPlanCatalog.Delete(id);
             DataRow row = null;
@@ -400,7 +400,7 @@ namespace gym_mangment_system
         {
             if (string.IsNullOrWhiteSpace(txtType.Text))
             {
-                MessageBox.Show("أدخل اسم نوع الاشتراك.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("أدخل اسم نوع الاشتراك.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -423,7 +423,7 @@ namespace gym_mangment_system
                 int newId = maxId + 1;
                 _dt.Rows.Add(newId, type, durationLabel, price, displayName);
                 SubscriptionPlanCatalog.Upsert(new SubscriptionPlan { Id = newId, Name = type, Price = price, DurationValue = durationValue, DurationUnit = durationUnit, Features = features });
-                MessageBox.Show("تمت إضافة نوع الاشتراك.", "نجاح", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تمت إضافة نوع الاشتراك.", "نجاح", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
@@ -437,7 +437,7 @@ namespace gym_mangment_system
                     row["السعر"] = price;
                     row["اسم العرض"] = displayName;
                     SubscriptionPlanCatalog.Upsert(new SubscriptionPlan { Id = _editingId, Name = type, Price = price, DurationValue = durationValue, DurationUnit = durationUnit, Features = features });
-                    MessageBox.Show("تم تحديث نوع الاشتراك.", "نجاح", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    GunaUi.Show("تم تحديث نوع الاشتراك.", "نجاح", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
 
@@ -468,13 +468,13 @@ namespace gym_mangment_system
         {
             if (gridSubs.SelectedRows.Count == 0)
             {
-                MessageBox.Show("اختر نوع اشتراك من الجدول للحذف.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("اختر نوع اشتراك من الجدول للحذف.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             DataGridViewRow row = gridSubs.SelectedRows[0];
             string type = row.Cells["نوع الاشتراك"].Value?.ToString() ?? "";
-            if (MessageBox.Show("حذف نوع الاشتراك: " + type + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            if (GunaUi.Show("حذف نوع الاشتراك: " + type + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
 
             if (row.Cells["ID"].Value != null)

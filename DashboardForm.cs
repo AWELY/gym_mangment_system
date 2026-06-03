@@ -40,7 +40,7 @@ namespace gym_mangment_system
                 // Only prompt on a real application exit (not when signing out).
                 if (!RequestSignOut)
                 {
-                    var answer = MessageBox.Show(
+                    var answer = GunaUi.Show(
                         "هل تريد أخذ نسخة احتياطية لقاعدة البيانات قبل الخروج؟",
                         "إغلاق النظام", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
@@ -192,7 +192,7 @@ namespace gym_mangment_system
             _btnSignOut.FlatAppearance.BorderSize = 0;
             _btnSignOut.Click += (s, e) =>
             {
-                if (MessageBox.Show("هل تريد تسجيل الخروج؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                if (GunaUi.Show("هل تريد تسجيل الخروج؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                     return;
                 RequestSignOut = true;
                 Close();

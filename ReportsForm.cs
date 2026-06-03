@@ -91,7 +91,7 @@ namespace gym_mangment_system
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("تعذر فتح التقرير المالي.\n\n" + ex.Message,
+                    GunaUi.Show("تعذر فتح التقرير المالي.\n\n" + ex.Message,
                         "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             };

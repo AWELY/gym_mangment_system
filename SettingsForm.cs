@@ -150,12 +150,12 @@ namespace gym_mangment_system
             {
                 using (var conn = new SqlConnection(cs))
                     conn.Open();
-                MessageBox.Show("تم الاتصال بقاعدة البيانات بنجاح ✅", "اختبار الاتصال",
+                GunaUi.Show("تم الاتصال بقاعدة البيانات بنجاح ✅", "اختبار الاتصال",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("فشل الاتصال:\n\n" + ex.Message, "اختبار الاتصال",
+                GunaUi.Show("فشل الاتصال:\n\n" + ex.Message, "اختبار الاتصال",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -164,7 +164,7 @@ namespace gym_mangment_system
         {
             Settings.Default.SqlConnectionString = _txtConn.Text?.Trim() ?? string.Empty;
             Settings.Default.Save();
-            MessageBox.Show(
+            GunaUi.Show(
                 "تم حفظ إعدادات الاتصال.\nسيتم استخدامها عند إعادة تشغيل النظام.",
                 "حفظ", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -207,7 +207,7 @@ namespace gym_mangment_system
             try
             {
                 string file = Db.BackupTo(folder);
-                MessageBox.Show(owner,
+                GunaUi.Show(owner,
                     "تم إنشاء النسخة الاحتياطية بنجاح ✅\n\n" + file,
                     "نسخ احتياطي", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
@@ -225,7 +225,7 @@ namespace gym_mangment_system
                 if (!string.IsNullOrWhiteSpace(defaultDir) &&
                     !string.Equals(defaultDir.TrimEnd('\\'), (folder ?? "").TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
                 {
-                    var retry = MessageBox.Show(owner,
+                    var retry = GunaUi.Show(owner,
                         "تعذر إنشاء النسخة الاحتياطية في المجلد المحدد، غالباً لأن حساب خدمة " +
                         "SQL Server لا يملك صلاحية الكتابة عليه (مثل سطح المكتب).\n\n" +
                         "هل تريد حفظ النسخة في مجلد SQL Server الافتراضي؟\n\n" + defaultDir,
@@ -238,7 +238,7 @@ namespace gym_mangment_system
                             string file2 = Db.BackupTo(defaultDir);
                             Settings.Default.BackupFolder = defaultDir;
                             Settings.Default.Save();
-                            MessageBox.Show(owner,
+                            GunaUi.Show(owner,
                                 "تم إنشاء النسخة الاحتياطية بنجاح ✅\n\n" + file2,
                                 "نسخ احتياطي", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return true;
@@ -250,7 +250,7 @@ namespace gym_mangment_system
                     }
                 }
 
-                MessageBox.Show(owner,
+                GunaUi.Show(owner,
                     "تعذر إنشاء النسخة الاحتياطية:\n\n" + ex.Message +
                     "\n\nملاحظة: يجب أن يملك حساب خدمة SQL Server صلاحية الكتابة على المجلد المحدد." +
                     "\nاختر مجلداً مثل C:\\GymBackups وامنح حساب الخدمة صلاحية الكتابة عليه، " +

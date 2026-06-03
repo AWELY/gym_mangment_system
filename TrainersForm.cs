@@ -117,7 +117,7 @@ namespace gym_mangment_system
 
         private void DeleteTrainer(int id, string name)
         {
-            if (MessageBox.Show("هل أنت متأكد من حذف المدرب: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            if (GunaUi.Show("هل أنت متأكد من حذف المدرب: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
             GymDataStore.Data.Trainers.RemoveAll(x => x.Id == id);
             GymDataStore.Save();
@@ -228,7 +228,7 @@ namespace gym_mangment_system
 
         private void BtnEdit_Click(object sender, EventArgs e)
         {
-            if (gridTrainers.SelectedRows.Count == 0) { MessageBox.Show("الرجاء تحديد مدرب للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (gridTrainers.SelectedRows.Count == 0) { GunaUi.Show("الرجاء تحديد مدرب للتعديل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
             _isEditing = true;
             var row = gridTrainers.SelectedRows[0];
             _editingTrainerId = Convert.ToInt32(row.Cells["ID"].Value);
@@ -246,21 +246,21 @@ namespace gym_mangment_system
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            if (gridTrainers.SelectedRows.Count == 0) { MessageBox.Show("الرجاء تحديد مدرب للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (gridTrainers.SelectedRows.Count == 0) { GunaUi.Show("الرجاء تحديد مدرب للحذف", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
             string name = gridTrainers.SelectedRows[0].Cells["الاسم"].Value?.ToString() ?? "";
-            if (MessageBox.Show("هل أنت متأكد من حذف المدرب: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (GunaUi.Show("هل أنت متأكد من حذف المدرب: " + name + "؟", "⚠️ تأكيد الحذف", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 int id = Convert.ToInt32(gridTrainers.SelectedRows[0].Cells["ID"].Value);
                 GymDataStore.Data.Trainers.RemoveAll(x => x.Id == id);
                 GymDataStore.Save();
                 RebindTrainersFromStore();
-                MessageBox.Show("تم حذف المدرب بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تم حذف المدرب بنجاح", "✅ تم الحذف", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void BtnFormSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtFName.Text)) { MessageBox.Show("الرجاء إدخال اسم المدرب", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+            if (string.IsNullOrWhiteSpace(txtFName.Text)) { GunaUi.Show("الرجاء إدخال اسم المدرب", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
             if (_isEditing && _editingTrainerId > 0)
             {
@@ -276,7 +276,7 @@ namespace gym_mangment_system
                     tr.JoinDate  = dtpFJoinDate.Value.ToString("yyyy-MM-dd");
                 }
                 GymDataStore.Save();
-                MessageBox.Show("تم تحديث بيانات المدرب", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تم تحديث بيانات المدرب", "✅ تم التحديث", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
@@ -290,7 +290,7 @@ namespace gym_mangment_system
                     JoinDate   = dtpFJoinDate.Value.ToString("yyyy-MM-dd")
                 });
                 GymDataStore.Save();
-                MessageBox.Show("تمت إضافة المدرب بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GunaUi.Show("تمت إضافة المدرب بنجاح", "✅ تمت الإضافة", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             HideForm();
             RebindTrainersFromStore();

@@ -194,7 +194,7 @@ namespace gym_mangment_system
 
         private void DeletePlan(string name)
         {
-            if (MessageBox.Show("حذف خطة التغذية: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+            if (GunaUi.Show("حذف خطة التغذية: " + name + "؟", "تأكيد", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
             GymDataStore.Data.FeedingPlans.RemoveAll(x => x.Name == name);
             GymDataStore.Save();
@@ -266,7 +266,7 @@ namespace gym_mangment_system
 
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("الرجاء إدخال اسم الخطة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("الرجاء إدخال اسم الخطة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -279,7 +279,7 @@ namespace gym_mangment_system
                 }
             if (nameTakenByOther)
             {
-                MessageBox.Show("توجد خطة بهذا الاسم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("توجد خطة بهذا الاسم بالفعل", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -318,7 +318,7 @@ namespace gym_mangment_system
                 if (!string.IsNullOrEmpty(m.Phone) && m.Phone.Contains(phoneTrim)) { found = m; break; }
             if (found == null)
             {
-                MessageBox.Show("لم يُعثر على عضو بهذا الرقم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("لم يُعثر على عضو بهذا الرقم", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -372,7 +372,7 @@ namespace gym_mangment_system
                     {
                         if (!string.IsNullOrWhiteSpace(plan.PdfPath))
                         {
-                            MessageBox.Show(
+                            GunaUi.Show(
                                 "ملف PDF غير موجود في المسار المحفوظ. سيتم إرسال رسالة نصية فقط.",
                                 "تنبيه",
                                 MessageBoxButtons.OK,
@@ -391,7 +391,7 @@ namespace gym_mangment_system
 
             if (result.Ok)
             {
-                MessageBox.Show(
+                GunaUi.Show(
                     sentAsDocument
                         ? "تم جدولة إرسال خطة التغذية (ملف PDF) عبر واتساب (WASL)."
                         : "تم جدولة إرسال الرسالة عبر واتساب (WASL).",
@@ -401,7 +401,7 @@ namespace gym_mangment_system
                 return;
             }
 
-            var openBrowser = MessageBox.Show(
+            var openBrowser = GunaUi.Show(
                 result.Detail + "\n\nهل تريد فتح واتساب في المتصفح كبديل؟",
                 "فشل الإرسال عبر الـ API",
                 MessageBoxButtons.YesNo,

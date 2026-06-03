@@ -73,5 +73,71 @@ namespace gym_mangment_system
             btn.ForeColor  = Color.White;
             if (btn.BorderRadius < 10) btn.BorderRadius = 12;
         }
+
+        // ---------------------------------------------------------------------
+        // Guna styled message dialogs — drop-in replacements for MessageBox.Show
+        // so the whole app shares one themed, RTL-friendly dialog instead of the
+        // native Windows message boxes.
+        // ---------------------------------------------------------------------
+
+        internal static DialogResult Show(string text)
+            => Core(null, text, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.None);
+
+        internal static DialogResult Show(string text, string caption)
+            => Core(null, text, caption, MessageBoxButtons.OK, MessageBoxIcon.None);
+
+        internal static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
+            => Core(null, text, caption, buttons, MessageBoxIcon.None);
+
+        internal static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+            => Core(null, text, caption, buttons, icon);
+
+        internal static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+            => Core(owner, text, caption, buttons, icon);
+
+        private static DialogResult Core(IWin32Window owner, string text, string caption,
+            MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            var dialog = new Guna2MessageDialog
+            {
+                Caption = caption ?? string.Empty,
+                Text    = text ?? string.Empty,
+                Buttons = MapButtons(buttons),
+                Icon    = MapIcon(icon),
+                Style   = ThemeManager.IsLight ? MessageDialogStyle.Light : MessageDialogStyle.Dark
+            };
+
+            if (owner is Form ownerForm)
+                dialog.Parent = ownerForm;
+
+            return dialog.Show();
+        }
+
+        private static MessageDialogButtons MapButtons(MessageBoxButtons buttons)
+        {
+            switch (buttons)
+            {
+                case MessageBoxButtons.OKCancel:        return MessageDialogButtons.OKCancel;
+                case MessageBoxButtons.YesNo:           return MessageDialogButtons.YesNo;
+                case MessageBoxButtons.YesNoCancel:     return MessageDialogButtons.YesNoCancel;
+                case MessageBoxButtons.RetryCancel:     return MessageDialogButtons.RetryCancel;
+                case MessageBoxButtons.AbortRetryIgnore:return MessageDialogButtons.AbortRetryIgnore;
+                default:                                return MessageDialogButtons.OK;
+            }
+        }
+
+        private static MessageDialogIcon MapIcon(MessageBoxIcon icon)
+        {
+            // MessageBoxIcon members share values (Error/Stop/Hand = 16, etc.),
+            // so switching on the documented names covers every alias.
+            switch (icon)
+            {
+                case MessageBoxIcon.Error:       return MessageDialogIcon.Error;       // Error/Stop/Hand
+                case MessageBoxIcon.Question:    return MessageDialogIcon.Question;
+                case MessageBoxIcon.Warning:     return MessageDialogIcon.Warning;     // Warning/Exclamation
+                case MessageBoxIcon.Information:  return MessageDialogIcon.Information;  // Information/Asterisk
+                default:                         return MessageDialogIcon.None;
+            }
+        }
     }
 }

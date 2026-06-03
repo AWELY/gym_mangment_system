@@ -36,7 +36,7 @@ namespace gym_mangment_system
             string n = NormalizePhoneForWaMe(phoneRaw);
             if (string.IsNullOrEmpty(n))
             {
-                MessageBox.Show("رقم الهاتف غير صالح لإرسال واتساب.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show("رقم الهاتف غير صالح لإرسال واتساب.", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace gym_mangment_system
             }
             catch (Exception ex)
             {
-                MessageBox.Show("تعذر فتح المتصفح:\n" + ex.Message, "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GunaUi.Show("تعذر فتح المتصفح:\n" + ex.Message, "خطأ", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

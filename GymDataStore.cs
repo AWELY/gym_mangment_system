@@ -38,7 +38,7 @@ namespace gym_mangment_system
             catch (Exception ex)
             {
                 _data = GymDataSnapshot.CreateEmpty();
-                MessageBox.Show(
+                GunaUi.Show(
                     "تعذر الاتصال بقاعدة البيانات. سيتم تشغيل النظام بدون بيانات.\n\n" +
                     "تأكد من تشغيل SQL Server وتنفيذ سكربت قاعدة البيانات (GymDB.sql)،\n" +
                     "ويمكنك تعديل سلسلة الاتصال من صفحة الإعدادات.\n\n" +
@@ -59,7 +59,7 @@ namespace gym_mangment_system
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                GunaUi.Show(
                     "تعذر حفظ البيانات في قاعدة البيانات.\n\nتفاصيل الخطأ:\n" + ex.Message,
                     "خطأ في الحفظ", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
