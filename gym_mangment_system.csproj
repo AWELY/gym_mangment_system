@@ -158,9 +158,6 @@
     <Compile Include="MembersForm.Designer.cs">
       <DependentUpon>MembersForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MembersReportForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DashboardForm.resx">
@@ -172,6 +169,7 @@
     <EmbeddedResource Include="GymMembers.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>GymMembers.cs</LastGenOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

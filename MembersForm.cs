@@ -381,25 +381,31 @@ namespace gym_mangment_system
         }
 
         // ═══════════════════════════════════════════
-        //  PRINT (Crystal Report: GymMembers.rpt)
+        //  PRINT — open the GymMembers.rpt report file directly
         // ═══════════════════════════════════════════
         private void BtnPrint_Click(object sender, EventArgs e)
         {
-            if (_dt.DefaultView.Count == 0)
+            string path = System.IO.Path.Combine(Application.StartupPath, "GymMembers.rpt");
+
+            if (!System.IO.File.Exists(path))
             {
-                GunaUi.Show("لا يوجد أعضاء للطباعة", "تنبيه", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                GunaUi.Show(
+                    "لم يتم العثور على ملف التقرير:\n" + path,
+                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             try
             {
-                using (var report = new MembersReportForm())
-                    report.ShowDialog(this);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                });
             }
             catch (Exception ex)
             {
                 GunaUi.Show(
-                    "تعذر فتح تقرير الأعضاء.\n\nتفاصيل الخطأ:\n" + ex.Message,
+                    "تعذر فتح ملف التقرير GymMembers.rpt.\n\nتفاصيل الخطأ:\n" + ex.Message,
                     "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
