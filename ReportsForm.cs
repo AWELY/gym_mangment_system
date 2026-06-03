@@ -110,7 +110,7 @@ namespace gym_mangment_system
                 Cursor = Cursors.Hand,
                 Margin = new Padding(15, 10, 15, 10)
             };
-            btnSalesReport.Click += (_, __) => OpenReportFile("SalesRevune.rpt", "إيرادات المبيعات");
+            btnSalesReport.Click += (_, __) => ReportLauncher.OpenEmbeddedReport("SalesRevune.rpt", "إيرادات المبيعات");
 
             titleBar.Controls.Add(title);
             titleBar.Controls.Add(btnPrint);
@@ -383,34 +383,6 @@ namespace gym_mangment_system
 
                 g.FillRectangle(netBrush, lx + 205, ly + 28, 14, 14);
                 g.DrawString("المتبقي", lFont, legBrush, lx + 225, ly + 25);
-            }
-        }
-
-        // Opens a Crystal report (.rpt) file with the system's default handler.
-        private void OpenReportFile(string fileName, string friendlyName)
-        {
-            string path = System.IO.Path.Combine(Application.StartupPath, fileName);
-
-            if (!System.IO.File.Exists(path))
-            {
-                GunaUi.Show(
-                    "لم يتم العثور على ملف التقرير:\n" + path,
-                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            try
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
-                {
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                GunaUi.Show(
-                    "تعذر فتح ملف التقرير (" + friendlyName + ").\n\nتفاصيل الخطأ:\n" + ex.Message,
-                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

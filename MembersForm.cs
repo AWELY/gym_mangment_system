@@ -385,29 +385,7 @@ namespace gym_mangment_system
         // ═══════════════════════════════════════════
         private void BtnPrint_Click(object sender, EventArgs e)
         {
-            string path = System.IO.Path.Combine(Application.StartupPath, "GymMembers.rpt");
-
-            if (!System.IO.File.Exists(path))
-            {
-                GunaUi.Show(
-                    "لم يتم العثور على ملف التقرير:\n" + path,
-                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            try
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path)
-                {
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                GunaUi.Show(
-                    "تعذر فتح ملف التقرير GymMembers.rpt.\n\nتفاصيل الخطأ:\n" + ex.Message,
-                    "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            ReportLauncher.OpenEmbeddedReport("GymMembers.rpt", "الأعضاء");
         }
 
         // ═══════════════════════════════════════════
