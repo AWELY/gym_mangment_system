@@ -98,7 +98,7 @@ namespace gym_mangment_system
             foreach (var def in ButtonDefs(buttons))
             {
                 int w = Math.Max(100, TextRenderer.MeasureText(def.Text, btnFont).Width + 36);
-                buttonList.Add(new Guna2Button
+                var button = new Guna2Button
                 {
                     Text         = def.Text,
                     Size         = new Size(w, btnH),
@@ -108,7 +108,18 @@ namespace gym_mangment_system
                     DialogResult = def.Result,
                     ForeColor    = def.Primary ? Color.White : s.TextPrimary,
                     FillColor    = def.Primary ? primaryFill : s.SecondaryButton
-                });
+                };
+
+                // Guna2Button does not auto-propagate its DialogResult to the form on
+                // click (unlike the native Button), so close the dialog explicitly.
+                DialogResult result = def.Result;
+                button.Click += (sender, args) =>
+                {
+                    DialogResult = result;
+                    Close();
+                };
+
+                buttonList.Add(button);
                 totalWidth += w;
             }
             totalWidth += gap * Math.Max(0, buttonList.Count - 1);
