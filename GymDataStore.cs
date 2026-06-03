@@ -483,5 +483,32 @@ namespace gym_mangment_system
                     total += s.Total;
             return total;
         }
+
+        /// <summary>Total revenue from every member's paid subscription (all members).</summary>
+        public static decimal TotalSubscriptionRevenue()
+        {
+            decimal total = 0;
+            foreach (var m in Data.Members)
+                total += ParsePriceFromMemberDisplay(m.PriceText);
+            return total;
+        }
+
+        /// <summary>Total revenue from every store sale ever recorded.</summary>
+        public static decimal TotalStoreRevenue()
+        {
+            decimal total = 0;
+            foreach (var s in Data.StoreSales)
+                total += s.Total;
+            return total;
+        }
+
+        /// <summary>Combined monthly payroll across all trainers.</summary>
+        public static decimal TotalMonthlySalaries()
+        {
+            decimal total = 0;
+            foreach (var t in Data.Trainers)
+                total += t.Salary;
+            return total;
+        }
     }
 }

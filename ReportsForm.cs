@@ -8,11 +8,10 @@ namespace gym_mangment_system
 {
     public partial class ReportsForm : Form, IThemeAware
     {
-        private decimal _monthlySubscriptions;
-        private decimal _monthlyStore;
-        private decimal _monthlySalaries;
-        private decimal _monthlyGross;
-        private decimal _monthlyNet;
+        private static readonly Color Green = Color.FromArgb(0, 166, 62);
+        private static readonly Color Red   = Color.FromArgb(231, 0, 11);
+        private static readonly Color Blue  = Color.FromArgb(43, 127, 255);
+        private static readonly Color Purple = Color.FromArgb(124, 58, 237);
 
         public ReportsForm()
         {
@@ -46,91 +45,81 @@ namespace gym_mangment_system
             UiColorScheme s = ThemeManager.Current;
             Controls.Clear();
 
-            _monthlySubscriptions = GymDataStore.SubscriptionCashInThisMonth();
-            _monthlyStore = GymDataStore.StoreRevenueThisMonth();
-            _monthlySalaries = 0;
-            foreach (var t in GymDataStore.Data.Trainers)
-                _monthlySalaries += t.Salary;
-            _monthlyGross = _monthlySubscriptions + _monthlyStore;
-            _monthlyNet = _monthlyGross - _monthlySalaries;
+            decimal subscriptions = GymDataStore.TotalSubscriptionRevenue();
+            decimal store         = GymDataStore.TotalStoreRevenue();
+            decimal salaries      = GymDataStore.TotalMonthlySalaries();
+            decimal revenue       = subscriptions + store;
+            decimal net           = revenue - salaries;
+            decimal margin        = revenue > 0 ? (net / revenue) * 100m : 0m;
 
             BackColor = s.ContentHost;
 
-            var title = new Label
+            var titleBar = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 70,
+                Height = 60,
+                BackColor = Color.Transparent
+            };
+            var title = new Label
+            {
+                Dock = DockStyle.Fill,
                 Font = new Font("Segoe UI", 20F, FontStyle.Bold),
                 ForeColor = s.TextPrimary,
-                Padding = new Padding(15, 10, 15, 5),
-                Text = "📊  المالية",
+                Padding = new Padding(15, 8, 15, 0),
+                Text = "📊  التقرير المالي",
                 TextAlign = ContentAlignment.MiddleRight,
                 BackColor = Color.Transparent
             };
+            var btnPrint = new Guna2Button
+            {
+                Dock = DockStyle.Left,
+                Width = 150,
+                Text = "🖨️ طباعة التقرير",
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
+                ForeColor = Color.White,
+                FillColor = Purple,
+                BorderRadius = 8,
+                Cursor = Cursors.Hand,
+                Margin = new Padding(15, 10, 15, 10)
+            };
+            btnPrint.Click += (_, __) =>
+            {
+                try
+                {
+                    using (var report = new FinanceReportForm())
+                        report.ShowDialog(this);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("تعذر فتح التقرير المالي.\n\n" + ex.Message,
+                        "خطأ في الطباعة", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+            titleBar.Controls.Add(title);
+            titleBar.Controls.Add(btnPrint);
 
+            // ── KPI cards row ──
             var cards = new TableLayoutPanel
             {
                 Dock = DockStyle.Top,
-                Height = 145,
+                Height = 140,
                 ColumnCount = 4,
                 RowCount = 1,
                 Padding = new Padding(3),
                 BackColor = Color.Transparent
             };
-            cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            for (int i = 0; i < 4; i++)
+                cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 
-            cards.Controls.Add(CreateFinancialCard("💵 ربح الاشتراكات", FormatMoney(_monthlySubscriptions), Color.FromArgb(43, 127, 255), s), 3, 0);
-            cards.Controls.Add(CreateFinancialCard("🛒 ربح المتجر", FormatMoney(_monthlyStore), Color.FromArgb(0, 166, 62), s), 2, 0);
-            cards.Controls.Add(CreateFinancialCard("🏋️ رواتب الشهر", "-" + FormatMoney(_monthlySalaries), Color.FromArgb(231, 0, 11), s), 1, 0);
-            cards.Controls.Add(CreateFinancialCard("✅ المتبقي بعد الرواتب", FormatMoney(_monthlyNet), _monthlyNet >= 0 ? Color.FromArgb(0, 166, 62) : Color.FromArgb(231, 0, 11), s), 0, 0);
+            cards.Controls.Add(CreateFinancialCard("💰 إجمالي الإيرادات", FormatMoney(revenue), Green, s), 3, 0);
+            cards.Controls.Add(CreateFinancialCard("🏋️ المصروفات (رواتب/شهر)", "-" + FormatMoney(salaries), Red, s), 2, 0);
+            cards.Controls.Add(CreateFinancialCard("✅ صافي الربح", FormatMoney(net), net >= 0 ? Green : Red, s), 1, 0);
+            cards.Controls.Add(CreateFinancialCard("📈 هامش الربح", margin.ToString("0.#") + "%", net >= 0 ? Blue : Red, s), 0, 0);
 
-            var summary = new Guna2Panel
-            {
-                Dock = DockStyle.Top,
-                Height = 150,
-                FillColor = s.PanelElevated,
-                BorderColor = s.BorderSubtle,
-                BorderRadius = 12,
-                Padding = new Padding(20, 12, 20, 12),
-                Margin = new Padding(0, 12, 0, 12)
-            };
-            summary.ShadowDecoration.Enabled = true;
+            // ── Income statement (قائمة الدخل) ──
+            var statement = BuildIncomeStatement(s, subscriptions, store, revenue, salaries, net, margin);
 
-            var formula = new Label
-            {
-                Dock = DockStyle.Top,
-                Height = 42,
-                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
-                ForeColor = s.TextPrimary,
-                TextAlign = ContentAlignment.MiddleRight,
-                Text = "المعادلة: الاشتراكات + المتجر - الرواتب = المتبقي",
-                BackColor = Color.Transparent
-            };
-
-            var details = new Label
-            {
-                Dock = DockStyle.Fill,
-                Font = new Font("Segoe UI", 12F),
-                ForeColor = s.TextMuted,
-                TextAlign = ContentAlignment.MiddleRight,
-                BackColor = Color.Transparent,
-                Text = string.Join(Environment.NewLine, new[]
-                {
-                    "دخل الشهر قبل الرواتب: " + FormatMoney(_monthlyGross),
-                    "إجمالي رواتب المدربين الشهرية: " + FormatMoney(_monthlySalaries),
-                    "المبلغ الموجود بعد خصم الرواتب: " + FormatMoney(_monthlyNet),
-                    _monthlyNet >= 0
-                        ? "الحالة: يوجد فائض بعد دفع الرواتب."
-                        : "الحالة: يوجد عجز بعد دفع الرواتب."
-                })
-            };
-
-            summary.Controls.Add(details);
-            summary.Controls.Add(formula);
-
+            // ── Monthly cash-flow chart ──
             pnlChart = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -146,9 +135,90 @@ namespace gym_mangment_system
             }
 
             Controls.Add(pnlChart);
-            Controls.Add(summary);
+            Controls.Add(statement);
             Controls.Add(cards);
-            Controls.Add(title);
+            Controls.Add(titleBar);
+        }
+
+        // Builds a finance-style income statement card.
+        private Control BuildIncomeStatement(UiColorScheme s, decimal subscriptions, decimal store,
+                                             decimal revenue, decimal salaries, decimal net, decimal margin)
+        {
+            var card = new Guna2Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 295,
+                FillColor = s.PanelElevated,
+                BorderColor = s.BorderSubtle,
+                BorderRadius = 12,
+                Padding = new Padding(20, 14, 20, 16),
+                Margin = new Padding(0, 12, 0, 12)
+            };
+            card.ShadowDecoration.Enabled = true;
+
+            var grid = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                BackColor = Color.Transparent
+            };
+            grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F)); // amount (left)
+            grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 62F)); // label  (right)
+
+            int row = 0;
+            AddStatementRow(grid, ref row, s, "قائمة الدخل", "", s.TextPrimary, 15F, FontStyle.Bold, false);
+            AddStatementRow(grid, ref row, s, "الإيرادات", "", s.TextMuted, 12F, FontStyle.Bold, false);
+            AddStatementRow(grid, ref row, s, "اشتراكات الأعضاء", FormatMoney(subscriptions), Green, 12F, FontStyle.Regular, false);
+            AddStatementRow(grid, ref row, s, "مبيعات المتجر", FormatMoney(store), Green, 12F, FontStyle.Regular, false);
+            AddStatementRow(grid, ref row, s, "إجمالي الإيرادات", FormatMoney(revenue), Green, 12.5F, FontStyle.Bold, true);
+            AddStatementRow(grid, ref row, s, "المصروفات", "", s.TextMuted, 12F, FontStyle.Bold, false);
+            AddStatementRow(grid, ref row, s, "رواتب المدربين (شهرياً)", "-" + FormatMoney(salaries), Red, 12F, FontStyle.Regular, false);
+            AddStatementRow(grid, ref row, s, "صافي الربح", FormatMoney(net), net >= 0 ? Green : Red, 13.5F, FontStyle.Bold, true);
+
+            card.Controls.Add(grid);
+            return card;
+        }
+
+        private void AddStatementRow(TableLayoutPanel grid, ref int row, UiColorScheme s,
+                                     string label, string amount, Color amountColor,
+                                     float fontSize, FontStyle style, bool divider)
+        {
+            grid.RowCount = row + 1;
+            grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 31F));
+
+            var lblAmount = new Label
+            {
+                Dock = DockStyle.Fill,
+                Text = amount,
+                ForeColor = amountColor,
+                Font = new Font("Segoe UI", fontSize, style),
+                TextAlign = ContentAlignment.MiddleLeft,
+                BackColor = Color.Transparent
+            };
+            var lblTitle = new Label
+            {
+                Dock = DockStyle.Fill,
+                Text = label,
+                ForeColor = s.TextPrimary,
+                Font = new Font("Segoe UI", fontSize, style),
+                TextAlign = ContentAlignment.MiddleRight,
+                BackColor = Color.Transparent
+            };
+
+            if (divider)
+            {
+                PaintEventHandler topLine = (sender, e) =>
+                {
+                    using (var pen = new Pen(s.BorderSubtle))
+                        e.Graphics.DrawLine(pen, 0, 0, ((Control)sender).Width, 0);
+                };
+                lblAmount.Paint += topLine;
+                lblTitle.Paint += topLine;
+            }
+
+            grid.Controls.Add(lblAmount, 0, row);
+            grid.Controls.Add(lblTitle, 1, row);
+            row++;
         }
 
         private Control CreateFinancialCard(string title, string value, Color accent, UiColorScheme s)
