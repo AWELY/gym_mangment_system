@@ -92,6 +92,11 @@
       <DependentUpon>GymMembers.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SalesRevune.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SalesRevune.rpt</DependentUpon>
+    </Compile>
     <Compile Include="SubscriptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -181,6 +186,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SalesRevune.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SalesRevune.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="StoreForm.resx">
       <DependentUpon>StoreForm.cs</DependentUpon>
     </EmbeddedResource>
