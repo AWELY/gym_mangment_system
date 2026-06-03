@@ -221,8 +221,10 @@ namespace gym_mangment_system
                     () =>
                     {
                         byte[] raw = File.ReadAllBytes(pathCopy);
-                        // WASL expects raw base64 with NO data: URI prefix.
-                        string media = Convert.ToBase64String(raw);
+                        // The WASL/WuzApi server requires a data: URI (the public docs
+                        // saying "raw base64, no prefix" are wrong). Prefix with the
+                        // file's MIME type so it arrives as the correct document type.
+                        string media = "data:" + MimeFromFileName(fileName) + ";base64," + Convert.ToBase64String(raw);
                         var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
                         var payload = new Dictionary<string, object>
                         {
@@ -242,6 +244,30 @@ namespace gym_mangment_system
             }
 
             return await PostJsonAsync(apiToken, sendUrl, json).ConfigureAwait(false);
+        }
+
+        /// <summary>Maps a file name extension to a MIME type for the data: URI.</summary>
+        private static string MimeFromFileName(string fileName)
+        {
+            string ext = Path.GetExtension(fileName ?? "").TrimStart('.').ToLowerInvariant();
+            switch (ext)
+            {
+                case "pdf":  return "application/pdf";
+                case "doc":  return "application/msword";
+                case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                case "xls":  return "application/vnd.ms-excel";
+                case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                case "ppt":  return "application/vnd.ms-powerpoint";
+                case "pptx": return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                case "zip":  return "application/zip";
+                case "rar":  return "application/vnd.rar";
+                case "txt":  return "text/plain";
+                case "csv":  return "text/csv";
+                case "png":  return "image/png";
+                case "jpg":
+                case "jpeg": return "image/jpeg";
+                default:     return "application/octet-stream";
+            }
         }
 
         /// <summary>Per-instance dispose is a no-op; <see cref="HttpClient"/> is shared for connection reuse.</summary>
