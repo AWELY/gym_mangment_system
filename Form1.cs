@@ -125,7 +125,11 @@ namespace gym_mangment_system
                 this.Show();
                 return;
             }
-            this.Close();
+
+            // Real exit (not a sign-out): terminate the whole application. Closing the
+            // hidden login form alone can leave the process running, so force a full
+            // shutdown of every window and message loop.
+            Application.Exit();
         }
 
         // ── drag the borderless window ──────────────────────
